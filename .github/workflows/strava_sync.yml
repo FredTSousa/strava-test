@@ -32,4 +32,4 @@ jobs:
           STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
           STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
           STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
-        run: python backfill_history.py
+        run: python cron_sync.py

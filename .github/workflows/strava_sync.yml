@@ -4,7 +4,9 @@ on:
   schedule:
     - cron: '0 */2 * * *' # Executes exactly at minute 0 of every 2nd hour
   workflow_dispatch: # Allows you to press a button in GitHub to test run it anytime
-
+  push:
+    branches:
+      - master      # <-- CHANGED FROM 'main' TO 'master'
 jobs:
   sync:
     runs-on: ubuntu-latest

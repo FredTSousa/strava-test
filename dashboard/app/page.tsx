@@ -34,6 +34,20 @@ type ParsedActivity = {
   fetchedAt: string;
 };
 
+const RUN_TITLE_KEYWORDS = ["cresce", "comeca", "supera"] as const;
+
+function normalizeForMatch(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+}
+
+function matchesRunsFilter(title: string): boolean {
+  const normalized = normalizeForMatch(title);
+  return RUN_TITLE_KEYWORDS.some((keyword) => normalized.includes(keyword));
+}
+
 function parseRow(row: StravaRawFeedRow): ParsedActivity {
   const raw = row.raw_json ?? {};
   const athlete = raw.athlete ?? {};
@@ -64,6 +78,7 @@ export default function DashboardPage() {
   const [memberFilter, setMemberFilter] = useState("");
   const [titleFilter, setTitleFilter] = useState("");
   const [minDistanceKm, setMinDistanceKm] = useState("");
+  const [runsFilter, setRunsFilter] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,9 +136,12 @@ export default function DashboardPage() {
       if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) {
         return false;
       }
+      if (runsFilter && !matchesRunsFilter(row.title)) {
+        return false;
+      }
       return true;
     });
-  }, [rows, memberFilter, titleFilter, minDistanceKm]);
+  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
 
   return (
     <div className="min-h-screen">
@@ -149,7 +167,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <FilterField
               id="member"
               label="Member Name"
@@ -174,6 +192,23 @@ export default function DashboardPage() {
               value={minDistanceKm}
               onChange={setMinDistanceKm}
             />
+            <div className="flex flex-col justify-end">
+              <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                Runs
+              </span>
+              <button
+                type="button"
+                onClick={() => setRunsFilter((on) => !on)}
+                aria-pressed={runsFilter}
+                className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#fc4c02]/30 ${
+                  runsFilter
+                    ? "border-[#fc4c02] bg-[#fc4c02]/20 text-[#fc4c02]"
+                    : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"
+                }`}
+              >
+                Cresce / Começa / Supera
+              </button>
+            </div>
           </div>
         </div>
       </header>

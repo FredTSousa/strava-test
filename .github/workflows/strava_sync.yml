@@ -1,0 +1,32 @@
+name: 2-Hour Strava Sync
+
+on:
+  schedule:
+    - cron: '0 */2 * * *' # Executes exactly at minute 0 of every 2nd hour
+  workflow_dispatch: # Allows you to press a button in GitHub to test run it anytime
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-node-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests python-dotenv supabase
+
+      - name: Run Sync Script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+          STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
+        run: python cron_sync.py

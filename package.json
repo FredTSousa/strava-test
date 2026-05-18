@@ -1,0 +1,26 @@
+﻿{
+  "name": "strava-test",
+  "version": "1.0.0",
+  "description": "Strava Test — API integration and smoke tests for GitLab",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "auth:url": "tsx src/auth-url.ts",
+    "test:api": "tsx src/index.ts"
+  },
+  "keywords": ["strava", "api", "gitlab"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

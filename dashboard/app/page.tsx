@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { assertSupabaseConfig, supabase } from "./utils/supabase";
+import { getSupabase } from "./utils/supabase";
 
 type StravaAthlete = {
   firstname?: string;
@@ -72,8 +72,9 @@ export default function DashboardPage() {
       setLoading(true);
       setError(null);
 
+      let db;
       try {
-        assertSupabaseConfig();
+        db = getSupabase();
       } catch (e) {
         if (!cancelled) {
           setError(e instanceof Error ? e.message : String(e));
@@ -82,7 +83,7 @@ export default function DashboardPage() {
         return;
       }
 
-      const { data, error: queryError } = await supabase
+      const { data, error: queryError } = await db
         .from("strava_raw_feed")
         .select("id_virtual, raw_json, fetched_at")
         .order("fetched_at", { ascending: false });

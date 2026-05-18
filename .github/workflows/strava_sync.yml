@@ -2,7 +2,8 @@ name: 2-Hour Strava Sync
 
 on:
   schedule:
-    - cron: '0 */2 * * *' # Executes exactly at minute 0 of every 2nd hour
+    # This expression tells GitHub to fire exactly at minutes 0, 15, 30, and 45 of every hour
+    - cron: '*/15 * * * *'
   workflow_dispatch: # Allows you to press a button in GitHub to test run it anytime
   push:
     branches:

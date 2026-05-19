@@ -95,28 +95,30 @@ export default function DashboardPage() {
   async function loadFeed() {
     setLoading(true);
     setError(null);
-
+  
     try {
       const db = getSupabase();
-
-      // 1. Puxa os utilizadores do Firestore espelhados
-     const { data, error: queryError } = await db
-      .from("view_strava_activities") // <--- LÊ A VISTA AQUI
-      .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id")
-      .order("fetched_at", { ascending: false });
-
+  
+      // 1. Carrega os utilizadores para as dropdowns
+      const { data: userData, error: userError } = await db
+        .from("users_firestore")
+        .select("id, display_name, email")
+        .order("display_name", { ascending: true });
+  
       if (userError) throw new Error(userError.message);
       setUsers(userData as FirestoreUser[]);
-
-      // 2. Puxa o Feed adicionando o novo ID de relacionamento
+  
+      // 2. Carrega as atividades a partir da VIEW (trazendo o id do user)
       const { data: feedData, error: queryError } = await db
-        .from("strava_raw_feed")
-        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id")
+        .from("view_strava_activities") // <--- Lendo da View
+        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id") // <--- Pedindo o ID explicitamente
         .order("fetched_at", { ascending: false });
-
+  
       if (queryError) throw new Error(queryError.message);
+      
+      // O .map(parseRow) vai converter o 'assigned_firestore_user_id' da DB para 'assignedFirestoreUserId' do React
       setRows((feedData as StravaRawFeedRow[]).map(parseRow));
-
+  
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setRows([]);
@@ -376,22 +378,20 @@ export default function DashboardPage() {
                           ) : (
                             /* CENÁRIO 2: Já está atribuído OU existem utilizadores sugeridos na lista */
                             <div className="flex items-center gap-2">
-                              <select
-                                value={row.assignedFirestoreUserId || ""}
+                             <select
+                                value={row.assignedFirestoreUserId || ""} // <--- Tem de ser a propriedade em CamelCase do estado do React
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
                                 className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-52 truncate ${
-                                  row.assignedFirestoreUserId 
-                                    ? "border-green-800 text-green-200" 
-                                    : "border-slate-700 text-slate-300"
+                                  row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
                                 }`}
                               >
                                 <option value="">-- Não Atribuído --</option>
                                 {suggestedUsers.map((user) => (
-                                  <option key={user.id} value={user.id} className="bg-slate-950 text-white">
+                                  <option key={user.id} value={user.id}>
                                     {user.display_name}
                                   </option>
                                 ))}
-                              </select>
+                            </select>
                               
                               <button
                                 type="button"

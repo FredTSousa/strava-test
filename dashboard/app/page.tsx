@@ -1,5 +1,5 @@
 "use client";
-
+export const revalidate = 0;
 import { useEffect, useMemo, useState } from "react";
 import { getSupabase } from "./utils/supabase";
 

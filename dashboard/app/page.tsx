@@ -36,6 +36,9 @@ type ParsedActivity = {
   fetchedAt: string;
   assignedFirestoreUserId: string | null; 
   originalFirestoreUserId: string | null; 
+  fetchedAt: string; // Vai guardar a data já bonita
+  assignedFirestoreUserId: string | null; 
+  originalFirestoreUserId: string | null;
 };
 
 type FirestoreUser = {
@@ -52,7 +55,20 @@ function normalizeForMatch(text: string): string {
     .replace(/\p{M}/gu, "")
     .toLowerCase();
 }
-
+function formatImportDate(isoString: string): string {
+  try {
+    const date = new Date(isoString);
+    // Formata para "DD/MM às HH:MM"
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    
+    return `${day}/${month} às ${hours}:${minutes}`;
+  } catch (e) {
+    return "—";
+  }
+}
 function matchesRunsFilter(title: string): boolean {
   const normalized = normalizeForMatch(title);
   return RUN_TITLE_KEYWORDS.some((keyword) => normalized.includes(keyword));
@@ -76,7 +92,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     distanceKm: Math.round((distanceM / 1000) * 100) / 100,
     movingTimeMin: Math.round(movingSec / 60),
     elevationGain: Math.round(raw.total_elevation_gain ?? 0),
-    fetchedAt: row.fetched_at,
+    fetchedAt: formatImportDate(row.fetched_at),,
     assignedFirestoreUserId: row.assigned_firestore_user_id,
     originalFirestoreUserId: row.assigned_firestore_user_id,
   };
@@ -299,6 +315,7 @@ export default function DashboardPage() {
                     <Th className="text-right">Distance</Th>
                     <Th className="text-right">Moving Time</Th>
                     <Th className="text-right">Elevation</Th>
+                    <Th>Importada em</Th>
                     <Th className="pl-6">Assign App User</Th> 
                   </tr>
                 </thead>
@@ -323,7 +340,7 @@ export default function DashboardPage() {
                                 </span>
                               )}
                             </div>
-                            {/* 🔍 A LINHA DO SPAN DO ID FOI REMOVIDA DAQUI */}
+                            
                           </div>
                         </td>
                         <Td className="max-w-xs truncate text-slate-200" title={row.title}>
@@ -343,7 +360,9 @@ export default function DashboardPage() {
                         <Td className="text-right tabular-nums text-slate-300">
                           {row.elevationGain} m
                         </Td>
-                        
+                        <Td className="text-slate-400 text-xs tabular-nums whitespace-nowrap">
+                          {row.fetchedAt}
+                        </Td>
                         <td className="px-4 py-3 pl-6">
                           {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
                             <div className="w-72 flex items-center">

@@ -361,7 +361,17 @@ export default function DashboardPage() {
                         </Td>
                         
                         {/* ELEMENTO TD ATUALIZADO COM TAMANHOS PADRONIZADOS */}
-                          <td className="px-4 py-3 pl-6">
+                          {/* COLUNA DE ATRIBUIÇÃO ADAPTATIVA */}
+                        <td className="px-4 py-3 pl-6">
+                          {/* CENÁRIO 1: O registo não está atribuído E não há nenhuma sugestão encontrada no Firestore */}
+                          {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
+                            <div className="w-72 flex items-center">
+                              <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
+                                ❌ Sem user no Movera
+                              </span>
+                            </div>
+                          ) : (
+                            /* CENÁRIO 2: Já está atribuído OU existem utilizadores sugeridos na lista */
                             <div className="flex items-center gap-2">
                               <select
                                 value={row.assignedFirestoreUserId || ""}
@@ -392,7 +402,8 @@ export default function DashboardPage() {
                                 {row.assignedFirestoreUserId ? "Mudar" : "Gravar"}
                               </button>
                             </div>
-                          </td>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}

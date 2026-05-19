@@ -39,16 +39,28 @@ def sync_users():
         # Mapeia os campos do teu Firestore para as colunas do Supabase
         email = user_data.get("email", "")
         # Tenta obter display_name ou name, dependendo de como guardas no Firebase
-        creation_date = user_data.get("criadoEm")
         display_name = user_data.get("display_name") or user_data.get("nome") or "Unknown User"
+        # TRATAMENTO DA DATA DO FIRESTORE:
+        creation_date_raw = user_data.get("criadoEm")
+        creation_date_iso = None
         
+        if creation_date_raw:
+            try:
+                # Se for um objeto datetime do Firebase/Python, converte para String ISO
+                if hasattr(creation_date_raw, "isoformat"):
+                    creation_date_iso = creation_date_raw.isoformat()
+                else:
+                    # Caso já venha como string por algum motivo
+                    creation_date_iso = str(creation_date_raw)
+            except Exception as dt_err:
+                print(f"⚠️ Warning: Could not parse date for user {user_id}: {dt_err}")
         # 2. Faz Upsert no Supabase
         try:
             supabase.table("users_firestore").upsert({
                 "id": user_id,
                 "email": email,
                 "display_name": display_name,
-                "created_at_firestore": creation_date
+                "created_at_firestore": creation_date_iso
             }).execute()
             count += 1
         except Exception as e:

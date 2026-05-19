@@ -240,7 +240,9 @@ export default function DashboardPage() {
       const normalizedTitle = normalizeForMatch(row.title);
       const hasChallengeInName = normalizedTitle.includes("comeca") || 
                                  normalizedTitle.includes("cresce") || 
-                                 normalizedTitle.includes("supera"); // Tem o termo no nome
+                                 normalizedTitle.includes("supera") ||
+                                 normalizedTitle.includes("desafio") || // 👈 Nova palavra-chave
+                                 normalizedTitle.includes("movera");; // Tem o termo no nome
 
       // Se o botão estiver ativo e a linha NÃO tiver ID e NÃO tiver o termo no nome, é descartada
       if (!hasChallengeId && !hasChallengeInName) return false;

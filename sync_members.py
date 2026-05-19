@@ -62,7 +62,7 @@ def sync_club_members():
             
             for _ in range(clones_a_criar):
                 # CONDICIONAL: Se não existia nenhum na BD, o primeiro entra VALIDADO
-                if qte_no_db == 0:
+                if qte_no_db == 0 and qte_no_strava==1:
                     status_validacao = True
                     print(f"  ✅ {nome_completo} é o primeiro com este nome. Entra como Validado.")
                     # Incrementamos virtualmente para que, se houver um 2º no mesmo loop, ele caia no else
@@ -70,7 +70,7 @@ def sync_club_members():
                 else:
                     # Se já existia um na BD, este é um clone. Entra como Falso (Pendente)
                     status_validacao = False
-                    print(f"  🚨 {nome_completo} já existe na BD (Clone detetado). Entra como Pendente.")
+                    print(f"  🚨 {nome_completo} já existe na BD ou ha 2 no strava (Clone detetado). Entra como Pendente.")
                 supabase.table("club_members").insert({
                     "firstname": firstname,
                     "lastname": lastname,

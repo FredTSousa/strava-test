@@ -146,7 +146,10 @@ export default function DashboardPage() {
       const db = getSupabase();
       const { error: updateError } = await db
         .from("strava_raw_feed")
-        .update({ assigned_firestore_user_id: userId })
+        .update({ 
+          assigned_firestore_user_id: userId,
+          last_assign_timestamp: new Date().toISOString() // Atualiza também na gravação manual!
+        })
         .eq("id_virtual", idVirtual);
 
       if (updateError) {

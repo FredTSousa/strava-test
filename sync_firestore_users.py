@@ -39,14 +39,16 @@ def sync_users():
         # Mapeia os campos do teu Firestore para as colunas do Supabase
         email = user_data.get("email", "")
         # Tenta obter display_name ou name, dependendo de como guardas no Firebase
-        display_name = user_data.get("display_name") or user_data.get("name") or "Unknown User"
+        creation_date = user_data.get("criadoEm")
+        display_name = user_data.get("display_name") or user_data.get("nome") or "Unknown User"
         
         # 2. Faz Upsert no Supabase
         try:
             supabase.table("users_firestore").upsert({
                 "id": user_id,
                 "email": email,
-                "display_name": display_name
+                "display_name": display_name,
+                "created_at_firestore": creation_date
             }).execute()
             count += 1
         except Exception as e:

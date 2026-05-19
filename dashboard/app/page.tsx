@@ -34,7 +34,7 @@ type ParsedActivity = {
   elevationGain: number;
   fetchedAt: string;
   assignedFirestoreUserId: string | null; 
-  originalFirestoreUserId: string | null; // 🔍 ADICIONAR ESTA LINHA
+  originalFirestoreUserId: string | null; 
 };
 
 type FirestoreUser = {
@@ -98,8 +98,6 @@ export default function DashboardPage() {
   
     try {
       const db = getSupabase();
-      setLoading(true);
-      setError(null);
       const { data: userData, error: userError } = await db
         .from("users_firestore")
         .select("id, display_name, email")
@@ -156,8 +154,6 @@ export default function DashboardPage() {
       } else {
         alert("Ligação gravada com sucesso!");
         
-        // 🔍 ATUALIZA O VALOR ORIGINAL NO ESTADO LOCAL:
-        // Isto faz o botão voltar a ficar disabled imediatamente após o sucesso
         setRows((prev) =>
           prev.map((row) =>
             row.idVirtual === idVirtual
@@ -170,6 +166,7 @@ export default function DashboardPage() {
       alert("Erro na ligação à base de dados.");
     }
   };
+
   const getSuggestedUsers = (athleteName: string) => {
     const normalizedAthlete = normalizeForMatch(athleteName).trim();
     const parts = normalizedAthlete.split(" ").filter(Boolean);
@@ -325,7 +322,6 @@ export default function DashboardPage() {
                                 </span>
                               )}
                             </div>
-                            {/* Linha de debug segura em ambiente JSX */}
                             <span className="text-[10px] font-mono text-slate-500">
                               ID: {row.assignedFirestoreUserId || "Unassigned"}
                             </span>
@@ -350,66 +346,61 @@ export default function DashboardPage() {
                         </Td>
                         
                         <td className="px-4 py-3 pl-6">
-                            {/* CENÁRIO 1: O registo não está atribuído E não há nenhuma sugestão encontrada no Firestore */}
-                            {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
-                              <div className="w-72 flex items-center">
-                                <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
-                                  ❌ Sem user no Movera
-                                </span>
-                              </div>
-                            ) : (
-                              /* CENÁRIO 2: Já está atribuído OU existem utilizadores sugeridos na lista */
-                              <div className="flex items-center gap-2">
-                                <select
-                                  value={row.assignedFirestoreUserId || ""}
-                                  onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                                  className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-52 truncate ${
-                                    row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
-                                  }`}
-                                >
-                                  <option value="">-- Não Atribuído --</option>
-                                  {(() => {
-                                    const finalOptions = [...suggestedUsers];
-                                    
-                                    if (row.assignedFirestoreUserId) {
-                                      const isAlreadyInOptions = finalOptions.some(u => u.id === row.assignedFirestoreUserId);
-                                      if (!isAlreadyInOptions) {
-                                        const currentUserObj = users.find(u => u.id === row.assignedFirestoreUserId);
-                                        if (currentUserObj) finalOptions.push(currentUserObj);
-                                      }
-                                    }
-                                    
-                                    return finalOptions.map((user) => (
-                                      <option key={user.id} value={user.id} className="bg-slate-950 text-white">
-                                        {user.display_name}
-                                      </option>
-                                    ));
-                                  })()}
-                                </select>
-                                
-                                {/* 🔍 AQUI ESTÁ A GRANDE ALTERAÇÃO DO BOTÃO: */}
+                          {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
+                            <div className="w-72 flex items-center">
+                              <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
+                                ❌ Sem user no Movera
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <select
+                                value={row.assignedFirestoreUserId || ""}
+                                onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
+                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-52 truncate ${
+                                  row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
+                                }`}
+                              >
+                                <option value="">-- Não Atribuído --</option>
                                 {(() => {
-                                  // Compara o valor atual selecionado com o valor original vindo da DB
-                                  const hasChanges = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
-                          
-                                  return (
-                                    <button
-                                      type="button"
-                                      disabled={!hasChanges} // Tranca o botão se NÃO houver mudanças
-                                      onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId)}
-                                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition w-16 text-center ${
-                                        hasChanges
-                                          ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
-                                          : "bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-50"
-                                      }`}
-                                    >
-                                      Gravar
-                                    </button>
-                                  );
+                                  const finalOptions = [...suggestedUsers];
+                                  
+                                  if (row.assignedFirestoreUserId) {
+                                    const isAlreadyInOptions = finalOptions.some(u => u.id === row.assignedFirestoreUserId);
+                                    if (!isAlreadyInOptions) {
+                                      const currentUserObj = users.find(u => u.id === row.assignedFirestoreUserId);
+                                      if (currentUserObj) finalOptions.push(currentUserObj);
+                                    }
+                                  }
+                                  
+                                  return finalOptions.map((user) => (
+                                    <option key={user.id} value={user.id} className="bg-slate-950 text-white">
+                                      {user.display_name}
+                                    </option>
+                                  ));
                                 })()}
-                              </div>
-                            )}
-                          </td>
+                              </select>
+                              
+                              {(() => {
+                                const hasChanges = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
+                                return (
+                                  <button
+                                    type="button"
+                                    disabled={!hasChanges}
+                                    onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId)}
+                                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition w-16 text-center ${
+                                      hasChanges
+                                        ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
+                                        : "bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-50"
+                                    }`}
+                                  >
+                                    Gravar
+                                  </button>
+                                );
+                              })()}
+                            </div>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}
@@ -423,6 +414,7 @@ export default function DashboardPage() {
   );
 }
 
+// Componentes Auxiliares Mantidos Iguais
 function FilterField({
   id,
   label,
@@ -469,7 +461,7 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
   );
 }
 
-function Td({ children, className = "" , title }: { children: React.ReactNode; className?: string; title?: string }) {
+function Td({ children, className = "", title }: { children: React.ReactNode; className?: string; title?: string }) {
   return (
     <td className={`px-4 py-3 ${className}`} title={title}>
       {children}

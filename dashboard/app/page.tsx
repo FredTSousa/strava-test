@@ -238,22 +238,25 @@ export default function DashboardPage() {
   }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 sm:px-6 lg:px-8">
+    /* 🔍 MUDANÇA ESTRUTURAL 1: Força o container a ocupar a altura exata do ecrã sem fazer scroll na página global */
+    <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
+      
+      {/* HEADER E FILTROS: Sempre visíveis e trancados no topo */}
+      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur shrink-0">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-sm font-medium uppercase tracking-wider text-[#fc4c02]">
                 Strava Club
               </p>
-              <h1 className="mt-1 text-3xl font-bold tracking-tight text-white">
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-white">
                 Activity Feed
               </h1>
-              <p className="mt-2 text-slate-400">
+              <p className="mt-1 text-xs text-slate-400">
                 Live view of synced club activities from Supabase
               </p>
             </div>
-            <div className="rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2 text-sm text-slate-300">
+            <div className="rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-1.5 text-xs text-slate-300">
               <span className="font-semibold text-[#fc4c02]">{filteredRows.length}</span>
               <span className="text-slate-500"> / </span>
               <span>{rows.length}</span>
@@ -294,7 +297,7 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setRunsFilter((on) => !on)}
                 aria-pressed={runsFilter}
-                className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#fc4c02]/30 ${
+                className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#fc4c02]/30 ${
                   runsFilter
                     ? "border-[#fc4c02] bg-[#fc4c02]/20 text-[#fc4c02]"
                     : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"
@@ -307,7 +310,8 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* 🔍 MUDANÇA ESTRUTURAL 2: O main agora adapta-se dinamicamente ao espaço que sobra do ecrã (`flex-1`) */}
+      <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 min-h-0 flex flex-col">
         {loading && <p className="py-16 text-center text-slate-400">Loading activities…</p>}
         {error && <div className="rounded-lg border border-red-900/50 bg-red-950/40 px-4 py-3 text-red-300">{error}</div>}
 
@@ -315,23 +319,26 @@ export default function DashboardPage() {
           <p className="py-16 text-center text-slate-500">No activities match your filters.</p>
         )}
 
+        {/* 🔍 MUDANÇA ESTRUTURAL 3: Ativação dos scrolls independentes na tabela */}
         {!loading && !error && filteredRows.length > 0 && (
-          <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 shadow-xl shadow-black/20">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-800 text-left text-sm">
-                <thead>
-                  <tr className="bg-slate-800/80">
+          <div className="flex-1 flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 shadow-xl shadow-black/20 min-h-0">
+            {/* O container ganha `overflow-auto` para o scroll horizontal e vertical ficarem sempre colados à tabela */}
+            <div className="flex-1 overflow-auto min-h-0">
+              <table className="min-w-full divide-y divide-slate-800 text-left text-sm table-auto">
+                {/* O thead agora fica trancado (Sticky) no topo do scroll da tabela */}
+                <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
+                  <tr className="border-b border-slate-800">
                     <Th>Athlete</Th>
                     <Th>Activity</Th>
                     <Th>Sport</Th>
                     <Th className="text-right">Distance</Th>
                     <Th className="text-right">Moving Time</Th>
-                    <Th className="text-right">Elevation</Th>
+                    <Th className="text-right">Eleva.</Th>
                     <Th>Importada em</Th>
                     <Th className="pl-6 min-w-[450px]">Assign App User & Challenge</Th> 
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/80">
+                <tbody className="divide-y divide-slate-800/80 bg-slate-900/20">
                   {filteredRows.map((row) => {
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
 
@@ -344,20 +351,18 @@ export default function DashboardPage() {
                       >
                         <td className="px-4 py-3 font-medium text-white">
                           <div className="flex flex-col gap-1">
-                            {/* 🔍 Configurado para quebrar em até 2 linhas e agrupar o badge */}
                             <div className="flex flex-wrap items-center gap-2 max-w-[160px]">
                               <span className="line-clamp-2 whitespace-normal break-words" title={row.athleteName}>
                                 {row.athleteName}
                               </span>
                               {row.assignedFirestoreUserId && row.challengeId && (
-                                <span className="inline-flex items-center text-[10px] text-green-400 bg-green-950 px-1.5 py-0.5 rounded border border-green-900/40 shrink-0">
+                                <span className="ml-2 inline-flex items-center text-[10px] text-green-400 bg-green-950 px-1.5 py-0.5 rounded border border-green-900/40 shrink-0">
                                   Linked
                                 </span>
                               )}
                             </div>
                           </div>
                         </td>
-                        {/* 🔍 Configurado para permitir quebra de texto na atividade (Até 2 linhas) */}
                         <Td className="max-w-[180px] line-clamp-2 whitespace-normal break-words text-slate-200" title={row.title}>
                           {row.title}
                         </Td>
@@ -388,7 +393,6 @@ export default function DashboardPage() {
                           ) : (
                             <div className="flex items-center gap-2 w-full max-w-[420px]">
                               
-                              {/* DROPDOWN 1: Membros Movera */}
                               <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
@@ -416,7 +420,6 @@ export default function DashboardPage() {
                                 })()}
                               </select>
 
-                              {/* DROPDOWN 2: Desafios (Challenges) */}
                               <select
                                 value={row.challengeId || ""}
                                 onChange={(e) => handleDropdownChallengeChange(row.idVirtual, e.target.value)}
@@ -432,7 +435,6 @@ export default function DashboardPage() {
                                 ))}
                               </select>
                               
-                              {/* BOTÃO GRAVAR */}
                               {(() => {
                                 const hasUserChanged = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
                                 const hasChallengeChanged = (row.challengeId || 0) !== (row.originalChallengeId || 0);
@@ -490,7 +492,7 @@ function FilterField({
 }) {
   return (
     <label htmlFor={id} className="block">
-      <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
+      <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
         {label}
       </span>
       <input
@@ -501,7 +503,7 @@ function FilterField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white placeholder:text-slate-600 outline-none transition focus:border-[#fc4c02]/50 focus:ring-2 focus:ring-[#fc4c02]/30"
+        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-600 outline-none transition focus:border-[#fc4c02]/50 focus:ring-2 focus:ring-[#fc4c02]/30"
       />
     </label>
   );
@@ -509,7 +511,7 @@ function FilterField({
 
 function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <th scope="col" className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400 ${className}`}>
+    <th scope="col" className={`px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400 ${className}`}>
       {children}
     </th>
   );
@@ -517,7 +519,7 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
 
 function Td({ children, className = "", title }: { children: React.ReactNode; className?: string; title?: string }) {
   return (
-    <td className={`px-4 py-3 ${className}`} title={title}>
+    <td className={`px-4 py-2.5 ${className}`} title={title}>
       {children}
     </td>
   );

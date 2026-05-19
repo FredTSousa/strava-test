@@ -100,10 +100,10 @@ export default function DashboardPage() {
       const db = getSupabase();
 
       // 1. Puxa os utilizadores do Firestore espelhados
-      const { data: userData, error: userError } = await db
-        .from("users_firestore")
-        .select("id, display_name, email")
-        .order("display_name", { ascending: true });
+     const { data, error: queryError } = await db
+      .from("view_strava_activities") // <--- LÊ A VISTA AQUI
+      .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id")
+      .order("fetched_at", { ascending: false });
 
       if (userError) throw new Error(userError.message);
       setUsers(userData as FirestoreUser[]);
@@ -144,20 +144,20 @@ export default function DashboardPage() {
   const handleSaveAssignment = async (idVirtual: string, userId: string | null) => {
     try {
       const db = getSupabase();
+  
+      // Faz UPSERT na tabela de metadados satélite (Grava ou atualiza a linha 1:1)
       const { error: updateError } = await db
-        .from("strava_raw_feed")
-        .update({ 
-          assigned_firestore_user_id: userId,
-          last_assign_timestamp: new Date().toISOString() // Atualiza também na gravação manual!
-        })
-        .eq("id_virtual", idVirtual);
-
+        .from("strava_activities_metadata")
+        .upsert({ 
+          id_virtual: idVirtual, 
+          assigned_firestore_user_id: userId || null,
+          last_assign_timestamp: new Date().toISOString()
+        });
+  
       if (updateError) {
         alert("Erro ao gravar: " + updateError.message);
       } else {
         alert("Ligação gravada com sucesso!");
-        // Opcional: podes recarregar com o loadFeed() se quiseres forçar refresco total,
-        // mas o estado reativo local já reflete a mudança visualmente.
       }
     } catch (e) {
       alert("Erro na ligação à base de dados.");

@@ -325,6 +325,8 @@ export default function DashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-800/80">
                   {filteredRows.map((row) => {
+            {/* COLA ESTA LINHA TEMPORÁRIA NO TEU HTML PARA VER NO ECRÃ */}
+<span className="text-xs text-red-500">ID na Row: {String(row.assignedFirestoreUserId)}</span>
             console.log("Atividade:", row.title, "User Atribuído:", row.assignedFirestoreUserId);
                     // Calcula dinamicamente as sugestões focadas para este atleta específico
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
@@ -380,19 +382,35 @@ export default function DashboardPage() {
                             /* CENÁRIO 2: Já está atribuído OU existem utilizadores sugeridos na lista */
                             <div className="flex items-center gap-2">
                              <select
-                                value={row.assignedFirestoreUserId || ""} // <--- Tem de ser a propriedade em CamelCase do estado do React
+                                value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-52 truncate ${
-                                  row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
-                                }`}
+                                className="w-52 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-white"
                               >
                                 <option value="">-- Não Atribuído --</option>
-                                {suggestedUsers.map((user) => (
-                                  <option key={user.id} value={user.id}>
-                                    {user.display_name}
-                                  </option>
-                                ))}
-                            </select>
+                                {(() => {
+                                  // 1. Começamos com as sugestões inteligentes
+                                  const finalOptions = [...suggestedUsers];
+                                  
+                                  // 2. Se esta row já tem um user associado na DB...
+                                  if (row.assignedFirestoreUserId) {
+                                    // ...verificamos se ele já está incluído nas sugestões
+                                    const isAlreadyInOptions = finalOptions.some(u => u.id === row.assignedFirestoreUserId);
+                                    
+                                    // Se NÃO estiver, vamos buscá-lo à lista global de users e injetamo-lo à força no dropdown
+                                    if (!isAlreadyInOptions) {
+                                      const currentUserObj = users.find(u => u.id === row.assignedFirestoreUserId);
+                                      if (currentUserObj) finalOptions.push(currentUserObj);
+                                    }
+                                  }
+                                  
+                                  // 3. Renderiza a lista combinada e segura
+                                  return finalOptions.map((user) => (
+                                    <option key={user.id} value={user.id}>
+                                      {user.display_name}
+                                    </option>
+                                  ));
+                                })()}
+                              </select>
                               
                               <button
                                 type="button"

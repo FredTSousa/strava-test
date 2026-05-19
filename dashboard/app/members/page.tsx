@@ -16,6 +16,9 @@ export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // O novo estado para controlar o filtro visual
+  const [onlyPending, setOnlyPending] = useState(false);
 
   async function loadMembers() {
     setLoading(true);
@@ -60,26 +63,54 @@ export default function MembersPage() {
       if (updateError) {
         alert("Error saving: " + updateError.message);
       } else {
-        loadMembers(); // Refresh implícito
+        loadMembers(); 
       }
     } catch (e) {
       alert("Database connection error");
     }
   };
 
+  // Lógica reativa: Filtra os membros em memória antes de renderizar no ecrã
+  const filteredMembers = onlyPending
+    ? members.filter((m) => !m.is_validated)
+    : members;
+
   return (
     <div className="min-h-screen text-slate-100">
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-          <p className="text-sm font-medium uppercase tracking-wider text-[#fc4c02]">
-            Management
-          </p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-white">
-            Club Members
-          </h1>
-          <p className="mt-2 text-slate-400">
-            Verify duplicate profile identities and assign administrative keywords
-          </p>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium uppercase tracking-wider text-[#fc4c02]">
+                Management
+              </p>
+              <h1 className="mt-1 text-3xl font-bold tracking-tight text-white">
+                Club Members
+              </h1>
+              <p className="mt-2 text-slate-400">
+                Verify duplicate profile identities and assign administrative keywords
+              </p>
+            </div>
+            
+            {/* O NOVO CONTROLO DE FILTRO VISUAL */}
+            <div className="flex flex-col justify-end">
+              <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                Filter Status
+              </span>
+              <button
+                type="button"
+                onClick={() => setOnlyPending((prev) => !prev)}
+                aria-pressed={onlyPending}
+                className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#fc4c02]/30 ${
+                  onlyPending
+                    ? "border-amber-500 bg-amber-500/10 text-amber-500"
+                    : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"
+                }`}
+              >
+                {onlyPending ? "⚠️ Showing Pending Only" : "Showing All Members"}
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -87,9 +118,17 @@ export default function MembersPage() {
         {loading && <p className="text-center text-slate-400 py-12">Loading members…</p>}
         {error && <div className="rounded-lg border border-red-900/50 bg-red-950/40 px-4 py-3 text-red-300 mb-6">{error}</div>}
 
-        {!loading && !error && (
+        {!loading && !error && filteredMembers.length === 0 && (
+          <p className="py-16 text-center text-slate-500">
+            {onlyPending 
+              ? "✓ No members pending validation. Great job!" 
+              : "No members found in the database."}
+          </p>
+        )}
+
+        {!loading && !error && filteredMembers.length > 0 && (
           <div className="flex flex-col gap-4">
-            {members.map((member) => (
+            {filteredMembers.map((member) => (
               <div
                 key={member.id}
                 className={`flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border transition-colors ${

@@ -161,20 +161,41 @@ export default function DashboardPage() {
     }
   };
 
-  // Algoritmo de Sugestão de Nomes Inteligente (Match Difuso)
-  const getSuggestedUsers = (athleteName: string) => {
-    const searchTerms = normalizeForMatch(athleteName)
-      .split(" ")
-      .filter((term) => term.length > 1); // Ignora letras soltas como "S." se necessário
+ // Algoritmo de Sugestão de Nomes Corrigido (Match por Primeiro Nome + Inicial do Apelido)
+const getSuggestedUsers = (athleteName: string) => {
+  const normalizedAthlete = normalizeForMatch(athleteName).trim();
+  
+  // Divide o nome do Strava por espaços (ex: ["antonio", "b"])
+  const parts = normalizedAthlete.split(" ").filter(Boolean);
+  
+  if (parts.length === 0) return users;
 
-    if (searchTerms.length === 0) return users;
+  const firstNameTarget = parts[0]; // ex: "antonio"
+  // Pega na inicial da segunda parte, limpando eventuais pontos (ex: "b." vira "b")
+  const lastNameInitialTarget = parts[1] ? parts[1].replace(".", "")[0] : null; 
 
-    return users.filter((user) => {
-      const normalizedUser = normalizeForMatch(user.display_name);
-      // Se o nome do utilizador contiver QUALQUER uma das frações do nome do atleta do Strava, sugere-o
-      return searchTerms.some((term) => normalizedUser.includes(term));
-    });
-  };
+  return users.filter((user) => {
+    const normalizedUser = normalizeForMatch(user.display_name).trim();
+    const userParts = normalizedUser.split(" ").filter(Boolean);
+    
+    if (userParts.length === 0) return false;
+
+    // Rule 1: O primeiro nome do Firestore TEM de ser igual ou conter o primeiro nome do Strava
+    const matchesFirstName = userParts[0].includes(firstNameTarget) || firstNameTarget.includes(userParts[0]);
+    if (!matchesFirstName) return false;
+
+    // Rule 2: Se o Strava enviou uma inicial (ex: "B"), valida se ALGUM dos apelidos do utilizador começa por "b"
+    if (lastNameInitialTarget) {
+      // Ignora o primeiro nome e vê se algum dos nomes seguintes começa com a letra alvo
+      const userLastNames = userParts.slice(1);
+      const hasMatchingLastnameInitial = userLastNames.some(name => name.startsWith(lastNameInitialTarget));
+      
+      return hasMatchingLastnameInitial;
+    }
+
+    return true;
+  });
+};
 
   const filteredRows = useMemo(() => {
     const memberQ = memberFilter.trim().toLowerCase();

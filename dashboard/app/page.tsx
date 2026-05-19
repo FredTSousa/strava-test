@@ -96,7 +96,8 @@ export default function DashboardPage() {
   
     try {
       const db = getSupabase();
-  
+      setLoading(true);
+      setError(null);
       const { data: userData, error: userError } = await db
         .from("users_firestore")
         .select("id, display_name, email")

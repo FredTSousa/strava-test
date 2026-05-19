@@ -224,18 +224,31 @@ export default function DashboardPage() {
   };
 
   const filteredRows = useMemo(() => {
-    const memberQ = memberFilter.trim().toLowerCase();
-    const titleQ = titleFilter.trim().toLowerCase();
-    const minKm = minDistanceKm.trim() === "" ? null : Number(minDistanceKm);
+  const memberQ = memberFilter.trim().toLowerCase();
+  const titleQ = titleFilter.trim().toLowerCase();
+  const minKm = minDistanceKm.trim() === "" ? null : Number(minDistanceKm);
 
-    return rows.filter((row) => {
-      if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
-      if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
-      if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
-      if (runsFilter && !row.challengeId) return false;
-      return true;
-    });
-  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
+  return rows.filter((row) => {
+    if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
+    if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
+    if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
+    
+    // 🔍 Filtro de Desafios Atualizado para o Ponto 2:
+    if (runsFilter) {
+      const hasChallengeId = !!row.challengeId; // Já está associado na DB
+      
+      const normalizedTitle = normalizeForMatch(row.title);
+      const hasChallengeInName = normalizedTitle.includes("comeca") || 
+                                 normalizedTitle.includes("cresce") || 
+                                 normalizedTitle.includes("supera"); // Tem o termo no nome
+
+      // Se o botão estiver ativo e a linha NÃO tiver ID e NÃO tiver o termo no nome, é descartada
+      if (!hasChallengeId && !hasChallengeInName) return false;
+    }
+
+    return true;
+  });
+}, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">

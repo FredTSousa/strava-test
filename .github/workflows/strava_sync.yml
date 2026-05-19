@@ -1,9 +1,7 @@
 name: 15-Minute Strava Sync
 
 on:
-  schedule:
-    # This expression tells GitHub to fire exactly at minutes 0, 15, 30, and 45 of every hour
-    - cron: '*/15 * * * *'
+  
   workflow_dispatch: # Allows you to press a button in GitHub to test run it anytime
   push:
     branches:

@@ -154,6 +154,15 @@ export default function DashboardPage() {
       )
     );
   };
+  const handleDropdownChallengeChange = (idVirtual: string, selectedChallengeId: string) => {
+      setRows((prev) =>
+        prev.map((row) =>
+          row.idVirtual === idVirtual
+            ? { ...row, challengeId: selectedChallengeId ? Number(selectedChallengeId) : null }
+            : row
+        )
+      );
+    };
 
   const handleSaveAssignment = async (idVirtual: string, userId: string | null) => {
     try {
@@ -401,23 +410,28 @@ export default function DashboardPage() {
                                 })()}
                               </select>
                               
-                              {(() => {
-                                const hasChanges = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
-                                return (
-                                  <button
-                                    type="button"
-                                    disabled={!hasChanges}
-                                    onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId)}
-                                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition w-16 text-center ${
-                                      hasChanges
-                                        ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
-                                        : "bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-50"
-                                    }`}
-                                  >
-                                    Gravar
-                                  </button>
-                                );
-                              })()}
+                               {(() => {
+                                  // O botão ativa-se se houver mudanças no User OU no Desafio
+                                  const hasUserChanged = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
+                                  const hasChallengeChanged = (row.challengeId || 0) !== (row.originalChallengeId || 0);
+                                  const hasChanges = hasUserChanged || hasChallengeChanged;
+                                
+                                  return (
+                                    <button
+                                      type="button"
+                                      disabled={!hasChanges}
+                                      // 🔍 PASSAMOS OS TRÊS PARÂMETROS PARA A FUNÇÃO DO UPSERT:
+                                      onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId, row.challengeId)}
+                                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition w-16 text-center ${
+                                        hasChanges
+                                          ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
+                                          : "bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-50"
+                                      }`}
+                                    >
+                                      Gravar
+                                    </button>
+                                  );
+                                })()}
                             </div>
                           )}
                         </td>

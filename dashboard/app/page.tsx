@@ -328,7 +328,6 @@ export default function DashboardPage() {
                     <Th className="text-right">Moving Time</Th>
                     <Th className="text-right">Elevation</Th>
                     <Th>Importada em</Th>
-                    {/* 🔍 Corrigido: min-w-[450px] para esticar a tabela horizontalmente em ecrãs menores */}
                     <Th className="pl-6 min-w-[450px]">Assign App User & Challenge</Th> 
                   </tr>
                 </thead>
@@ -345,17 +344,21 @@ export default function DashboardPage() {
                       >
                         <td className="px-4 py-3 font-medium text-white">
                           <div className="flex flex-col gap-1">
-                            <div className="flex items-center">
-                              {row.athleteName}
+                            {/* 🔍 Configurado para quebrar em até 2 linhas e agrupar o badge */}
+                            <div className="flex flex-wrap items-center gap-2 max-w-[160px]">
+                              <span className="line-clamp-2 whitespace-normal break-words" title={row.athleteName}>
+                                {row.athleteName}
+                              </span>
                               {row.assignedFirestoreUserId && row.challengeId && (
-                                <span className="ml-2 inline-flex items-center text-[10px] text-green-400 bg-green-950 px-1.5 py-0.5 rounded border border-green-900/40">
+                                <span className="inline-flex items-center text-[10px] text-green-400 bg-green-950 px-1.5 py-0.5 rounded border border-green-900/40 shrink-0">
                                   Linked
                                 </span>
                               )}
                             </div>
                           </div>
                         </td>
-                        <Td className="max-w-xs truncate text-slate-200" title={row.title}>
+                        {/* 🔍 Configurado para permitir quebra de texto na atividade (Até 2 linhas) */}
+                        <Td className="max-w-[180px] line-clamp-2 whitespace-normal break-words text-slate-200" title={row.title}>
                           {row.title}
                         </Td>
                         <Td>
@@ -383,7 +386,6 @@ export default function DashboardPage() {
                               </span>
                             </div>
                           ) : (
-                            /* 🔍 Corrigido: max-w-[420px] e shrink-0 em todos os elementos em linha */
                             <div className="flex items-center gap-2 w-full max-w-[420px]">
                               
                               {/* DROPDOWN 1: Membros Movera */}

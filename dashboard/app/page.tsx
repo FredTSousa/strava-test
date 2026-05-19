@@ -351,7 +351,7 @@ export default function DashboardPage() {
                       >
                         <td className="px-4 py-3 font-medium text-white">
                           <div className="flex flex-col gap-1">
-                            <div className="flex flex-wrap items-center gap-2 max-w-[160px]">
+                            <div className="flex flex-wrap items-center gap-2 max-w-[80px]">
                               <span className="line-clamp-2 whitespace-normal break-words" title={row.athleteName}>
                                 {row.athleteName}
                               </span>

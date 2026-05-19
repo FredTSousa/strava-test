@@ -61,10 +61,20 @@ def sync_club_members():
             print(f"⚠️ Novo registo detetado para {nome_completo}. A criar {clones_a_criar} membro(s) pendente(s).")
             
             for _ in range(clones_a_criar):
+                # CONDICIONAL: Se não existia nenhum na BD, o primeiro entra VALIDADO
+                if qte_no_db == 0:
+                    status_validacao = True
+                    print(f"  ✅ {nome_completo} é o primeiro com este nome. Entra como Validado.")
+                    # Incrementamos virtualmente para que, se houver um 2º no mesmo loop, ele caia no else
+                    qte_no_db += 1 
+                else:
+                    # Se já existia um na BD, este é um clone. Entra como Falso (Pendente)
+                    status_validacao = False
+                    print(f"  🚨 {nome_completo} já existe na BD (Clone detetado). Entra como Pendente.")
                 supabase.table("club_members").insert({
                     "firstname": firstname,
                     "lastname": lastname,
-                    "is_validated": False # Entra como pendente de revisão!
+                    "is_validated": status_validacao # Entra como pendente de revisão!
                 }).execute()
 
     print("🏁 Sincronização de membros terminada.")

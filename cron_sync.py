@@ -73,7 +73,7 @@ def sync_club_feed():
             # We hit an item we already saved last time.
             # Because the feed is strictly ordered by time, everything after this is old news.
             print("Reached previously synced data. Stopping execution loop safely.")
-            break
+            continue
 
         # It's unique! Save the entire raw JSON payload into our table
         payload = {

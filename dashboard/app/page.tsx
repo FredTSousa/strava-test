@@ -238,10 +238,8 @@ export default function DashboardPage() {
   }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
 
   return (
-    /* 🔍 MUDANÇA ESTRUTURAL 1: Força o container a ocupar a altura exata do ecrã sem fazer scroll na página global */
     <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
       
-      {/* HEADER E FILTROS: Sempre visíveis e trancados no topo */}
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur shrink-0">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -310,7 +308,6 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* 🔍 MUDANÇA ESTRUTURAL 2: O main agora adapta-se dinamicamente ao espaço que sobra do ecrã (`flex-1`) */}
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 min-h-0 flex flex-col">
         {loading && <p className="py-16 text-center text-slate-400">Loading activities…</p>}
         {error && <div className="rounded-lg border border-red-900/50 bg-red-950/40 px-4 py-3 text-red-300">{error}</div>}
@@ -319,23 +316,23 @@ export default function DashboardPage() {
           <p className="py-16 text-center text-slate-500">No activities match your filters.</p>
         )}
 
-        {/* 🔍 MUDANÇA ESTRUTURAL 3: Ativação dos scrolls independentes na tabela */}
         {!loading && !error && filteredRows.length > 0 && (
           <div className="flex-1 flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 shadow-xl shadow-black/20 min-h-0">
-            {/* O container ganha `overflow-auto` para o scroll horizontal e vertical ficarem sempre colados à tabela */}
             <div className="flex-1 overflow-auto min-h-0">
-              <table className="min-w-full divide-y divide-slate-800 text-left text-sm table-auto">
-                {/* O thead agora fica trancado (Sticky) no topo do scroll da tabela */}
+              
+              {/* 🔍 Alteração: Adicionado `table-fixed` para o browser obedecer rigidamente às larguras fixas dos cabeçalhos */}
+              <table className="min-w-full divide-y divide-slate-800 text-left text-sm table-fixed">
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
                   <tr className="border-b border-slate-800">
-                    <Th>Athlete</Th>
-                    <Th>Activity</Th>
-                    <Th>Sport</Th>
-                    <Th className="text-right">Distance</Th>
-                    <Th className="text-right">Moving Time</Th>
-                    <Th className="text-right">Eleva.</Th>
-                    <Th>Importada em</Th>
-                    <Th className="pl-6 min-w-[450px]">Assign App User & Challenge</Th> 
+                    {/* 🔍 Configuração Rígida de Larguras no Cabeçalho (Th) */}
+                    <Th className="w-[110px]">Athlete</Th>
+                    <Th className="w-auto">Activity</Th> {/* 🔍 w-auto: É esta coluna que vai sugar o espaço livre! */}
+                    <Th className="w-[85px]">Sport</Th>
+                    <Th className="w-[90px] text-right">Distance</Th>
+                    <Th className="w-[95px] text-right">Moving Time</Th>
+                    <Th className="w-[85px] text-right">Elevation</Th>
+                    <Th className="w-[110px]">Importada em</Th>
+                    <Th className="pl-6 w-[360px]">Assign App User & Challenge</Th> 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/80 bg-slate-900/20">
@@ -349,25 +346,29 @@ export default function DashboardPage() {
                           row.assignedFirestoreUserId ? "bg-green-950/5 hover:bg-green-950/10" : ""
                         }`}
                       >
-                        <td className="px-4 py-3 font-medium text-white">
+                        <td className="px-4 py-3 font-medium text-white vertical-align-top">
                           <div className="flex flex-col gap-1">
-                            <div className="flex flex-wrap items-center gap-2 max-w-[80px]">
-                              <span className="line-clamp-2 whitespace-normal break-words" title={row.athleteName}>
-                                {row.athleteName}
-                              </span>
-                              {row.assignedFirestoreUserId && row.challengeId && (
-                                <span className="ml-2 inline-flex items-center text-[10px] text-green-400 bg-green-950 px-1.5 py-0.5 rounded border border-green-900/40 shrink-0">
+                            {/* 🔍 Nome do Atleta trancado a 110px, quebrando em linhas se necessário */}
+                            <div className="whitespace-normal break-words leading-tight">
+                              {row.athleteName}
+                            </div>
+                            {row.assignedFirestoreUserId && row.challengeId && (
+                              <div className="mt-1">
+                                <span className="inline-flex items-center text-[9px] text-green-400 bg-green-950 px-1 py-0.5 rounded border border-green-900/40 shrink-0">
                                   Linked
                                 </span>
-                              )}
-                            </div>
+                              </div>
+                            )}
                           </div>
                         </td>
-                        <Td className="max-w-[180px] line-clamp-2 whitespace-normal break-words text-slate-200" title={row.title}>
+
+                        {/* 🔍 Dinâmico: Ocupa tudo o que sobra e faz linhas normais se o título for longo */}
+                        <td className="px-4 py-3 text-slate-200 whitespace-normal break-words leading-normal">
                           {row.title}
-                        </Td>
+                        </td>
+
                         <Td>
-                          <span className="inline-flex rounded-full bg-[#fc4c02]/15 px-2.5 py-0.5 text-xs font-medium text-[#fc4c02]">
+                          <span className="inline-flex rounded-full bg-[#fc4c02]/15 px-2 py-0.5 text-xs font-medium text-[#fc4c02]">
                             {row.sportType}
                           </span>
                         </Td>
@@ -385,22 +386,24 @@ export default function DashboardPage() {
                         </Td>
                         <td className="px-4 py-3 pl-6">
                           {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
-                            <div className="w-72 flex items-center">
+                            <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
                                 ❌ Sem user no Movera
                               </span>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2 w-full max-w-[420px]">
+                            /* 🔍 Removida a limitação de tamanho do container geral da coluna */
+                            <div className="flex items-center gap-2">
                               
+                              {/* DROPDOWN 1: Membros Movera -> 🔍 Trancado estritamente a 120px */}
                               <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-40 shrink-0 truncate ${
+                                className={`rounded-lg border text-xs bg-slate-950 px-1.5 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-[120px] shrink-0 truncate ${
                                   row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
                                 }`}
                               >
-                                <option value="">-- Não Atribuído --</option>
+                                <option value="">-- User --</option>
                                 {(() => {
                                   const finalOptions = [...suggestedUsers];
                                   
@@ -420,14 +423,15 @@ export default function DashboardPage() {
                                 })()}
                               </select>
 
+                              {/* DROPDOWN 2: Desafios (Challenges) -> 🔍 Trancado estritamente a 80px */}
                               <select
                                 value={row.challengeId || ""}
                                 onChange={(e) => handleDropdownChallengeChange(row.idVirtual, e.target.value)}
-                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-32 shrink-0 ${
+                                className={`rounded-lg border text-xs bg-slate-950 px-1.5 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-[80px] shrink-0 ${
                                   row.challengeId ? "border-amber-700 text-amber-200" : "border-slate-700 text-slate-300"
                                 }`}
                               >
-                                <option value="">-- Sem Desafio --</option>
+                                <option value="">-- Run --</option>
                                 {CHALLENGES_LIST.map((challenge) => (
                                   <option key={challenge.id} value={challenge.id} className="bg-slate-950 text-white">
                                     {challenge.name}
@@ -435,6 +439,7 @@ export default function DashboardPage() {
                                 ))}
                               </select>
                               
+                              {/* BOTÃO GRAVAR */}
                               {(() => {
                                 const hasUserChanged = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
                                 const hasChallengeChanged = (row.challengeId || 0) !== (row.originalChallengeId || 0);
@@ -445,7 +450,7 @@ export default function DashboardPage() {
                                     type="button"
                                     disabled={!hasChanges}
                                     onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId, row.challengeId)}
-                                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition w-16 text-center shrink-0 ${
+                                    className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition w-16 text-center shrink-0 ${
                                       hasChanges
                                         ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
                                         : "bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-50"

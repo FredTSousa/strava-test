@@ -102,7 +102,7 @@ export default function DashboardPage() {
       // 1. Carrega os utilizadores para as dropdowns
       const { data: userData, error: userError } = await db
         .from("users_firestore")
-        .select("id, display_name, email,assigned_firestore_user_id")
+        .select("id, display_name, email")
         .order("display_name", { ascending: true });
   
       if (userError) throw new Error(userError.message);

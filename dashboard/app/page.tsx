@@ -440,3 +440,20 @@ function Th({
       {children}
     </th>
   );
+}
+
+function Td({
+  children,
+  className = "",
+  title,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  title?: string;
+}) {
+  return (
+    <td className={`px-4 py-3 ${className}`} title={title}>
+      {children}
+    </td>
+  );
+}

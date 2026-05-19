@@ -323,9 +323,7 @@ export default function DashboardPage() {
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] font-mono text-slate-500">
-                              ID: {row.assignedFirestoreUserId || "Unassigned"}
-                            </span>
+                            {/* 🔍 A LINHA DO SPAN DO ID FOI REMOVIDA DAQUI */}
                           </div>
                         </td>
                         <Td className="max-w-xs truncate text-slate-200" title={row.title}>

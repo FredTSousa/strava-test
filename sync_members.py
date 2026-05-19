@@ -2,6 +2,7 @@ import os
 import requests
 from dotenv import load_dotenv
 from supabase import create_client, Client
+from cron_sync import get_valid_access_token
 
 load_dotenv()
 

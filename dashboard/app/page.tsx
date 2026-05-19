@@ -23,6 +23,8 @@ type StravaRawFeedRow = {
   raw_json: StravaActivityJson;
   fetched_at: string;
   assigned_firestore_user_id: string | null; 
+  challenge_id: number | null;
+  challenge_name: string | null;
 };
 
 type ParsedActivity = {
@@ -92,6 +94,8 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     fetchedAt: formatImportDate(row.fetched_at),
     assignedFirestoreUserId: row.assigned_firestore_user_id,
     originalFirestoreUserId: row.assigned_firestore_user_id,
+    challengeId: row.challenge_id,
+    challengeName: row.challenge_name,
   };
 }
 
@@ -160,6 +164,7 @@ export default function DashboardPage() {
         .upsert({ 
           id_virtual: idVirtual, 
           assigned_firestore_user_id: userId || null,
+          challengeId: challengeId || null,
           last_assign_timestamp: new Date().toISOString()
         });
   
@@ -171,7 +176,7 @@ export default function DashboardPage() {
         setRows((prev) =>
           prev.map((row) =>
             row.idVirtual === idVirtual
-              ? { ...row, originalFirestoreUserId: userId }
+              ? { ...row, originalFirestoreUserId: userId, originalChallengeId: challengeId }
               : row
           )
         );
@@ -217,7 +222,7 @@ export default function DashboardPage() {
       if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
       if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
       if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
-      if (runsFilter && !matchesRunsFilter(row.title)) return false;
+      if (runsFilter && !matchesRunsFilter(row.title) && !row.challengeId) return false;
       return true;
     });
   }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);

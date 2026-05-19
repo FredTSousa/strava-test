@@ -36,9 +36,6 @@ type ParsedActivity = {
   fetchedAt: string;
   assignedFirestoreUserId: string | null; 
   originalFirestoreUserId: string | null; 
-  fetchedAt: string; // Vai guardar a data já bonita
-  assignedFirestoreUserId: string | null; 
-  originalFirestoreUserId: string | null;
 };
 
 type FirestoreUser = {
@@ -92,7 +89,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     distanceKm: Math.round((distanceM / 1000) * 100) / 100,
     movingTimeMin: Math.round(movingSec / 60),
     elevationGain: Math.round(raw.total_elevation_gain ?? 0),
-    fetchedAt: formatImportDate(row.fetched_at),,
+    fetchedAt: formatImportDate(row.fetched_at),
     assignedFirestoreUserId: row.assigned_firestore_user_id,
     originalFirestoreUserId: row.assigned_firestore_user_id,
   };

@@ -325,6 +325,7 @@ export default function DashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-800/80">
                   {filteredRows.map((row) => {
+            console.log("Atividade:", row.title, "User Atribuído:", row.assignedFirestoreUserId);
                     // Calcula dinamicamente as sugestões focadas para este atleta específico
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
 

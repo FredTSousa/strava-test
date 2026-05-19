@@ -405,7 +405,7 @@ export default function DashboardPage() {
                               </span>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-1.5 max-w-[255px]">
+                            <div className="flex items-center gap-1.5 max-w-[270px]">
                               
                               {/* DROPDOWN 1: Membros Movera -> Trancado estritamente a 120px */}
                               <select

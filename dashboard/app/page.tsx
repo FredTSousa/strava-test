@@ -21,7 +21,7 @@ type StravaRawFeedRow = {
   id_virtual: string;
   raw_json: StravaActivityJson;
   fetched_at: string;
-  assigned_firestore_user_id: string | null; // Adicionado à linha vinda da DB
+  assigned_firestore_user_id: string | null; 
 };
 
 type ParsedActivity = {
@@ -33,10 +33,9 @@ type ParsedActivity = {
   movingTimeMin: number;
   elevationGain: number;
   fetchedAt: string;
-  assignedFirestoreUserId: string | null; // Mapeado para o estado do componente
+  assignedFirestoreUserId: string | null; 
 };
 
-// Nova tipagem para os utilizadores vindos do Firestore
 type FirestoreUser = {
   id: string;
   display_name: string;
@@ -82,7 +81,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
 
 export default function DashboardPage() {
   const [rows, setRows] = useState<ParsedActivity[]>([]);
-  const [users, setUsers] = useState<FirestoreUser[]>([]); // Estado para utilizadores
+  const [users, setUsers] = useState<FirestoreUser[]>([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,7 +90,6 @@ export default function DashboardPage() {
   const [minDistanceKm, setMinDistanceKm] = useState("");
   const [runsFilter, setRunsFilter] = useState(false);
 
-  // Carrega tanto as atividades como os utilizadores da Supabase
   async function loadFeed() {
     setLoading(true);
     setError(null);
@@ -99,7 +97,6 @@ export default function DashboardPage() {
     try {
       const db = getSupabase();
   
-      // 1. Carrega os utilizadores para as dropdowns
       const { data: userData, error: userError } = await db
         .from("users_firestore")
         .select("id, display_name, email")
@@ -108,15 +105,13 @@ export default function DashboardPage() {
       if (userError) throw new Error(userError.message);
       setUsers(userData as FirestoreUser[]);
   
-      // 2. Carrega as atividades a partir da VIEW (trazendo o id do user)
       const { data: feedData, error: queryError } = await db
-        .from("view_strava_activities") // <--- Lendo da View
-        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id") // <--- Pedindo o ID explicitamente
+        .from("view_strava_activities") 
+        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id") 
         .order("fetched_at", { ascending: false });
   
       if (queryError) throw new Error(queryError.message);
       
-      // O .map(parseRow) vai converter o 'assigned_firestore_user_id' da DB para 'assignedFirestoreUserId' do React
       setRows((feedData as StravaRawFeedRow[]).map(parseRow));
   
     } catch (e) {
@@ -131,7 +126,6 @@ export default function DashboardPage() {
     loadFeed();
   }, []);
 
-  // Lógica Reativa: Quando mudas o dropdown no ecrã, atualiza o estado local temporariamente
   const handleDropdownUserChange = (idVirtual: string, selectedUserId: string) => {
     setRows((prev) =>
       prev.map((row) =>
@@ -142,12 +136,10 @@ export default function DashboardPage() {
     );
   };
 
-  // Envia a mutação física de Update para o Postgres
   const handleSaveAssignment = async (idVirtual: string, userId: string | null) => {
     try {
       const db = getSupabase();
   
-      // Faz UPSERT na tabela de metadados satélite (Grava ou atualiza a linha 1:1)
       const { error: updateError } = await db
         .from("strava_activities_metadata")
         .upsert({ 
@@ -166,14 +158,13 @@ export default function DashboardPage() {
     }
   };
 
- // Algoritmo de Sugestão de Nomes Corrigido (Match por Primeiro Nome + Inicial do Apelido)
   const getSuggestedUsers = (athleteName: string) => {
     const normalizedAthlete = normalizeForMatch(athleteName).trim();
     const parts = normalizedAthlete.split(" ").filter(Boolean);
     
     if (parts.length === 0) return users;
   
-    const firstNameTarget = parts[0]; // ex: "joana"
+    const firstNameTarget = parts[0]; 
     const lastNameInitialTarget = parts[1] ? parts[1].replace(".", "")[0] : null; 
   
     return users.filter((user) => {
@@ -182,16 +173,12 @@ export default function DashboardPage() {
       
       if (userParts.length === 0) return false;
   
-      // CORREÇÃO AQUI: O primeiro nome do Firestore TEM de ser EXATAMENTE IGUAL ao do Strava
       const matchesFirstName = userParts[0] === firstNameTarget;
       if (!matchesFirstName) return false;
   
-      // Se o Strava enviou uma inicial (ex: "A"), valida se algum dos apelidos começa por essa letra
       if (lastNameInitialTarget) {
         const userLastNames = userParts.slice(1);
-        const hasMatchingLastnameInitial = userLastNames.some(name => name.startsWith(lastNameInitialTarget));
-        
-        return hasMatchingLastnameInitial;
+        return userLastNames.some(name => name.startsWith(lastNameInitialTarget));
       }
   
       return true;
@@ -204,24 +191,16 @@ export default function DashboardPage() {
     const minKm = minDistanceKm.trim() === "" ? null : Number(minDistanceKm);
 
     return rows.filter((row) => {
-      if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) {
-        return false;
-      }
-      if (titleQ && !row.title.toLowerCase().includes(titleQ)) {
-        return false;
-      }
-      if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) {
-        return false;
-      }
-      if (runsFilter && !matchesRunsFilter(row.title)) {
-        return false;
-      }
+      if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
+      if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
+      if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
+      if (runsFilter && !matchesRunsFilter(row.title)) return false;
       return true;
     });
   }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -291,20 +270,11 @@ export default function DashboardPage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {loading && (
-          <p className="py-16 text-center text-slate-400">Loading activities…</p>
-        )}
-
-        {error && (
-          <div className="rounded-lg border border-red-900/50 bg-red-950/40 px-4 py-3 text-red-300">
-            {error}
-          </div>
-        )}
+        {loading && <p className="py-16 text-center text-slate-400">Loading activities…</p>}
+        {error && <div className="rounded-lg border border-red-900/50 bg-red-950/40 px-4 py-3 text-red-300">{error}</div>}
 
         {!loading && !error && filteredRows.length === 0 && (
-          <p className="py-16 text-center text-slate-500">
-            No activities match your filters.
-          </p>
+          <p className="py-16 text-center text-slate-500">No activities match your filters.</p>
         )}
 
         {!loading && !error && filteredRows.length > 0 && (
@@ -319,35 +289,34 @@ export default function DashboardPage() {
                     <Th className="text-right">Distance</Th>
                     <Th className="text-right">Moving Time</Th>
                     <Th className="text-right">Elevation</Th>
-                    {/* NOVA COLUNA HEADER */}
                     <Th className="pl-6">Assign App User</Th> 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/80">
                   {filteredRows.map((row) => {
-            {/* COLA ESTA LINHA TEMPORÁRIA NO TEU HTML PARA VER NO ECRÃ */}
-<span className="text-xs text-red-500">ID na Row: {String(row.assignedFirestoreUserId)}</span>
-            console.log("Atividade:", row.title, "User Atribuído:", row.assignedFirestoreUserId);
-                    // Calcula dinamicamente as sugestões focadas para este atleta específico
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
 
                     return (
                       <tr
                         key={row.idVirtual}
                         className={`transition-colors hover:bg-slate-800/40 ${
-                          row.assignedFirestoreUserId 
-                            ? "bg-green-950/5 hover:bg-green-950/10" 
-                            : ""
+                          row.assignedFirestoreUserId ? "bg-green-950/5 hover:bg-green-950/10" : ""
                         }`}
                       >
                         <td className="px-4 py-3 font-medium text-white">
-                          <div>
-                            {row.athleteName}
-                            {row.assignedFirestoreUserId && (
-                              <span className="ml-2 inline-flex items-center text-[10px] text-green-400 bg-green-950 px-1.5 py-0.5 rounded border border-green-900/40">
-                                Linked
-                              </span>
-                            )}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center">
+                              {row.athleteName}
+                              {row.assignedFirestoreUserId && (
+                                <span className="ml-2 inline-flex items-center text-[10px] text-green-400 bg-green-950 px-1.5 py-0.5 rounded border border-green-900/40">
+                                  Linked
+                                </span>
+                              )}
+                            </div>
+                            {/* Linha de debug segura em ambiente JSX */}
+                            <span className="text-[10px] font-mono text-slate-500">
+                              ID: {row.assignedFirestoreUserId || "Unassigned"}
+                            </span>
                           </div>
                         </td>
                         <Td className="max-w-xs truncate text-slate-200" title={row.title}>
@@ -368,10 +337,7 @@ export default function DashboardPage() {
                           {row.elevationGain} m
                         </Td>
                         
-                        {/* ELEMENTO TD ATUALIZADO COM TAMANHOS PADRONIZADOS */}
-                          {/* COLUNA DE ATRIBUIÇÃO ADAPTATIVA */}
                         <td className="px-4 py-3 pl-6">
-                          {/* CENÁRIO 1: O registo não está atribuído E não há nenhuma sugestão encontrada no Firestore */}
                           {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
                             <div className="w-72 flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
@@ -379,33 +345,28 @@ export default function DashboardPage() {
                               </span>
                             </div>
                           ) : (
-                            /* CENÁRIO 2: Já está atribuído OU existem utilizadores sugeridos na lista */
                             <div className="flex items-center gap-2">
-                             <select
+                              <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                                className="w-52 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-white"
+                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-52 truncate ${
+                                  row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
+                                }`}
                               >
                                 <option value="">-- Não Atribuído --</option>
                                 {(() => {
-                                  // 1. Começamos com as sugestões inteligentes
                                   const finalOptions = [...suggestedUsers];
                                   
-                                  // 2. Se esta row já tem um user associado na DB...
                                   if (row.assignedFirestoreUserId) {
-                                    // ...verificamos se ele já está incluído nas sugestões
                                     const isAlreadyInOptions = finalOptions.some(u => u.id === row.assignedFirestoreUserId);
-                                    
-                                    // Se NÃO estiver, vamos buscá-lo à lista global de users e injetamo-lo à força no dropdown
                                     if (!isAlreadyInOptions) {
                                       const currentUserObj = users.find(u => u.id === row.assignedFirestoreUserId);
                                       if (currentUserObj) finalOptions.push(currentUserObj);
                                     }
                                   }
                                   
-                                  // 3. Renderiza a lista combinada e segura
                                   return finalOptions.map((user) => (
-                                    <option key={user.id} value={user.id}>
+                                    <option key={user.id} value={user.id} className="bg-slate-950 text-white">
                                       {user.display_name}
                                     </option>
                                   ));
@@ -477,32 +438,15 @@ function FilterField({
   );
 }
 
-function Th({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <th
-      scope="col"
-      className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400 ${className}`}
-    >
+    <th scope="col" className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400 ${className}`}>
       {children}
     </th>
   );
 }
 
-function Td({
-  children,
-  className = "",
-  title,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  title?: string;
-}) {
+function Td({ children, className = "" , title }: { children: React.ReactNode; className?: string; title?: string }) {
   return (
     <td className={`px-4 py-3 ${className}`} title={title}>
       {children}

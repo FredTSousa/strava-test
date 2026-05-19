@@ -22,7 +22,7 @@ type StravaRawFeedRow = {
   raw_json: StravaActivityJson;
   fetched_at: string;
   assigned_firestore_user_id: string | null; 
-  challenge_id: number | null; // 🔍 Adicionado da View
+  challenge_id: number | null; 
 };
 
 type ParsedActivity = {
@@ -36,8 +36,8 @@ type ParsedActivity = {
   fetchedAt: string; 
   assignedFirestoreUserId: string | null; 
   originalFirestoreUserId: string | null;
-  challengeId: number | null;         // 🔍 Estado atual do desafio
-  originalChallengeId: number | null; // 🔍 Pivot de comparação do desafio
+  challengeId: number | null;         
+  originalChallengeId: number | null; 
 };
 
 type FirestoreUser = {
@@ -46,7 +46,6 @@ type FirestoreUser = {
   email: string;
 };
 
-// Mapeamento estático dos desafios para renderizar as opções do dropdown
 const CHALLENGES_LIST = [
   { id: 1, name: "Começa" },
   { id: 2, name: "Cresce" },
@@ -95,8 +94,6 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     fetchedAt: formatImportDate(row.fetched_at),
     assignedFirestoreUserId: row.assigned_firestore_user_id,
     originalFirestoreUserId: row.assigned_firestore_user_id,
-    
-    // Mapeia os dados relacionais do desafio
     challengeId: row.challenge_id,
     originalChallengeId: row.challenge_id,
   };
@@ -154,11 +151,10 @@ export default function DashboardPage() {
         row.idVirtual === idVirtual
           ? { ...row, assignedFirestoreUserId: selectedUserId || null }
           : row
-    )
+      )
     );
   };
 
-  // 🔍 Função gémea para escutar a mudança do Desafio no ecrã
   const handleDropdownChallengeChange = (idVirtual: string, selectedChallengeId: string) => {
     setRows((prev) =>
       prev.map((row) =>
@@ -169,7 +165,6 @@ export default function DashboardPage() {
     );
   };
 
-  // 🔍 O teu método UPSERT atualizado com suporte aos dois parâmetros relacionais
   const handleSaveAssignment = async (idVirtual: string, userId: string | null, challengeId: number | null) => {
     try {
       const db = getSupabase();
@@ -188,7 +183,6 @@ export default function DashboardPage() {
       } else {
         alert("Alterações gravadas com sucesso!");
         
-        // Sincroniza ambos os pivots originais para voltar a trancar o botão
         setRows((prev) =>
           prev.map((row) =>
             row.idVirtual === idVirtual
@@ -238,10 +232,7 @@ export default function DashboardPage() {
       if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
       if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
       if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
-      
-      // 🔍 Otimização: Se o botão de filtro estiver ativo, só deixa passar o que tiver um Desafio associado
       if (runsFilter && !row.challengeId) return false;
-      
       return true;
     });
   }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
@@ -337,7 +328,8 @@ export default function DashboardPage() {
                     <Th className="text-right">Moving Time</Th>
                     <Th className="text-right">Elevation</Th>
                     <Th>Importada em</Th>
-                    <Th className="pl-6">Assign App User & Challenge</Th> 
+                    {/* 🔍 Corrigido: min-w-[450px] para esticar a tabela horizontalmente em ecrãs menores */}
+                    <Th className="pl-6 min-w-[450px]">Assign App User & Challenge</Th> 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/80">
@@ -391,12 +383,14 @@ export default function DashboardPage() {
                               </span>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-3">
+                            /* 🔍 Corrigido: max-w-[420px] e shrink-0 em todos os elementos em linha */
+                            <div className="flex items-center gap-2 w-full max-w-[420px]">
+                              
                               {/* DROPDOWN 1: Membros Movera */}
                               <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-44 truncate ${
+                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-40 shrink-0 truncate ${
                                   row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
                                 }`}
                               >
@@ -420,11 +414,11 @@ export default function DashboardPage() {
                                 })()}
                               </select>
 
-                              {/* 🔍 DROPDOWN 2: Tabela Relacional de Desafios (Challenges) */}
+                              {/* DROPDOWN 2: Desafios (Challenges) */}
                               <select
                                 value={row.challengeId || ""}
                                 onChange={(e) => handleDropdownChallengeChange(row.idVirtual, e.target.value)}
-                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-32 ${
+                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-32 shrink-0 ${
                                   row.challengeId ? "border-amber-700 text-amber-200" : "border-slate-700 text-slate-300"
                                 }`}
                               >
@@ -436,7 +430,7 @@ export default function DashboardPage() {
                                 ))}
                               </select>
                               
-                              {/* BOTÃO GRAVAR: Escuta e valida ambos os dropdowns simultaneamente */}
+                              {/* BOTÃO GRAVAR */}
                               {(() => {
                                 const hasUserChanged = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
                                 const hasChallengeChanged = (row.challengeId || 0) !== (row.originalChallengeId || 0);
@@ -447,7 +441,7 @@ export default function DashboardPage() {
                                     type="button"
                                     disabled={!hasChanges}
                                     onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId, row.challengeId)}
-                                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition w-16 text-center ${
+                                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition w-16 text-center shrink-0 ${
                                       hasChanges
                                         ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
                                         : "bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-50"

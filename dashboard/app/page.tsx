@@ -1,6 +1,7 @@
 "use client";
-export const revalidate = 0;
+export const dynamic = "force-dynamic"; // 🔍 Usa isto em vez do revalidate!
 import { useEffect, useMemo, useState } from "react";
+// ... resto do teu código igual
 import { getSupabase } from "./utils/supabase";
 
 type StravaAthlete = {

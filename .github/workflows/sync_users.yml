@@ -1,0 +1,29 @@
+name: Sync Firestore Users to Supabase
+
+on:
+  workflow_dispatch: # Botão manual
+  schedule:
+    - cron: '0 0 * * *' # Corre automaticamente todos os dias à meia-noite UTC
+
+jobs:
+  sync-users:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests python-dotenv supabase firebase-admin
+
+      - name: Run Sync Script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python sync_firestore_users.py

@@ -364,37 +364,39 @@ const getSuggestedUsers = (athleteName: string) => {
                           {row.elevationGain} m
                         </Td>
                         
-                        {/* NOVO ELEMENTO TD: SELETOR E BOTÃO DE GRAVAÇÃO */}
-                        <td className="px-4 py-3 pl-6">
-                          <div className="flex items-center gap-2">
-                            <select
-                              value={row.assignedFirestoreUserId || ""}
-                              onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                              className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 max-w-[180px] ${
-                                row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
-                              }`}
-                            >
-                              <option value="">-- Não Atribuído --</option>
-                              {suggestedUsers.map((user) => (
-                                <option key={user.id} value={user.id}>
-                                  {user.display_name}
-                                </option>
-                              ))}
-                            </select>
-                            
-                            <button
-                              type="button"
-                              onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId)}
-                              className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${
-                                row.assignedFirestoreUserId
-                                  ? "bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700 hover:text-white"
-                                  : "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10"
-                              }`}
-                            >
-                              {row.assignedFirestoreUserId ? "Mudar" : "Gravar"}
-                            </button>
-                          </div>
-                        </td>
+                        {/* ELEMENTO TD ATUALIZADO COM TAMANHOS PADRONIZADOS */}
+                          <td className="px-4 py-3 pl-6">
+                            <div className="flex items-center gap-2">
+                              <select
+                                value={row.assignedFirestoreUserId || ""}
+                                onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
+                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-52 truncate ${
+                                  row.assignedFirestoreUserId 
+                                    ? "border-green-800 text-green-200" 
+                                    : "border-slate-700 text-slate-300"
+                                }`}
+                              >
+                                <option value="">-- Não Atribuído --</option>
+                                {suggestedUsers.map((user) => (
+                                  <option key={user.id} value={user.id} className="bg-slate-950 text-white">
+                                    {user.display_name}
+                                  </option>
+                                ))}
+                              </select>
+                              
+                              <button
+                                type="button"
+                                onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId)}
+                                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition w-16 text-center ${
+                                  row.assignedFirestoreUserId
+                                    ? "bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700 hover:text-white"
+                                    : "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10"
+                                }`}
+                              >
+                                {row.assignedFirestoreUserId ? "Mudar" : "Gravar"}
+                              </button>
+                            </div>
+                          </td>
                       </tr>
                     );
                   })}

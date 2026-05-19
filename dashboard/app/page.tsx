@@ -333,7 +333,7 @@ export default function DashboardPage() {
                   <col className="w-[90px]" />  {/* Moving Time */}
                   <col className="w-[75px]" />  {/* Eleva. */}
                   <col className="w-[120px]" /> {/* Importada em */}
-                  <col className="w-[275px]" /> {/* Dropdowns + Botão (Sem transbordar!) */}
+                  <col className="w-[295px]" /> {/* Dropdowns + Botão (Sem transbordar!) */}
                 </colgroup>
 
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
@@ -345,7 +345,7 @@ export default function DashboardPage() {
                     <Th className="text-right">Moving Time</Th>
                     <Th className="text-right">Eleva.</Th> {/* 🔍 Nome alterado aqui */}
                     <Th>Importada em</Th>
-                    <Th className="pl-6">Assign App User & Challenge</Th> 
+                    <Th className="pl-6 pr-4">Assign App User & Challenge</Th> 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/80 bg-slate-900/20">
@@ -397,7 +397,7 @@ export default function DashboardPage() {
                         <Td className="text-slate-400 text-xs tabular-nums whitespace-nowrap align-top">
                           {row.fetchedAt}
                         </Td>
-                        <td className="px-4 py-3 pl-6 align-top">
+                        <td className="px-4 py-3 pl-6 pr-4align-top">
                           {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
                             <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">

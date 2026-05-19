@@ -320,19 +320,29 @@ export default function DashboardPage() {
           <div className="flex-1 flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 shadow-xl shadow-black/20 min-h-0">
             <div className="flex-1 overflow-auto min-h-0">
               
-              {/* 🔍 Alteração: Adicionado `table-fixed` para o browser obedecer rigidamente às larguras fixas dos cabeçalhos */}
               <table className="min-w-full divide-y divide-slate-800 text-left text-sm table-fixed">
+                {/* 🔍 CORREÇÃO: Mapeamento de largura explícita via <colgroup> antes de renderizar as células. Isto garante que o motor do browser tranca as colunas nos tamanhos certos, deixando a coluna 2 (Activity) em modo fluido. */}
+                <colgroup>
+                  <col className="w-[110px]" /> {/* Athlete */}
+                  <col className="w-auto" />     {/* Activity (Ocupa o resto) */}
+                  <col className="w-[85px]" />  {/* Sport */}
+                  <col className="w-[90px]" />  {/* Distance */}
+                  <col className="w-[95px]" />  {/* Moving Time */}
+                  <col className="w-[85px]" />  {/* Elevation */}
+                  <col className="w-[110px]" /> {/* Importada em */}
+                  <col className="w-[300px]" /> {/* Assign Dropdowns + Botão */}
+                </colgroup>
+
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
                   <tr className="border-b border-slate-800">
-                    {/* 🔍 Configuração Rígida de Larguras no Cabeçalho (Th) */}
-                    <Th className="w-[110px]">Athlete</Th>
-                    <Th className="w-auto">Activity</Th> {/* 🔍 w-auto: É esta coluna que vai sugar o espaço livre! */}
-                    <Th className="w-[85px]">Sport</Th>
-                    <Th className="w-[90px] text-right">Distance</Th>
-                    <Th className="w-[95px] text-right">Moving Time</Th>
-                    <Th className="w-[85px] text-right">Elevation</Th>
-                    <Th className="w-[110px]">Importada em</Th>
-                    <Th className="pl-6 w-[360px]">Assign App User & Challenge</Th> 
+                    <Th>Athlete</Th>
+                    <Th>Activity</Th>
+                    <Th>Sport</Th>
+                    <Th className="text-right">Distance</Th>
+                    <Th className="text-right">Moving Time</Th>
+                    <Th className="text-right">Elevation</Th>
+                    <Th>Importada em</Th>
+                    <Th className="pl-6">Assign App User & Challenge</Th> 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/80 bg-slate-900/20">
@@ -346,9 +356,9 @@ export default function DashboardPage() {
                           row.assignedFirestoreUserId ? "bg-green-950/5 hover:bg-green-950/10" : ""
                         }`}
                       >
-                        <td className="px-4 py-3 font-medium text-white vertical-align-top">
+                        {/* 🔍 Adicionado max-w e quebra explícita na célula */}
+                        <td className="px-4 py-3 font-medium text-white max-w-[110px] align-top">
                           <div className="flex flex-col gap-1">
-                            {/* 🔍 Nome do Atleta trancado a 110px, quebrando em linhas se necessário */}
                             <div className="whitespace-normal break-words leading-tight">
                               {row.athleteName}
                             </div>
@@ -362,29 +372,29 @@ export default function DashboardPage() {
                           </div>
                         </td>
 
-                        {/* 🔍 Dinâmico: Ocupa tudo o que sobra e faz linhas normais se o título for longo */}
-                        <td className="px-4 py-3 text-slate-200 whitespace-normal break-words leading-normal">
+                        {/* 🔍 Coluna da Atividade: Fluida, quebra linhas naturalmente */}
+                        <td className="px-4 py-3 text-slate-200 whitespace-normal break-words leading-normal align-top">
                           {row.title}
                         </td>
 
-                        <Td>
+                        <Td className="align-top">
                           <span className="inline-flex rounded-full bg-[#fc4c02]/15 px-2 py-0.5 text-xs font-medium text-[#fc4c02]">
                             {row.sportType}
                           </span>
                         </Td>
-                        <Td className="text-right tabular-nums text-slate-300">
+                        <Td className="text-right tabular-nums text-slate-300 align-top">
                           {row.distanceKm.toFixed(2)} km
                         </Td>
-                        <Td className="text-right tabular-nums text-slate-300">
+                        <Td className="text-right tabular-nums text-slate-300 align-top">
                           {row.movingTimeMin} min
                         </Td>
-                        <Td className="text-right tabular-nums text-slate-300">
+                        <Td className="text-right tabular-nums text-slate-300 align-top">
                           {row.elevationGain} m
                         </Td>
-                        <Td className="text-slate-400 text-xs tabular-nums whitespace-nowrap">
+                        <Td className="text-slate-400 text-xs tabular-nums whitespace-nowrap align-top">
                           {row.fetchedAt}
                         </Td>
-                        <td className="px-4 py-3 pl-6">
+                        <td className="px-4 py-3 pl-6 align-top max-w-[300px]">
                           {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
                             <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
@@ -392,10 +402,9 @@ export default function DashboardPage() {
                               </span>
                             </div>
                           ) : (
-                            /* 🔍 Removida a limitação de tamanho do container geral da coluna */
                             <div className="flex items-center gap-2">
                               
-                              {/* DROPDOWN 1: Membros Movera -> 🔍 Trancado estritamente a 120px */}
+                              {/* DROPDOWN 1: Membros Movera -> Trancado estritamente a 120px */}
                               <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
@@ -423,7 +432,7 @@ export default function DashboardPage() {
                                 })()}
                               </select>
 
-                              {/* DROPDOWN 2: Desafios (Challenges) -> 🔍 Trancado estritamente a 80px */}
+                              {/* DROPDOWN 2: Desafios (Challenges) -> Trancado estritamente a 80px */}
                               <select
                                 value={row.challengeId || ""}
                                 onChange={(e) => handleDropdownChallengeChange(row.idVirtual, e.target.value)}
@@ -450,7 +459,7 @@ export default function DashboardPage() {
                                     type="button"
                                     disabled={!hasChanges}
                                     onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId, row.challengeId)}
-                                    className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition w-16 text-center shrink-0 ${
+                                    className={`rounded-lg px-2 py-1.5 text-xs font-semibold transition w-16 text-center shrink-0 ${
                                       hasChanges
                                         ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
                                         : "bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-50"
@@ -514,6 +523,7 @@ function FilterField({
   );
 }
 
+/* 🔍 CORREÇÃO: O componente Th agora aceita e espalha a propriedade `className` nativa corretamente para que os estilos de alinhamento funcionem a 100% */
 function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <th scope="col" className={`px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400 ${className}`}>

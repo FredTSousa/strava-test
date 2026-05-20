@@ -428,7 +428,7 @@ export default function DashboardPage() {
                           {row.isSynced ? (
                             <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-emerald-950/80 px-3 py-1.5 text-xs font-bold text-emerald-400 border border-emerald-500/30 tracking-wide whitespace-nowrap">
-                                ✓ Sincronizado (Draft)
+                                ✓ Sincronizado
                               </span>
                             </div>
                           ) : !hasUser && suggestedUsers.length === 0 ? (

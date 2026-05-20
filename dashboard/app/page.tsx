@@ -456,7 +456,7 @@ export default function DashboardPage() {
                                   if (semContaCount > 0) {
                                     return (
                                       <option disabled className="text-red-400 bg-red-950/40 font-semibold">
-                                        ⚠️ Há mais {semContaCount} {row.athleteName} sem conta no Movera!
+                                        ⚠️ Há mais {semContaCount} {semContaCount === 1 ? "membro" : "membros"} {row.athleteName} sem conta no Movera!
                                       </option>
                                     );
                                   }

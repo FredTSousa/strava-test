@@ -6,8 +6,8 @@ from firebase_admin import credentials, firestore, initialize_app
 # ==========================================
 # CONFIGURAÇÕES E INICIALIZAÇÃO
 # ==========================================
-SUPABASE_URL = "SUA_SUPABASE_URL"
-SUPABASE_KEY = "SUA_SUPABASE_ANON_OR_SERVICE_KEY"
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # 🔒 Barreira de segurança: Apenas o teu ID avança para o Firestore
 MEU_USER_ID_TESTE = "vIgrcNOyXieB3D1oE57OIhR0EW33"

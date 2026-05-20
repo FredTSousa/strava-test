@@ -209,10 +209,10 @@ export default function DashboardPage() {
       const suggestedUsers = getSuggestedUsers(row.athleteName);
       const isMissingMoveraUser = !hasUserChosen && suggestedUsers.length === 0;
 
-      // 🟢 FILTRO 1: Se "Por Escolher" estiver ligado, esconde tudo o que já tem user selecionado
-      if (unassignedOnlyFilter && hasUserChosen) return false;
+      // 🟢 CORREÇÃO CRÍTICA: "Por Escolher" só aceita quem NÃO tem user escolhido E TEM opções para escolher
+      if (unassignedOnlyFilter && (hasUserChosen || isMissingMoveraUser)) return false;
 
-      // 🟢 FILTRO 2: Se "Sem User Movera" estiver ligado, mostra apenas as linhas órfãs de sugestão
+      // FILTRO 2: "Sem User Movera" mostra estritamente os órfãos de sugestão
       if (noMoveraUserFilter && !isMissingMoveraUser) return false;
 
       if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;

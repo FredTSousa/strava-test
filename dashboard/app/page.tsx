@@ -23,7 +23,7 @@ type StravaRawFeedRow = {
   raw_json: StravaActivityJson;
   fetched_at: string;
   assigned_firestore_user_id: string | null; 
-  synced_to_firestore: boolean; // 👈 Adicionado para saber o estado real vindo da DB
+  synced_to_firestore: boolean;
 };
 
 type ParsedActivity = {
@@ -37,7 +37,7 @@ type ParsedActivity = {
   elevationGain: number;
   fetchedAt: string; 
   assignedFirestoreUserId: string | null; 
-  isSynced: boolean; // 👈 Mapeamento explícito se o Python já processou
+  isSynced: boolean;
 };
 
 type FirestoreUser = {
@@ -88,7 +88,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     elevationGain: Math.round(raw.total_elevation_gain ?? 0),
     fetchedAt: formatImportDate(row.fetched_at),
     assignedFirestoreUserId: row.assigned_firestore_user_id,
-    isSynced: row.synced_to_firestore ?? false, // 👈 Tranca o estado real do Worker Python
+    isSynced: row.synced_to_firestore ?? false,
   };
 }
 
@@ -102,7 +102,10 @@ export default function DashboardPage() {
   const [titleFilter, setTitleFilter] = useState("");
   const [minDistanceKm, setMinDistanceKm] = useState("");
   const [runsFilter, setRunsFilter] = useState(false);
-  const [hideSyncedFilter, setHideSyncedFilter] = useState(false);
+  
+  // 🟢 Novos filtros focados nas Action Items do operador
+  const [unassignedOnlyFilter, setUnassignedOnlyFilter] = useState(false); 
+  const [noMoveraUserFilter, setNoMoveraUserFilter] = useState(false);
 
   async function loadFeed() {
     setLoading(true);
@@ -120,7 +123,6 @@ export default function DashboardPage() {
   
       const { data: feedData, error: queryError } = await db
         .from("view_strava_activities") 
-         // 🟢 Garantiu o 'synced_to_firestore' vindo do Supabase
         .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore") 
         .order("fetched_at", { ascending: false });
   
@@ -158,7 +160,7 @@ export default function DashboardPage() {
         .upsert({ 
           id_virtual: idVirtual, 
           assigned_firestore_user_id: valueToSave,
-          synced_to_firestore: false, // Força a re-sincronização no Python se mudar de user
+          synced_to_firestore: false, 
           last_assign_timestamp: new Date().toISOString()
         });
   
@@ -203,14 +205,20 @@ export default function DashboardPage() {
     const minKm = minDistanceKm.trim() === "" ? null : Number(minDistanceKm);
 
     return rows.filter((row) => {
-      // Filtro para ocultar processos fechados (Sincronizados pelo Python)
-      if (hideSyncedFilter && row.isSynced) return false;
+      const hasUserChosen = !!row.assignedFirestoreUserId;
+      const suggestedUsers = getSuggestedUsers(row.athleteName);
+      const isMissingMoveraUser = !hasUserChosen && suggestedUsers.length === 0;
+
+      // 🟢 FILTRO 1: Se "Por Escolher" estiver ligado, esconde tudo o que já tem user selecionado
+      if (unassignedOnlyFilter && hasUserChosen) return false;
+
+      // 🟢 FILTRO 2: Se "Sem User Movera" estiver ligado, mostra apenas as linhas órfãs de sugestão
+      if (noMoveraUserFilter && !isMissingMoveraUser) return false;
 
       if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
       if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
       if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
       
-      // 🟢 CORRIGIDO: O filtro foca estritamente nas palavras-chave do título da corrida
       if (runsFilter) {
         const normalizedTitle = normalizeForMatch(row.title);
         const hasChallengeInName = normalizedTitle.includes("comeca") || 
@@ -224,7 +232,7 @@ export default function DashboardPage() {
 
       return true;
     });
-  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter, hideSyncedFilter]);
+  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter, unassignedOnlyFilter, noMoveraUserFilter]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
@@ -251,7 +259,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {/* Alterado grid para cols-6 para acomodar perfeitamente os botões sem esmagar os campos */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
             <FilterField
               id="member"
               label="Member Name"
@@ -284,30 +293,51 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setRunsFilter((on) => !on)}
                 aria-pressed={runsFilter}
-                className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#fc4c02]/30 ${
+                className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#fc4c02]/30 truncate ${
                   runsFilter
                     ? "border-[#fc4c02] bg-[#fc4c02]/20 text-[#fc4c02]"
                     : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"
                 }`}
               >
-                Apenas Prováveis Desafios
+                Prováveis Desafios
               </button>
             </div>
+
+            {/* 🟢 FILTRO: POR ESCOLHER */}
             <div className="flex flex-col justify-end">
               <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
-                Triagem Manual
+                Falta Tratar
               </span>
               <button
                 type="button"
-                onClick={() => setHideSyncedFilter((on) => !on)}
-                aria-pressed={hideSyncedFilter}
-                className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${
-                  hideSyncedFilter
-                    ? "border-amber-500 bg-amber-500/20 text-amber-400"
+                onClick={() => setUnassignedOnlyFilter((on) => !on)}
+                aria-pressed={unassignedOnlyFilter}
+                className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-amber-500/30 truncate ${
+                  unassignedOnlyFilter
+                    ? "border-amber-500 bg-amber-500/20 text-amber-400 font-semibold"
                     : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"
                 }`}
               >
-                Ocultar Sincronizados
+                Por Escolher
+              </button>
+            </div>
+
+            {/* 🟢 FILTRO: SEM USER NO MOVERA */}
+            <div className="flex flex-col justify-end">
+              <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                Incompatíveis
+              </span>
+              <button
+                type="button"
+                onClick={() => setNoMoveraUserFilter((on) => !on)}
+                aria-pressed={noMoveraUserFilter}
+                className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500/30 truncate ${
+                  noMoveraUserFilter
+                    ? "border-red-500 bg-red-500/20 text-red-400 font-semibold"
+                    : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"
+                }`}
+              >
+                Sem User Movera
               </button>
             </div>
           </div>
@@ -335,7 +365,7 @@ export default function DashboardPage() {
                   <col className="w-[90px]" />  {/* Moving Time */}
                   <col className="w-[75px]" />  {/* Eleva. */}
                   <col className="w-[120px]" /> {/* Importada em */}
-                  <col className="w-[190px]" /> {/* Dropdown / Alerta Sem cortes */}
+                  <col className="w-[190px]" /> {/* Dropdown / Alerta anti-corte */}
                 </colgroup>
 
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
@@ -396,28 +426,25 @@ export default function DashboardPage() {
                         </Td>
                         <td className="px-4 py-3 pl-6 pr-4 align-top">
                           {row.isSynced ? (
-                            /* 🟢 ESTADO 1: PROCESSADO E SINCRONIZADO PELO WORKER (Travado e não editável) */
                             <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-emerald-950/80 px-3 py-1.5 text-xs font-bold text-emerald-400 border border-emerald-500/30 tracking-wide whitespace-nowrap">
                                 ✓ Sincronizado (Draft)
                               </span>
                             </div>
                           ) : !hasUser && suggestedUsers.length === 0 ? (
-                            /* ESTADO 2: SEM COMPATIBILIDADE DE NOME */
                             <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide whitespace-nowrap">
                                 ❌ Sem user no Movera
                               </span>
                             </div>
                           ) : (
-                            /* ESTADO 3: PENDENTE DE COMPLEMENTO / EM TRÂNSITO */
                             <div className="flex items-center max-w-[170px]">
                               <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
                                 // 🟢 UX Corrigida: 
-                                // Se não tem seleção (-- User --), avisa em Amber.
-                                // Se já tem utilizador escolhido (mas aguarda o Sync), fica com a borda cinzenta original.
+                                // - Borda branca padrão (`border-slate-700`) se tiver user selecionado (ou seja, quando o operador já cumpriu o seu papel).
+                                // - Borda Amber ativa se estiver em `-- User --` a pedir atenção direta do operador.
                                 className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-slate-200 outline-none focus:border-[#fc4c02]/50 w-full truncate transition-all duration-200 ${
                                   !hasUser 
                                     ? "border-amber-500/80 text-amber-400 font-bold bg-amber-950/30 shadow-md shadow-amber-500/10 animate-pulse hover:animate-none" 

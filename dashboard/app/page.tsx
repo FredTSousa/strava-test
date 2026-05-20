@@ -36,7 +36,7 @@ type ParsedActivity = {
   elevationGain: number;
   fetchedAt: string; 
   assignedFirestoreUserId: string | null; 
-  originalFirestoreUserId: string | null;
+  originalFirestoreUserId: string | null; // 👈 Indica se o processo já fechou (deu sync)
 };
 
 type FirestoreUser = {
@@ -87,7 +87,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     elevationGain: Math.round(raw.total_elevation_gain ?? 0),
     fetchedAt: formatImportDate(row.fetched_at),
     assignedFirestoreUserId: row.assigned_firestore_user_id,
-    originalFirestoreUserId: row.assigned_firestore_user_id,
+    originalFirestoreUserId: row.assigned_firestore_user_id, // Se veio da DB, consideramos pré-synced do passado
   };
 }
 
@@ -101,7 +101,7 @@ export default function DashboardPage() {
   const [titleFilter, setTitleFilter] = useState("");
   const [minDistanceKm, setMinDistanceKm] = useState("");
   const [runsFilter, setRunsFilter] = useState(false);
-  const [hideAssignedFilter, setHideAssignedFilter] = useState(false); // 👈 Corrigido: Ocultar Atribuídos
+  const [hideSyncedFilter, setHideSyncedFilter] = useState(false); // 👈 Filtra por processo fechado (Synced)
 
   async function loadFeed() {
     setLoading(true);
@@ -141,6 +141,7 @@ export default function DashboardPage() {
   const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
     const valueToSave = selectedUserId || null;
 
+    // Atualiza o estado da dropdown imediatamente na UI
     setRows((prev) =>
       prev.map((row) =>
         row.idVirtual === idVirtual
@@ -156,16 +157,20 @@ export default function DashboardPage() {
         .upsert({ 
           id_virtual: idVirtual, 
           assigned_firestore_user_id: valueToSave,
+          // Como o utilizador alterou manualmente, limpamos o estado de "fechado" 
+          // até que o script Python corra de novo e atualize a flag na DB.
+          synced_to_firestore: false, 
           last_assign_timestamp: new Date().toISOString()
         });
   
       if (updateError) {
         alert("Erro ao gravar automaticamente: " + updateError.message);
       } else {
+        // Gravação feita no Supabase com sucesso (Fica pendente de Sync do Python)
         setRows((prev) =>
           prev.map((row) =>
             row.idVirtual === idVirtual
-              ? { ...row, originalFirestoreUserId: valueToSave }
+              ? { ...row, originalFirestoreUserId: null } // Desmarca como "Processo Fechado"
               : row
           )
         );
@@ -208,8 +213,9 @@ export default function DashboardPage() {
     const minKm = minDistanceKm.trim() === "" ? null : Number(minDistanceKm);
 
     return rows.filter((row) => {
-      // 🔍 Corrigido: Se o filtro estiver ativo, remove tudo o que JÁ TEM user escolhido
-      if (hideAssignedFilter && !!row.assignedFirestoreUserId) return false;
+      // 🔍 Oculta apenas os processos fechados (Onde o utilizador foi gravado E sincronizado)
+      const isProcessoFechado = !!row.originalFirestoreUserId;
+      if (hideSyncedFilter && isProcessoFechado) return false;
 
       if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
       if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
@@ -229,7 +235,7 @@ export default function DashboardPage() {
 
       return true;
     });
-  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter, hideAssignedFilter]);
+  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter, hideSyncedFilter]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
@@ -298,22 +304,21 @@ export default function DashboardPage() {
                 Apenas Prováveis Desafios
               </button>
             </div>
-            {/* 🔍 NOVO FILTRO DE PRODUTIVIDADE: OCULTAR ATRIBUÍDOS */}
             <div className="flex flex-col justify-end">
               <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
                 Triagem Manual
               </span>
               <button
                 type="button"
-                onClick={() => setHideAssignedFilter((on) => !on)}
-                aria-pressed={hideAssignedFilter}
+                onClick={() => setHideSyncedFilter((on) => !on)}
+                aria-pressed={hideSyncedFilter}
                 className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${
-                  hideAssignedFilter
+                  hideSyncedFilter
                     ? "border-amber-500 bg-amber-500/20 text-amber-400"
                     : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"
                 }`}
               >
-                Ocultar Atribuídos
+                Ocultar Sincronizados
               </button>
             </div>
           </div>
@@ -341,7 +346,7 @@ export default function DashboardPage() {
                   <col className="w-[90px]" />  {/* Moving Time */}
                   <col className="w-[75px]" />  {/* Eleva. */}
                   <col className="w-[120px]" /> {/* Importada em */}
-                  <col className="w-[160px]" /> {/* Dropdown única */}
+                  <col className="w-[190px]" /> {/* 🟢 Alargada e segura para prevenir cortes */}
                 </colgroup>
 
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
@@ -360,19 +365,18 @@ export default function DashboardPage() {
                   {filteredRows.map((row) => {
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
                     const hasUser = !!row.assignedFirestoreUserId;
+                    
+                    // O processo só fecha quando o utilizador atual é o mesmo que o sincronizado em background
+                    const isProcessoFechado = hasUser && row.assignedFirestoreUserId === row.originalFirestoreUserId;
 
                     return (
                       <tr
                         key={row.idVirtual}
-                        className={`transition-colors hover:bg-slate-800/40 ${
-                          hasUser 
-                            ? "bg-slate-900/10 opacity-70" // 🟢 Já preenchido fica apagado e discreto (Objetivo Cumprido)
-                            : "bg-amber-950/5" // 🟢 Por preencher ganha um tom quente de fundo
-                        }`}
+                        className="transition-colors hover:bg-slate-800/40 bg-slate-950"
                       >
                         <td className="px-4 py-3 font-medium text-white align-top">
                           <div className="flex flex-col gap-0.5">
-                            <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px]">
+                            <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px] text-slate-200">
                               {row.athleteName}
                             </div>
                             <div className="text-slate-500 text-[10px] truncate max-w-[142px]" title={row.deviceName}>
@@ -405,25 +409,25 @@ export default function DashboardPage() {
                         <td className="px-4 py-3 pl-6 pr-4 align-top">
                           {!hasUser && suggestedUsers.length === 0 ? (
                             <div className="flex items-center">
-                              <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
+                              <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide whitespace-nowrap">
                                 ❌ Sem user no Movera
                               </span>
                             </div>
                           ) : (
-                            <div className="flex items-center max-w-[150px]">
+                            <div className="flex items-center max-w-[170px]">
                               <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                                // 🟢 INVERSÃO VISUAL TOTAL:
-                                // Se NÃO tem user (-- User --), acende um aviso Amber vibrante a pedir ação.
-                                // Se JÁ tem user, acalma e fica com uma borda discreta de processo fechado.
-                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 outline-none focus:border-[#fc4c02]/50 w-full truncate transition-all duration-200 ${
+                                // 🟢UX Calibrada e Limpa: 
+                                // - Se não tem user escolhido (-- User --), acende o Amber vibrante (Action Item real).
+                                // - Se já tem utilizador escolhido, volta à border branca/cinzenta padrão (Fica idêntico e consistente).
+                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-slate-200 outline-none focus:border-[#fc4c02]/50 w-full truncate transition-all duration-200 ${
                                   !hasUser 
                                     ? "border-amber-500/80 text-amber-400 font-bold bg-amber-950/30 shadow-md shadow-amber-500/10 animate-pulse hover:animate-none" 
-                                    : "border-slate-800 text-slate-500 bg-slate-950/40"
+                                    : "border-slate-700 text-slate-200 hover:border-slate-600" // 👈 Volta para a border padrão
                                 }`}
                               >
-                                <option value="">-- User --</option>
+                                <option value="" className="text-amber-400 font-bold">-- User --</option>
                                 {(() => {
                                   const finalOptions = [...suggestedUsers];
                                   

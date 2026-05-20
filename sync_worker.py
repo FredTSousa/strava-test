@@ -1,30 +1,44 @@
 import os
-import math
-from supabase import create_client
-from firebase_admin import credentials, firestore, initialize_app
+import json
+from dotenv import load_dotenv
+import firebase_admin
+from firebase_admin import credentials, firestore
+from supabase import create_client, Client
+
+load_dotenv()
 
 # ==========================================
-# CONFIGURAÇÕES E INICIALIZAÇÃO
+# 1. INICIALIZAÇÃO DAS BASES DE DADOS
 # ==========================================
+
+# Inicializa Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# 🔒 Barreira de segurança: Apenas o teu ID avança para o Firestore
-MEU_USER_ID_TESTE = "vIgrcNOyXieB3D1oE57OIhR0EW33"
+# Inicializa Firebase usando o Secret do GitHub (Igual ao teu script de users)
+firebase_secret = os.getenv("FIREBASE_SERVICE_ACCOUNT")
+if not firebase_secret:
+    raise Exception("Missing FIREBASE_SERVICE_ACCOUNT environment variable.")
 
-if not len(initialize_app.__self__._apps):
-    cred = credentials.Certificate("caminho/para/o-teu-firebase-key.json")
-    initialize_app(cred)
+cred_dict = json.loads(firebase_secret)
+cred = credentials.Certificate(cred_dict)
+firebase_admin.initialize_app(cred)
 
 db_firestore = firestore.client()
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# 🔒 Barreira de segurança para a fase de testes
+MEU_USER_ID_TESTE = "vIgrcNOyXieB3D1oE57OIhR0EW33"
+
+# ==========================================
+# 2. LOGICA DE SYNC DE TREINOS (DRAFT)
+# ==========================================
 
 def run_batch_sync():
-    print("⚡ A iniciar varrimento de atividades pendentes (Modo de Teste: Draft Forçado)...")
+    print("🚀 Starting Supabase to Firestore workouts sync (Test Mode: Draft)...")
     
     try:
-        # Procurar metadados com utilizador atribuído e por sincronizar
+        # Puxar metadados do Supabase elegíveis (com user e por sincronizar)
         resposta_meta = supabase.table("strava_activities_metadata") \
             .select("id_virtual, assigned_firestore_user_id, challenge_id") \
             .not_.is_("assigned_firestore_user_id", "null") \
@@ -34,7 +48,7 @@ def run_batch_sync():
         atividades_pendentes = resposta_meta.data
         
         if not atividades_pendentes:
-            print("✨ Nenhuma atividade pendente para sincronizar.")
+            print("✨ No pending workouts to sync.")
             return
 
         sync_count = 0
@@ -44,11 +58,11 @@ def run_batch_sync():
             user_id = registo["assigned_firestore_user_id"]
             challenge_id = registo["challenge_id"]
 
-            # 🛑 CLÁUSULA DE BARREIRA: Se não for o teu ID de teste, ignora
+            # 🛑 CLÁUSULA DE BARREIRA: Para já, só mexe no teu user
             if user_id != MEU_USER_ID_TESTE:
                 continue
 
-            # Procurar os dados detalhados na View do Supabase
+            # Puxar dados brutos da View do Supabase
             resposta_view = supabase.table("view_strava_activities") \
                 .select("raw_json") \
                 .eq("id_virtual", id_virtual) \
@@ -56,19 +70,19 @@ def run_batch_sync():
                 .execute()
             
             if not resposta_view.data:
-                print(f"⚠️ Dados brutos não encontrados para a atividade {id_virtual}. A saltar...")
+                print(f"⚠️ Warning: Raw JSON not found for activity {id_virtual}. Skipping...")
                 continue
                 
             raw = resposta_view.data.get("raw_json", {})
             moving_seconds = raw.get("moving_time", 0)
             
-            # Conversões matemáticas de tempo
+            # Cálculos de tempo para o teu modelo Firestore
             horas = moving_seconds // 3600
             minutos = (moving_seconds % 3600) // 60
             segundos = moving_seconds % 60
             dur_min = round(moving_seconds / 60)
             
-            # Mapeamento estrito do desporto
+            # Mapeamento do tipo de desporto
             tipo = "outro"
             sport_type = raw.get("sport_type")
             if sport_type == "Run":
@@ -76,46 +90,43 @@ def run_batch_sync():
             elif sport_type == "TrailRun":
                 tipo = "trail"
 
-            # 📂 Payload exato para o Firestore (Esquema NoSQL dinâmico)
+            # Payload estruturado para a subcoleção do teu Firestore
             treino_payload = {
-                "criadoEm": firestore.SERVER_TIMESTAMP,
+                "criadoEm": firestore.SERVER_TIMESTAMP, # Timestamp do Firebase
                 "data": raw.get("start_date"),
                 "durMin": dur_min,
                 "elev": round(raw.get("total_elevation_gain", 0)),
                 "km": round((raw.get("distance", 0) / 1000), 2),
                 "horas": horas,
-                "minutos": minutes,
+                "minutos": minutos,
                 "segundos": segundos,
                 "nome": raw.get("name", "Treino Sem Nome"),
                 "tipo": tipo,
                 "externalId": id_virtual,
                 "challengeId": challenge_id,
-                "estado": "draft"  # 👈 Regra de Ouro: Entra sempre como rascunho bloqueado
+                "estado": "draft" # Entra sempre bloqueado como rascunho
             }
 
-            # Referência do documento: users -> {MEU_USER_ID_TESTE} -> treinos -> {id_virtual}
+            # Referência direta: users -> {MEU_USER_ID_TESTE} -> treinos -> {id_virtual}
             treino_ref = db_firestore.collection("users").document(MEU_USER_ID_TESTE) \
                                      .collection("treinos").document(id_virtual)
             
-            # Grava ou atualiza mantendo outros campos intocados caso existam
+            # Upsert seguro no Firestore
             treino_ref.set(treino_payload, merge=True)
 
-            # Validar e fechar a flag no Supabase para não repetir no próximo ciclo
+            # Validar e fechar a flag no Supabase para não repetir o registo
             supabase.table("strava_activities_metadata") \
                     .update({"synced_to_firestore": True}) \
                     .eq("id_virtual", id_virtual) \
                     .execute()
             
             sync_count += 1
-            print(f"   ↳ [ID: {id_virtual}] Sincronizado como DRAFT no Firestore.")
+            print(f"   ↳ [ID: {id_virtual}] Workout synced as DRAFT to Firestore.")
 
-        if sync_count > 0:
-            print(f"🎉 Processo concluído! {sync_count} treinos guardados em modo rascunho.")
-        else:
-            print("✨ Varrimento terminado: Nenhuma atividade elegível pertencia ao teu ID.")
+        print(f"🏁 Sync complete. Successfully mirrored {sync_count} workouts to Firestore.")
 
     except Exception as e:
-        print(f"❌ Erro crítico no lote: {e}")
+        print(f"❌ Critical error during batch execution: {e}")
 
 if __name__ == "__main__":
     run_batch_sync()

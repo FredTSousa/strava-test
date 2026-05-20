@@ -24,7 +24,7 @@ type StravaRawFeedRow = {
   fetched_at: string;
   assigned_firestore_user_id: string | null; 
   synced_to_firestore: boolean;
-  total_strava_club_matches?: number;
+  total_strava_club_matches?: number; // 🟢 FIX: Declarado aqui para o TypeScript não reclamar!
 };
 
 type ParsedActivity = {
@@ -89,7 +89,9 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     movingTimeMin: Math.round(movingSec / 60),
     elevationGain: Math.round(raw.total_elevation_gain ?? 0),
     fetchedAt: formatImportDate(row.fetched_at),
-    assignedFirestoreUserId: row.assigned_firestore_user_id,
+    // 🟢 O MAPEAMENTO CORRETO: 
+    // Lê o snake_case que vem do banco e guarda no CamelCase do TypeScript
+    assignedFirestoreUserId: row.assigned_firestore_user_id, 
     isSynced: row.synced_to_firestore ?? false,
     totalStravaClubMatches: row.total_strava_club_matches ?? 0,
   };
@@ -106,7 +108,6 @@ export default function DashboardPage() {
   const [minDistanceKm, setMinDistanceKm] = useState("");
   const [runsFilter, setRunsFilter] = useState(false);
   
-  // 🟢 Novos filtros focados nas Action Items do operador
   const [unassignedOnlyFilter, setUnassignedOnlyFilter] = useState(false); 
   const [noMoveraUserFilter, setNoMoveraUserFilter] = useState(false);
 
@@ -124,9 +125,10 @@ export default function DashboardPage() {
       if (userError) throw new Error(userError.message);
       setUsers(userData as FirestoreUser[]);
   
+      // 🟢 AJUSTE: Adicionada a nova coluna 'total_strava_club_matches' no .select() da View
       const { data: feedData, error: queryError } = await db
         .from("view_strava_activities") 
-        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore") 
+        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches") 
         .order("fetched_at", { ascending: false });
   
       if (queryError) throw new Error(queryError.message);
@@ -212,10 +214,8 @@ export default function DashboardPage() {
       const suggestedUsers = getSuggestedUsers(row.athleteName);
       const isMissingMoveraUser = !hasUserChosen && suggestedUsers.length === 0;
 
-      // 🟢 CORREÇÃO CRÍTICA: "Por Escolher" só aceita quem NÃO tem user escolhido E TEM opções para escolher
       if (unassignedOnlyFilter && (hasUserChosen || isMissingMoveraUser)) return false;
 
-      // FILTRO 2: "Sem User Movera" mostra estritamente os órfãos de sugestão
       if (noMoveraUserFilter && !isMissingMoveraUser) return false;
 
       if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
@@ -262,7 +262,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Alterado grid para cols-6 para acomodar perfeitamente os botões sem esmagar os campos */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
             <FilterField
               id="member"
@@ -306,7 +305,6 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* 🟢 FILTRO: POR ESCOLHER */}
             <div className="flex flex-col justify-end">
               <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
                 Falta Tratar
@@ -325,7 +323,6 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* 🟢 FILTRO: SEM USER NO MOVERA */}
             <div className="flex flex-col justify-end">
               <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
                 Incompatíveis
@@ -361,14 +358,14 @@ export default function DashboardPage() {
               
               <table className="min-w-full divide-y divide-slate-800 text-left text-sm table-fixed">
                 <colgroup>
-                  <col className="w-[150px]" /> {/* Athlete / Device */}
-                  <col className="w-auto" />     {/* Activity */}
-                  <col className="w-[70px]" />  {/* Sport */}
-                  <col className="w-[85px]" />  {/* Distance */}
-                  <col className="w-[90px]" />  {/* Moving Time */}
-                  <col className="w-[75px]" />  {/* Eleva. */}
-                  <col className="w-[120px]" /> {/* Importada em */}
-                  <col className="w-[190px]" /> {/* Dropdown / Alerta anti-corte */}
+                  <col className="w-[150px]" />
+                  <col className="w-auto" />
+                  <col className="w-[70px]" />
+                  <col className="w-[85px]" />
+                  <col className="w-[90px]" />
+                  <col className="w-[75px]" />
+                  <col className="w-[120px]" />
+                  <col className="w-[190px]" />
                 </colgroup>
 
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
@@ -453,7 +450,6 @@ export default function DashboardPage() {
                               >
                                 <option value="" className="text-amber-400 font-bold">-- Escolher User --</option>
                                 
-                                {/* 🟢 AVISO DINÂMICO SOLICITADO */}
                                 {(() => {
                                   const semContaCount = row.totalStravaClubMatches - suggestedUsers.length;
                                   if (semContaCount > 0) {
@@ -466,7 +462,6 @@ export default function DashboardPage() {
                                   return null;
                                 })()}
                               
-                                {/* GRUPO 1: Sugestões */}
                                 {suggestedUsers.length > 0 && (
                                   <optgroup label="✨ Sugestões de Match" className="bg-slate-900 text-[#fc4c02] font-semibold">
                                     {suggestedUsers.map((user) => (
@@ -477,7 +472,6 @@ export default function DashboardPage() {
                                   </optgroup>
                                 )}
                               
-                                {/* GRUPO 2: Todos os Utilizadores */}
                                 <optgroup label="👥 Todos os Utilizadores da App" className="bg-slate-900 text-slate-400 font-semibold">
                                   {users.map((user) => {
                                     const isSuggested = suggestedUsers.some(s => s.id === user.id);

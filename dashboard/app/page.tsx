@@ -450,6 +450,7 @@ export default function DashboardPage() {
                               >
                                 <option value="" className="text-amber-400 font-bold">-- Escolher User --</option>
                                 
+                                {/* ⚠️ AVISO DINÂMICO: Mostra quantos membros do clube do Strava com este nome ainda NÃO têm conta */}
                                 {(() => {
                                   const semContaCount = row.totalStravaClubMatches - suggestedUsers.length;
                                   if (semContaCount > 0) {
@@ -462,8 +463,9 @@ export default function DashboardPage() {
                                   return null;
                                 })()}
                               
+                                {/* ✨ LISTA EXCLUSIVA: Só mostra os utilizadores sugeridos da base de dados */}
                                 {suggestedUsers.length > 0 && (
-                                  <optgroup label="✨ Sugestões de Match" className="bg-slate-900 text-[#fc4c02] font-semibold">
+                                  <optgroup label="✨ Utilizadores Encontrados" className="bg-slate-900 text-[#fc4c02] font-semibold">
                                     {suggestedUsers.map((user) => (
                                       <option key={`sug-${user.id}`} value={user.id} className="bg-slate-950 text-white font-normal">
                                         {user.display_name} ({user.email})
@@ -471,17 +473,6 @@ export default function DashboardPage() {
                                     ))}
                                   </optgroup>
                                 )}
-                              
-                                <optgroup label="👥 Todos os Utilizadores da App" className="bg-slate-900 text-slate-400 font-semibold">
-                                  {users.map((user) => {
-                                    const isSuggested = suggestedUsers.some(s => s.id === user.id);
-                                    return (
-                                      <option key={`all-${user.id}`} value={user.id} className="bg-slate-950 text-slate-300 font-normal">
-                                        {user.display_name} {isSuggested ? "✓" : ""}
-                                      </option>
-                                    );
-                                  })}
-                                </optgroup>
                               </select>
                             </div>
                           )}

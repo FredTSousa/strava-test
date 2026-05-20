@@ -15,7 +15,7 @@ type StravaActivityJson = {
   moving_time?: number;
   total_elevation_gain?: number;
   athlete?: StravaAthlete;
-  device_name?: string; // 👈 Adicionado
+  device_name?: string;
 };
 
 type StravaRawFeedRow = {
@@ -28,7 +28,7 @@ type StravaRawFeedRow = {
 type ParsedActivity = {
   idVirtual: string;
   athleteName: string;
-  deviceName: string; // 👈 Adicionado
+  deviceName: string;
   title: string;
   sportType: string;
   distanceKm: number;
@@ -44,9 +44,6 @@ type FirestoreUser = {
   display_name: string;
   email: string;
 };
-
-// 🔒 O teu ID único do Firestore para controlo estrito de bloqueio
-const MEU_USER_ID_TESTE = "vIgrcNOyXieB3D1oE57OIhR0EW33";
 
 function normalizeForMatch(text: string): string {
   return text
@@ -82,7 +79,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
   return {
     idVirtual: row.id_virtual,
     athleteName,
-    deviceName: raw.device_name ?? "Unknown Device", // 👈 Extração do Dispositivo
+    deviceName: raw.device_name ?? "Unknown Device",
     title: raw.name ?? "Untitled",
     sportType: raw.sport_type ?? "—",
     distanceKm: Math.round((distanceM / 1000) * 100) / 100,
@@ -104,6 +101,7 @@ export default function DashboardPage() {
   const [titleFilter, setTitleFilter] = useState("");
   const [minDistanceKm, setMinDistanceKm] = useState("");
   const [runsFilter, setRunsFilter] = useState(false);
+  const [hideAssignedFilter, setHideAssignedFilter] = useState(false); // 👈 Corrigido: Ocultar Atribuídos
 
   async function loadFeed() {
     setLoading(true);
@@ -140,43 +138,40 @@ export default function DashboardPage() {
     loadFeed();
   }, []);
 
-  const handleDropdownUserChange = (idVirtual: string, selectedUserId: string) => {
+  const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
+    const valueToSave = selectedUserId || null;
+
     setRows((prev) =>
       prev.map((row) =>
         row.idVirtual === idVirtual
-          ? { ...row, assignedFirestoreUserId: selectedUserId || null }
+          ? { ...row, assignedFirestoreUserId: valueToSave }
           : row
       )
     );
-  };
 
-  const handleSaveAssignment = async (idVirtual: string, userId: string | null) => {
     try {
       const db = getSupabase();
-  
       const { error: updateError } = await db
         .from("strava_activities_metadata")
         .upsert({ 
           id_virtual: idVirtual, 
-          assigned_firestore_user_id: userId || null,
+          assigned_firestore_user_id: valueToSave,
           last_assign_timestamp: new Date().toISOString()
         });
   
       if (updateError) {
-        alert("Erro ao gravar: " + updateError.message);
+        alert("Erro ao gravar automaticamente: " + updateError.message);
       } else {
-        alert("Alterações gravadas com sucesso! O script de background tratará do sync.");
-        
         setRows((prev) =>
           prev.map((row) =>
             row.idVirtual === idVirtual
-              ? { ...row, originalFirestoreUserId: userId }
+              ? { ...row, originalFirestoreUserId: valueToSave }
               : row
           )
         );
       }
     } catch (e) {
-      alert("Erro na ligação à base de dados.");
+      alert("Erro na ligação para gravação automática.");
     }
   };
 
@@ -213,6 +208,9 @@ export default function DashboardPage() {
     const minKm = minDistanceKm.trim() === "" ? null : Number(minDistanceKm);
 
     return rows.filter((row) => {
+      // 🔍 Corrigido: Se o filtro estiver ativo, remove tudo o que JÁ TEM user escolhido
+      if (hideAssignedFilter && !!row.assignedFirestoreUserId) return false;
+
       if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
       if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
       if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
@@ -231,7 +229,7 @@ export default function DashboardPage() {
 
       return true;
     });
-  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
+  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter, hideAssignedFilter]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
@@ -258,7 +256,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <FilterField
               id="member"
               label="Member Name"
@@ -300,6 +298,24 @@ export default function DashboardPage() {
                 Apenas Prováveis Desafios
               </button>
             </div>
+            {/* 🔍 NOVO FILTRO DE PRODUTIVIDADE: OCULTAR ATRIBUÍDOS */}
+            <div className="flex flex-col justify-end">
+              <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                Triagem Manual
+              </span>
+              <button
+                type="button"
+                onClick={() => setHideAssignedFilter((on) => !on)}
+                aria-pressed={hideAssignedFilter}
+                className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${
+                  hideAssignedFilter
+                    ? "border-amber-500 bg-amber-500/20 text-amber-400"
+                    : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"
+                }`}
+              >
+                Ocultar Atribuídos
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -318,14 +334,14 @@ export default function DashboardPage() {
               
               <table className="min-w-full divide-y divide-slate-800 text-left text-sm table-fixed">
                 <colgroup>
-                  <col className="w-[150px]" /> {/* 🟢 Alargado de 110px para 150px para caber o nome completo */}
+                  <col className="w-[150px]" /> {/* Athlete / Device */}
                   <col className="w-auto" />     {/* Activity */}
                   <col className="w-[70px]" />  {/* Sport */}
                   <col className="w-[85px]" />  {/* Distance */}
                   <col className="w-[90px]" />  {/* Moving Time */}
                   <col className="w-[75px]" />  {/* Eleva. */}
                   <col className="w-[120px]" /> {/* Importada em */}
-                  <col className="w-[200px]" /> {/* 🟢 Reduzido para 200px pois agora só tem 1 dropdown + 1 botão */}
+                  <col className="w-[160px]" /> {/* Dropdown única */}
                 </colgroup>
 
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
@@ -343,26 +359,22 @@ export default function DashboardPage() {
                 <tbody className="divide-y divide-slate-800/80 bg-slate-900/20">
                   {filteredRows.map((row) => {
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
-                    
-                    // 🔍 Verifica se já foi sincronizado para o teu ID de testes
-                    const isSyncedToMe = row.originalFirestoreUserId === MEU_USER_ID_TESTE;
+                    const hasUser = !!row.assignedFirestoreUserId;
 
                     return (
                       <tr
                         key={row.idVirtual}
                         className={`transition-colors hover:bg-slate-800/40 ${
-                          isSyncedToMe 
-                            ? "bg-emerald-950/20 hover:bg-emerald-950/30" // 🟢 Nova cor diferenciada e travada para os synced
-                            : row.assignedFirestoreUserId ? "bg-slate-800/20" : ""
+                          hasUser 
+                            ? "bg-slate-900/10 opacity-70" // 🟢 Já preenchido fica apagado e discreto (Objetivo Cumprido)
+                            : "bg-amber-950/5" // 🟢 Por preencher ganha um tom quente de fundo
                         }`}
                       >
                         <td className="px-4 py-3 font-medium text-white align-top">
                           <div className="flex flex-col gap-0.5">
-                            {/* 🟢 Margem máxima calibrada para a nova largura da coluna */}
                             <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px]">
                               {row.athleteName}
                             </div>
-                            {/* 🟢 Renderização do nome do dispositivo abaixo do atleta */}
                             <div className="text-slate-500 text-[10px] truncate max-w-[142px]" title={row.deviceName}>
                               {row.deviceName}
                             </div>
@@ -391,29 +403,24 @@ export default function DashboardPage() {
                           {row.fetchedAt}
                         </Td>
                         <td className="px-4 py-3 pl-6 pr-4 align-top">
-                          {isSyncedToMe ? (
-                            /* 🟢 ESTADO 1: JÁ SYNCHRONIZED (Travado e não editável) */
-                            <div className="flex items-center">
-                              <span className="inline-flex items-center rounded-lg bg-emerald-950/80 px-3 py-1.5 text-xs font-bold text-emerald-400 border border-emerald-500/30 tracking-wide shadow-sm shadow-emerald-500/5">
-                                ✓ Sincronizado (Draft)
-                              </span>
-                            </div>
-                          ) : !row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
-                            /* ESTADO 2: SEM COMPATIBILIDADE */
+                          {!hasUser && suggestedUsers.length === 0 ? (
                             <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
                                 ❌ Sem user no Movera
                               </span>
                             </div>
                           ) : (
-                            /* ESTADO 3: EDITÁVEL / PENDENTE DE GRAVAÇÃO */
-                            <div className="flex items-center gap-2 max-w-[190px]">
-                              
+                            <div className="flex items-center max-w-[150px]">
                               <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                                className={`rounded-lg border text-xs bg-slate-950 px-1.5 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-[120px] shrink-0 truncate ${
-                                  row.assignedFirestoreUserId ? "border-amber-600 text-amber-200" : "border-slate-700 text-slate-300"
+                                // 🟢 INVERSÃO VISUAL TOTAL:
+                                // Se NÃO tem user (-- User --), acende um aviso Amber vibrante a pedir ação.
+                                // Se JÁ tem user, acalma e fica com uma borda discreta de processo fechado.
+                                className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 outline-none focus:border-[#fc4c02]/50 w-full truncate transition-all duration-200 ${
+                                  !hasUser 
+                                    ? "border-amber-500/80 text-amber-400 font-bold bg-amber-950/30 shadow-md shadow-amber-500/10 animate-pulse hover:animate-none" 
+                                    : "border-slate-800 text-slate-500 bg-slate-950/40"
                                 }`}
                               >
                                 <option value="">-- User --</option>
@@ -429,31 +436,12 @@ export default function DashboardPage() {
                                   }
                                   
                                   return finalOptions.map((user) => (
-                                    <option key={user.id} value={user.id} className="bg-slate-950 text-white">
+                                    <option key={user.id} value={user.id} className="bg-slate-950 text-white font-normal">
                                       {user.display_name}
                                     </option>
                                   ));
                                 })()}
                               </select>
-
-                              {(() => {
-                                const hasChanges = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
-
-                                return (
-                                  <button
-                                    type="button"
-                                    disabled={!hasChanges}
-                                    onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId)}
-                                    className={`rounded-lg px-1 py-1.5 text-xs font-semibold transition w-14 text-center shrink-0 ${
-                                      hasChanges
-                                        ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
-                                        : "bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-50"
-                                    }`}
-                                  >
-                                    Gravar
-                                  </button>
-                                );
-                              })()}
                             </div>
                           )}
                         </td>

@@ -15,6 +15,7 @@ type StravaActivityJson = {
   moving_time?: number;
   total_elevation_gain?: number;
   athlete?: StravaAthlete;
+  device_name?: string; // 👈 Adicionado
 };
 
 type StravaRawFeedRow = {
@@ -22,12 +23,12 @@ type StravaRawFeedRow = {
   raw_json: StravaActivityJson;
   fetched_at: string;
   assigned_firestore_user_id: string | null; 
-  challenge_id: number | null; 
 };
 
 type ParsedActivity = {
   idVirtual: string;
   athleteName: string;
+  deviceName: string; // 👈 Adicionado
   title: string;
   sportType: string;
   distanceKm: number;
@@ -36,8 +37,6 @@ type ParsedActivity = {
   fetchedAt: string; 
   assignedFirestoreUserId: string | null; 
   originalFirestoreUserId: string | null;
-  challengeId: number | null;         
-  originalChallengeId: number | null; 
 };
 
 type FirestoreUser = {
@@ -46,11 +45,8 @@ type FirestoreUser = {
   email: string;
 };
 
-const CHALLENGES_LIST = [
-  { id: 1, name: "Começa" },
-  { id: 2, name: "Cresce" },
-  { id: 3, name: "Supera" }
-];
+// 🔒 O teu ID único do Firestore para controlo estrito de bloqueio
+const MEU_USER_ID_TESTE = "vIgrcNOyXieB3D1oE57OIhR0EW33";
 
 function normalizeForMatch(text: string): string {
   return text
@@ -86,6 +82,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
   return {
     idVirtual: row.id_virtual,
     athleteName,
+    deviceName: raw.device_name ?? "Unknown Device", // 👈 Extração do Dispositivo
     title: raw.name ?? "Untitled",
     sportType: raw.sport_type ?? "—",
     distanceKm: Math.round((distanceM / 1000) * 100) / 100,
@@ -94,8 +91,6 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     fetchedAt: formatImportDate(row.fetched_at),
     assignedFirestoreUserId: row.assigned_firestore_user_id,
     originalFirestoreUserId: row.assigned_firestore_user_id,
-    challengeId: row.challenge_id,
-    originalChallengeId: row.challenge_id,
   };
 }
 
@@ -126,7 +121,7 @@ export default function DashboardPage() {
   
       const { data: feedData, error: queryError } = await db
         .from("view_strava_activities") 
-        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, challenge_id") 
+        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id") 
         .order("fetched_at", { ascending: false });
   
       if (queryError) throw new Error(queryError.message);
@@ -155,17 +150,7 @@ export default function DashboardPage() {
     );
   };
 
-  const handleDropdownChallengeChange = (idVirtual: string, selectedChallengeId: string) => {
-    setRows((prev) =>
-      prev.map((row) =>
-        row.idVirtual === idVirtual
-          ? { ...row, challengeId: selectedChallengeId ? Number(selectedChallengeId) : null }
-          : row
-      )
-    );
-  };
-
-  const handleSaveAssignment = async (idVirtual: string, userId: string | null, challengeId: number | null) => {
+  const handleSaveAssignment = async (idVirtual: string, userId: string | null) => {
     try {
       const db = getSupabase();
   
@@ -174,19 +159,18 @@ export default function DashboardPage() {
         .upsert({ 
           id_virtual: idVirtual, 
           assigned_firestore_user_id: userId || null,
-          challenge_id: challengeId || null, 
           last_assign_timestamp: new Date().toISOString()
         });
   
       if (updateError) {
         alert("Erro ao gravar: " + updateError.message);
       } else {
-        alert("Alterações gravadas com sucesso!");
+        alert("Alterações gravadas com sucesso! O script de background tratará do sync.");
         
         setRows((prev) =>
           prev.map((row) =>
             row.idVirtual === idVirtual
-              ? { ...row, originalFirestoreUserId: userId, originalChallengeId: challengeId }
+              ? { ...row, originalFirestoreUserId: userId }
               : row
           )
         );
@@ -224,33 +208,30 @@ export default function DashboardPage() {
   };
 
   const filteredRows = useMemo(() => {
-  const memberQ = memberFilter.trim().toLowerCase();
-  const titleQ = titleFilter.trim().toLowerCase();
-  const minKm = minDistanceKm.trim() === "" ? null : Number(minDistanceKm);
+    const memberQ = memberFilter.trim().toLowerCase();
+    const titleQ = titleFilter.trim().toLowerCase();
+    const minKm = minDistanceKm.trim() === "" ? null : Number(minDistanceKm);
 
-  return rows.filter((row) => {
-    if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
-    if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
-    if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
-    
-    // 🔍 Filtro de Desafios Atualizado para o Ponto 2:
-    if (runsFilter) {
-      const hasChallengeId = !!row.challengeId; // Já está associado na DB
+    return rows.filter((row) => {
+      if (memberQ && !row.athleteName.toLowerCase().includes(memberQ)) return false;
+      if (titleQ && !row.title.toLowerCase().includes(titleQ)) return false;
+      if (minKm !== null && !Number.isNaN(minKm) && row.distanceKm < minKm) return false;
       
-      const normalizedTitle = normalizeForMatch(row.title);
-      const hasChallengeInName = normalizedTitle.includes("comeca") || 
-                                 normalizedTitle.includes("cresce") || 
-                                 normalizedTitle.includes("supera") ||
-                                 normalizedTitle.includes("desafio") || // 👈 Nova palavra-chave
-                                 normalizedTitle.includes("movera");; // Tem o termo no nome
+      if (runsFilter) {
+        const hasFirestoreUser = !!row.assignedFirestoreUserId;
+        const normalizedTitle = normalizeForMatch(row.title);
+        const hasChallengeInName = normalizedTitle.includes("comeca") || 
+                                   normalizedTitle.includes("cresce") || 
+                                   normalizedTitle.includes("supera") ||
+                                   normalizedTitle.includes("desafio") || 
+                                   normalizedTitle.includes("movera");
 
-      // Se o botão estiver ativo e a linha NÃO tiver ID e NÃO tiver o termo no nome, é descartada
-      if (!hasChallengeId && !hasChallengeInName) return false;
-    }
+        if (!hasFirestoreUser && !hasChallengeInName) return false;
+      }
 
-    return true;
-  });
-}, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
+      return true;
+    });
+  }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
@@ -336,70 +317,67 @@ export default function DashboardPage() {
             <div className="flex-1 overflow-auto min-h-0">
               
               <table className="min-w-full divide-y divide-slate-800 text-left text-sm table-fixed">
-                {/* 🔍 CALIBRAÇÃO RÍGIDA DO COLGROUP: 
-                    Tranca o atleta a 110px. 
-                    Deixa a atividade como w-auto (vai sugar 100% do espaço restante).
-                    Fixa a última coluna a exatamente 275px para albergar perfeitamente o User (120px) + Desafio (80px) + Botão (56px) + gaps e paddings internos. */}
                 <colgroup>
-                  <col className="w-[110px]" /> {/* Athlete */}
-                  <col className="w-auto" />     {/* Activity (Totalmente fluida!) */}
+                  <col className="w-[150px]" /> {/* 🟢 Alargado de 110px para 150px para caber o nome completo */}
+                  <col className="w-auto" />     {/* Activity */}
                   <col className="w-[70px]" />  {/* Sport */}
                   <col className="w-[85px]" />  {/* Distance */}
                   <col className="w-[90px]" />  {/* Moving Time */}
                   <col className="w-[75px]" />  {/* Eleva. */}
                   <col className="w-[120px]" /> {/* Importada em */}
-                  <col className="w-[295px]" /> {/* Dropdowns + Botão (Sem transbordar!) */}
+                  <col className="w-[200px]" /> {/* 🟢 Reduzido para 200px pois agora só tem 1 dropdown + 1 botão */}
                 </colgroup>
 
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">
                   <tr className="border-b border-slate-800">
-                    <Th>Athlete</Th>
+                    <Th>Athlete / Device</Th>
                     <Th>Activity</Th>
                     <Th>Sport</Th>
                     <Th className="text-right">Distance</Th>
                     <Th className="text-right">Moving Time</Th>
-                    <Th className="text-right">Eleva.</Th> {/* 🔍 Nome alterado aqui */}
+                    <Th className="text-right">Eleva.</Th>
                     <Th>Importada em</Th>
-                    <Th className="pl-6 pr-4">Assign App User & Challenge</Th> 
+                    <Th className="pl-6 pr-4">Assign App User</Th> 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/80 bg-slate-900/20">
                   {filteredRows.map((row) => {
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
+                    
+                    // 🔍 Verifica se já foi sincronizado para o teu ID de testes
+                    const isSyncedToMe = row.originalFirestoreUserId === MEU_USER_ID_TESTE;
 
                     return (
                       <tr
                         key={row.idVirtual}
                         className={`transition-colors hover:bg-slate-800/40 ${
-                          row.assignedFirestoreUserId ? "bg-green-950/5 hover:bg-green-950/10" : ""
+                          isSyncedToMe 
+                            ? "bg-emerald-950/20 hover:bg-emerald-950/30" // 🟢 Nova cor diferenciada e travada para os synced
+                            : row.assignedFirestoreUserId ? "bg-slate-800/20" : ""
                         }`}
                       >
                         <td className="px-4 py-3 font-medium text-white align-top">
-                          <div className="flex flex-col gap-1">
-                            {/* Trancado estritamente à largura máxima da coluna */}
-                            <div className="whitespace-normal break-words leading-tight text-xs max-w-[102px]">
+                          <div className="flex flex-col gap-0.5">
+                            {/* 🟢 Margem máxima calibrada para a nova largura da coluna */}
+                            <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px]">
                               {row.athleteName}
                             </div>
-                            {row.assignedFirestoreUserId && row.challengeId && (
-                              <div className="mt-1">
-                                <span className="inline-flex items-center text-[9px] text-green-400 bg-green-950 px-1 py-0.5 rounded border border-green-900/40 shrink-0">
-                                  Linked
-                                </span>
-                              </div>
-                            )}
+                            {/* 🟢 Renderização do nome do dispositivo abaixo do atleta */}
+                            <div className="text-slate-500 text-[10px] truncate max-w-[142px]" title={row.deviceName}>
+                              {row.deviceName}
+                            </div>
                           </div>
                         </td>
 
-                        {/* Ocupa dinamicamente todo o espaço que sobra no ecrã */}
                         <td className="px-4 py-3 text-slate-200 whitespace-normal break-words leading-normal align-top">
                           {row.title}
                         </td>
 
-                        <Td className="align-top">
+                        <td className="px-4 py-2.5 align-top">
                           <span className="inline-flex rounded-full bg-[#fc4c02]/15 px-1.5 py-0.5 text-[11px] font-medium text-[#fc4c02]">
                             {row.sportType}
                           </span>
-                        </Td>
+                        </td>
                         <Td className="text-right tabular-nums text-slate-300 align-top">
                           {row.distanceKm.toFixed(2)} km
                         </Td>
@@ -412,22 +390,30 @@ export default function DashboardPage() {
                         <Td className="text-slate-400 text-xs tabular-nums whitespace-nowrap align-top">
                           {row.fetchedAt}
                         </Td>
-                        <td className="px-4 py-3 pl-6 pr-4align-top">
-                          {!row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
+                        <td className="px-4 py-3 pl-6 pr-4 align-top">
+                          {isSyncedToMe ? (
+                            /* 🟢 ESTADO 1: JÁ SYNCHRONIZED (Travado e não editável) */
+                            <div className="flex items-center">
+                              <span className="inline-flex items-center rounded-lg bg-emerald-950/80 px-3 py-1.5 text-xs font-bold text-emerald-400 border border-emerald-500/30 tracking-wide shadow-sm shadow-emerald-500/5">
+                                ✓ Sincronizado (Draft)
+                              </span>
+                            </div>
+                          ) : !row.assignedFirestoreUserId && suggestedUsers.length === 0 ? (
+                            /* ESTADO 2: SEM COMPATIBILIDADE */
                             <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide">
                                 ❌ Sem user no Movera
                               </span>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-1.5 max-w-[270px]">
+                            /* ESTADO 3: EDITÁVEL / PENDENTE DE GRAVAÇÃO */
+                            <div className="flex items-center gap-2 max-w-[190px]">
                               
-                              {/* DROPDOWN 1: Membros Movera -> Trancado estritamente a 120px */}
                               <select
                                 value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
                                 className={`rounded-lg border text-xs bg-slate-950 px-1.5 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-[120px] shrink-0 truncate ${
-                                  row.assignedFirestoreUserId ? "border-green-800 text-green-200" : "border-slate-700 text-slate-300"
+                                  row.assignedFirestoreUserId ? "border-amber-600 text-amber-200" : "border-slate-700 text-slate-300"
                                 }`}
                               >
                                 <option value="">-- User --</option>
@@ -450,33 +436,14 @@ export default function DashboardPage() {
                                 })()}
                               </select>
 
-                              {/* DROPDOWN 2: Desafios (Challenges) -> Trancado estritamente a 80px */}
-                              <select
-                                value={row.challengeId || ""}
-                                onChange={(e) => handleDropdownChallengeChange(row.idVirtual, e.target.value)}
-                                className={`rounded-lg border text-xs bg-slate-950 px-1 py-1.5 text-white outline-none focus:border-[#fc4c02]/50 w-[80px] shrink-0 ${
-                                  row.challengeId ? "border-amber-700 text-amber-200" : "border-slate-700 text-slate-300"
-                                }`}
-                              >
-                                <option value="">-- Run --</option>
-                                {CHALLENGES_LIST.map((challenge) => (
-                                  <option key={challenge.id} value={challenge.id} className="bg-slate-950 text-white">
-                                    {challenge.name}
-                                  </option>
-                                ))}
-                              </select>
-                              
-                              {/* BOTÃO GRAVAR: Reduzido milimetricamente para w-14 (56px) para encaixar na perfeição */}
                               {(() => {
-                                const hasUserChanged = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
-                                const hasChallengeChanged = (row.challengeId || 0) !== (row.originalChallengeId || 0);
-                                const hasChanges = hasUserChanged || hasChallengeChanged;
+                                const hasChanges = (row.assignedFirestoreUserId || "") !== (row.originalFirestoreUserId || "");
 
                                 return (
                                   <button
                                     type="button"
                                     disabled={!hasChanges}
-                                    onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId, row.challengeId)}
+                                    onClick={() => handleSaveAssignment(row.idVirtual, row.assignedFirestoreUserId)}
                                     className={`rounded-lg px-1 py-1.5 text-xs font-semibold transition w-14 text-center shrink-0 ${
                                       hasChanges
                                         ? "bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/10 cursor-pointer"
@@ -549,9 +516,9 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
   );
 }
 
-function Td({ children, className = "", title }: { children: React.ReactNode; className?: string; title?: string }) {
+function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <td className={`px-4 py-2.5 ${className}`} title={title}>
+    <td className={`px-4 py-2.5 ${className}`}>
       {children}
     </td>
   );

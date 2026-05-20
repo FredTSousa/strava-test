@@ -1,0 +1,28 @@
+name: Manual Strava Workouts Firestore Sync
+
+on:
+  workflow_dispatch: # Permite execução manual no GitHub ou disparo via API da Supabase/Next.js
+
+jobs:
+  sync_workouts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install python-dotenv supabase firebase-admin
+
+      - name: Run Workouts Sync Script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python sync_worker.py

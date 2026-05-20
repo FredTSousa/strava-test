@@ -104,7 +104,7 @@ def run_batch_sync():
                 "tipo": tipo,
                 "externalId": id_virtual,
                 "challengeId": challenge_id,
-                "estado": "draft" # Entra sempre bloqueado como rascunho
+                "status": "draft" # Entra sempre bloqueado como rascunho
             }
 
             # Referência direta: users -> {MEU_USER_ID_TESTE} -> treinos -> {id_virtual}

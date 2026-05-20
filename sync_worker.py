@@ -27,8 +27,7 @@ firebase_admin.initialize_app(cred)
 
 db_firestore = firestore.client()
 
-# 🔒 BARREIRA DE SEGURANÇA: Só o teu ID de utilizador avança para o Firestore
-MEU_USER_ID_TESTE = "vIgrcNOyXieB3D1oE57OIhR0EW33"
+
 
 # ==========================================
 # 2. LOGICA DE SYNC DE TREINOS (MODO TESTE RESTREITO)
@@ -58,9 +57,7 @@ def run_batch_sync():
             id_virtual = registo["id_virtual"]
             user_id = registo["assigned_firestore_user_id"]
 
-            # 🛑 TRANCADO: Se não for o teu ID de teste, ignora e deixa a linha intocada no Supabase
-            if user_id != MEU_USER_ID_TESTE:
-                continue
+          
 
             # Puxar dados brutos da View do Supabase
             resposta_view = supabase.table("view_strava_activities") \
@@ -112,7 +109,7 @@ def run_batch_sync():
 
             try:
                 # Envia estritamente para a tua coleção no Firestore
-                treino_ref = db_firestore.collection("users").document(MEU_USER_ID_TESTE) \
+                treino_ref = db_firestore.collection("users").document(user_id) \
                                          .collection("treinos").document(id_virtual)
                 
                 treino_ref.set(treino_payload, merge=True)

@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install requests python-dotenv supabase
+          pip install requests python-dotenv supabase firebase-admin
 
       - name: Run Sync Script
         env:

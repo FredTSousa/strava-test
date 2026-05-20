@@ -24,6 +24,7 @@ type StravaRawFeedRow = {
   fetched_at: string;
   assigned_firestore_user_id: string | null; 
   synced_to_firestore: boolean;
+  total_strava_club_matches?: number;
 };
 
 type ParsedActivity = {

@@ -38,6 +38,7 @@ type ParsedActivity = {
   fetchedAt: string; 
   assignedFirestoreUserId: string | null; 
   isSynced: boolean;
+  totalStravaClubMatches: number;
 };
 
 type FirestoreUser = {
@@ -89,6 +90,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     fetchedAt: formatImportDate(row.fetched_at),
     assignedFirestoreUserId: row.assigned_firestore_user_id,
     isSynced: row.synced_to_firestore ?? false,
+    totalStravaClubMatches: row.total_strava_club_matches ?? 0,
   };
 }
 
@@ -440,35 +442,51 @@ export default function DashboardPage() {
                           ) : (
                             <div className="flex items-center max-w-[170px]">
                               <select
-                                value={row.assignedFirestoreUserId || ""}
+                                value={row.assigned_firestore_user_id || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
-                                // 🟢 UX Corrigida: 
-                                // - Borda branca padrão (`border-slate-700`) se tiver user selecionado (ou seja, quando o operador já cumpriu o seu papel).
-                                // - Borda Amber ativa se estiver em `-- User --` a pedir atenção direta do operador.
                                 className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-slate-200 outline-none focus:border-[#fc4c02]/50 w-full truncate transition-all duration-200 ${
                                   !hasUser 
                                     ? "border-amber-500/80 text-amber-400 font-bold bg-amber-950/30 shadow-md shadow-amber-500/10 animate-pulse hover:animate-none" 
                                     : "border-slate-700 text-slate-200 hover:border-slate-600" 
                                 }`}
                               >
-                                <option value="" className="text-amber-400 font-bold">-- User --</option>
+                                <option value="" className="text-amber-400 font-bold">-- Escolher User --</option>
+                                
+                                {/* 🟢 AVISO DINÂMICO SOLICITADO */}
                                 {(() => {
-                                  const finalOptions = [...suggestedUsers];
-                                  
-                                  if (row.assignedFirestoreUserId) {
-                                    const isAlreadyInOptions = finalOptions.some(u => u.id === row.assignedFirestoreUserId);
-                                    if (!isAlreadyInOptions) {
-                                      const currentUserObj = users.find(u => u.id === row.assignedFirestoreUserId);
-                                      if (currentUserObj) finalOptions.push(currentUserObj);
-                                    }
+                                  const semContaCount = row.totalStravaClubMatches - suggestedUsers.length;
+                                  if (semContaCount > 0) {
+                                    return (
+                                      <option disabled className="text-red-400 bg-red-950/40 font-semibold">
+                                        ⚠️ Há mais {semContaCount} {semContaCount === 1 ? "membro" : "membros"} sem conta no Movera!
+                                      </option>
+                                    );
                                   }
-                                  
-                                  return finalOptions.map((user) => (
-                                    <option key={user.id} value={user.id} className="bg-slate-950 text-white font-normal">
-                                      {user.display_name}
-                                    </option>
-                                  ));
+                                  return null;
                                 })()}
+                              
+                                {/* GRUPO 1: Sugestões */}
+                                {suggestedUsers.length > 0 && (
+                                  <optgroup label="✨ Sugestões de Match" className="bg-slate-900 text-[#fc4c02] font-semibold">
+                                    {suggestedUsers.map((user) => (
+                                      <option key={`sug-${user.id}`} value={user.id} className="bg-slate-950 text-white font-normal">
+                                        {user.display_name} ({user.email})
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                )}
+                              
+                                {/* GRUPO 2: Todos os Utilizadores */}
+                                <optgroup label="👥 Todos os Utilizadores da App" className="bg-slate-900 text-slate-400 font-semibold">
+                                  {users.map((user) => {
+                                    const isSuggested = suggestedUsers.some(s => s.id === user.id);
+                                    return (
+                                      <option key={`all-${user.id}`} value={user.id} className="bg-slate-950 text-slate-300 font-normal">
+                                        {user.display_name} {isSuggested ? "✓" : ""}
+                                      </option>
+                                    );
+                                  })}
+                                </optgroup>
                               </select>
                             </div>
                           )}

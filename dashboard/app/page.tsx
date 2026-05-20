@@ -440,7 +440,7 @@ export default function DashboardPage() {
                           ) : (
                             <div className="flex items-center max-w-[170px]">
                               <select
-                                value={row.assigned_firestore_user_id || ""}
+                                value={row.assignedFirestoreUserId || ""}
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
                                 className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-slate-200 outline-none focus:border-[#fc4c02]/50 w-full truncate transition-all duration-200 ${
                                   !hasUser 

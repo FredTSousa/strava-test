@@ -2,8 +2,22 @@ import os
 import time
 import random  
 import requests
+from dotenv import load_dotenv #
 from supabase import create_client, Client
 
+
+load_dotenv()
+
+print("📂 Pasta atual onde o Python está a rodar:", os.getcwd())
+print("📄 Ficheiros que o Python consegue ver nesta pasta:", os.listdir('.'))
+print(f"🔍 O que foi lido do SUPABASE_URL: {os.getenv('SUPABASE_URL')}")
+print(f"🔍 O que foi lido do SUPABASE_KEY: {os.getenv('SUPABASE_KEY')}")
+
+print(f"🔍 O que foi lido do STRAVA_CLIENT_ID: {os.getenv('STRAVA_CLIENT_ID')}")
+
+print(f"🔍 O que foi lido do STRAVA_REFRESH_TOKEN: {os.getenv('STRAVA_REFRESH_TOKEN')}")
+
+print(f"🔍 O que foi lido do STRAVA_CLUB_ID: {os.getenv('STRAVA_CLUB_ID')}")
 # Inicializa Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -28,51 +42,71 @@ def update_cookie_in_supabase(novo_cookie: str):
         "value": novo_cookie
     }).execute()
 
+from curl_cffi import requests 
+
 def run_keep_alive():
-    # Jitter curto para segurança
-    tempo_espera = random.randint(10, 15)
-    print(f"🎲 [Segurança] A aguardar {tempo_espera} segundos...")
-    time.sleep(tempo_espera)
-    
-    print("📡 A iniciar verificação do cookie...")
+    print("📡 A iniciar verificação com emulador de browser...")
     cookie_atual = get_current_cookie()
     
-    session = requests.Session()
+    # Criamos a sessão usando o motor do Chrome limpo
+    session = requests.Session(impersonate="chrome120")
     
-    # 1. Copiamos todos os headers do teu Postman, MAS SEM O COOKIE AQUI
+    # Headers limpos de lixo de telemetria antiga do teu Postman (Sentry, etc.)
+    # Deixamos apenas o que o Chrome envia nativamente
     session.headers.update({
         "accept": "application/json, text/plain, */*",
-        "accept-language": "en-US",
-        "baggage": "sentry-environment=production,sentry-release=d29a634aab6043b7b8279d4da97b1d9d332748f6,sentry-public_key=6ffc1c27d92347b49d7659886aab9deb,sentry-trace_id=7526e228ad004a27a02585f138b0032f,sentry-org_id=352714,sentry-sampled=false,sentry-sample_rand=0.7808152430404058,sentry-sample_rate=0",
-        "priority": "u=1, i",
-        "referer": f"https://www.strava.com/clubs/{CLUB_ID}/recent_activity?num_entries=75",
-        "sec-ch-ua": '"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"',
+        "accept-language": "en-US,pt-PT;q=0.9,pt;q=0.8",
+        "referer": f"https://www.strava.com/clubs/{CLUB_ID}/recent_activity",
+        "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": '"Windows"',
         "sec-fetch-dest": "empty",
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
-        "sentry-trace": "7526e228ad004a27a02585f138b0032f-af970c7c315b8da2-0",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
-        "x-csrf-token": "BAIHJmyrSsY9R3I12QOK0v1SDl3d3bNaSCIgGWLyLYsAgwNJLXognYzZYMOh9P447pXJcQWnai9HcPZvVTHfIw",
-        "x-requested-with": "XMLHttpRequest"
+        "x-requested-with": "XMLHttpRequest",
+        "Cookie": cookie_atual # Injetamos a string direta do Supabase
     })
     
-    # 2. 🟢 A MAGIA: Limpar o valor do cookie de espaços e injetar nativamente no jar da sessão
-    # Isto extrai apenas o valor limpo da hash do _strava4_session
-    cookie_limpo = cookie_atual.replace("_strava4_session=", "").replace(";", "").strip()
-    session.cookies.set("_strava4_session", cookie_limpo, domain=".strava.com")
-    
+    # URL do feed limpo, sem timestamps antigos que possam ter expirado
     url = f"https://www.strava.com/clubs/{CLUB_ID}/feed?feed_type=club&club_id={CLUB_ID}"
     
-    # Mantemos allow_redirects=False para travar o 301/302 se falhar
+    # Fazemos o request travando redirecionamentos
     response = session.get(url, allow_redirects=False)
     
     print(f"📥 Código de Resposta do Strava: {response.status_code}")
     
     if response.status_code == 200:
-        print("✅ Conexão bem-sucedida! O Strava aceitou o request nativo.")
-        
+        print("✅ CONSEGUIMOS! O Strava achou que o Python era o Chrome real.")
+        # 🟢 PRINT DO RESPONSE BODY EM FORMATO JSON
+        # Tenta tratar a resposta como JSON
+        try:
+            dados_do_feed = response.json()
+            import json
+            json_bonito = json.dumps(dados_do_feed, indent=2, ensure_ascii=False)
+            
+            # 1. Faz o print de TUDO no terminal
+            print("\n📦 --- CONTEÚDO DO FEED COMPLETO (JSON) ---")
+            print(json_bonito)
+            print("-------------------------------------------\n")
+            
+            # 2. Grava num ficheiro local para não perderes nada
+            with open("resposta_strava.json", "w", encoding="utf-8") as f:
+                f.write(json_bonito)
+            print("💾 Gravação concluída! O conteúdo total foi guardado em 'resposta_strava.json'")
+            
+        except Exception:
+            # Se não for JSON, é HTML puro
+            html_completo = response.text
+            
+            # 1. Faz o print de TUDO no terminal
+            print("\n📦 --- CONTEÚDO COMPLETO (HTML) ---")
+            print(html_completo)
+            print("-----------------------------------\n")
+            
+            # 2. Grava num ficheiro local
+            with open("resposta_strava.html", "w", encoding="utf-8") as f:
+                f.write(html_completo)
+            print("💾 Gravação concluída! O conteúdo total foi guardado em 'resposta_strava.html'")
         cookies_na_sessao = session.cookies.get_dict()
         if "_strava4_session" in cookies_na_sessao:
             cookie_renovado = f"_strava4_session={cookies_na_sessao['_strava4_session']};"
@@ -83,11 +117,9 @@ def run_keep_alive():
                 print("ℹ️ O cookie atual ainda é o mais recente.")
                 
     elif response.status_code in [301, 302]:
-        print(f"🚨 Redirecionamento (Status {response.status_code}) para: {response.headers.get('Location')}")
-    elif response.status_code in [401, 403]:
-        print(f"🚨 Erro de Autenticação/Bloqueio (Status {response.status_code})")
+        print(f"🚨 Redirecionado para: {response.headers.get('Location')}")
     else:
-        print(f"⚠️ Resposta inesperada: Status {response.status_code}")
+        print(f"⚠️ Status inesperado: {response.status_code}")
 
 if __name__ == "__main__":
     run_keep_alive()

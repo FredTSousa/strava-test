@@ -1,0 +1,3536 @@
+{
+  "entries": [
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "5.09<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "5:58<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "30<abbr class='unit' title='minute'>m</abbr> 24<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": "<p>Não havia necessidade 🤷🏼‍♀️</p>",
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Mini treino corrida dos Guerreiros",
+        "id": "18597825536",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 3492590158791250222,
+            "id_string": "3492590158791250222",
+            "activity_id": 18597825536,
+            "name": "descida decatlhon-estádio",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "3:43",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": {
+          "type": "local_legend",
+          "image": "//d3nn82uaxijpm6.cloudfront.net/assets/segments/local_legends/icon-local-legends-4aafef4e2df8b0445a4b57d5daeedd537fd5b82518b413b4933f478760b54a15.svg",
+          "image_caption": "Local Legend - descida decatlhon-estádio",
+          "text": "Marta just became the Local Legend of descida decatlhon-estádio",
+          "url": "https://www.strava.com/segments/19679916/local-legend?category=women",
+          "analytics": {
+            "achieved_entity_type": 9,
+            "achieved_entity_type_id": 3492590158791250222,
+            "achievement_type": "local_legend",
+            "segment_id": 19679916,
+            "segment_effort_id": 3492590158791250222
+          },
+          "subtitle": "Most segment efforts in the last 90 days"
+        },
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/59639043/46474916/1/medium.jpg",
+          "athleteName": "Marta De Campos",
+          "athleteId": "59639043",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/59639043\">Marta De Campos</a>",
+          "sex": "F",
+          "firstName": "Marta"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/ZFYER4Z3LTPAOCDKQQAFOE4TIZE2R4ZUHYQUXID4SWYLM4QAG2CAGF2VCBSHTGE4MY6XHUHH44XFSXZG74YXYEAFHKMJ5KLC6JEEM===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/OJ5KXNNIO3FAB43DGKJFQEHQZXWWAZDSGU23EVOL6QXEU5MYLSNSD2EF7YB2H5BBFTT6I4EGQAXXHBROGPVCCXGEFXACB5VPGBXWC=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/ZFYER4Z3LTPAOCDKQQAFOE4TIZE2R4ZUHYQUXID4SWYLM4QAG2CAGF2VCBSHTGE4MY6XHUHH44XFSXZG74YXYEAFHKMJ5KLC6JEEM=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/FFGD7LKI5BMIVU2HWDRTAXBMKKTF7HPN3UAMZDSV74AZ2HFBWB6UHQ6WBH5OTCQWEYRZOH7MMUCJWDB3S233DZHFMVBQLJ3KZMK3C==="
+          },
+          "photoList": [
+            {
+              "photo_id": "223257f4-2ee7-44f5-96fb-7015d8eb192f",
+              "id": 11460099175,
+              "media_type": 1,
+              "activity_id": 18597825536,
+              "post_id": null,
+              "activity_name_escaped": null,
+              "caption_escaped": "",
+              "thumbnail": "https://dgtzuqphqg23d.cloudfront.net/j5dk9Oujtsw4qm-RbLWlNRRG1daTd6Nd-Ma9tdzvlo4-57x128.jpg",
+              "large": "https://dgtzuqphqg23d.cloudfront.net/j5dk9Oujtsw4qm-RbLWlNRRG1daTd6Nd-Ma9tdzvlo4-921x2048.jpg",
+              "video": null,
+              "duration": null,
+              "lat": null,
+              "lng": null,
+              "native": true,
+              "owner_id": "59639043",
+              "viewing_athlete_id": "1165965736",
+              "editable": false,
+              "activity": {},
+              "dimensions": {
+                "large": {
+                  "height": 2048,
+                  "width": 921
+                },
+                "thumbnail": {
+                  "height": 128,
+                  "width": 57
+                }
+              },
+              "is_sponsored_photo": false,
+              "enhanced_photo": null,
+              "parent_trackable_id": "fb6ba0b1a312bcd08645d6b86a764334db45b200",
+              "showEnhancedTag": false
+            }
+          ]
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Braga"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [],
+          "kudosCount": 0,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T16:31:02Z",
+        "elapsedTime": 2032,
+        "deviceName": "Garmin Forerunner 165",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779383094,
+        "rank": 1779383094.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "4.79<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "6:27<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "30<abbr class='unit' title='minute'>m</abbr> 56<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Afternoon Run",
+        "id": "18597441789",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 3492583558908888624,
+            "id_string": "3492583558908888624",
+            "activity_id": 18597441789,
+            "name": "Eul velocidadw",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "2:04",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558908378672,
+            "id_string": "3492583558908378672",
+            "activity_id": 18597441789,
+            "name": "400 m EUL",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "1:45",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558909502000,
+            "id_string": "3492583558909502000",
+            "activity_id": 18597441789,
+            "name": "1KM--Pista",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "5:42",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558909531696,
+            "id_string": "3492583558909531696",
+            "activity_id": 18597441789,
+            "name": "Volta Pista EUL (início Marca)",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "3:53",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558907449904,
+            "id_string": "3492583558907449904",
+            "activity_id": 18597441789,
+            "name": "EUL - 500m",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "3:01",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558909830704,
+            "id_string": "3492583558909830704",
+            "activity_id": 18597441789,
+            "name": "Eul velocidadw",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "2:05",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558907326000,
+            "id_string": "3492583558907326000",
+            "activity_id": 18597441789,
+            "name": "400 m EUL",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "2:16",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558908223024,
+            "id_string": "3492583558908223024",
+            "activity_id": 18597441789,
+            "name": "1KM--Pista",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "6:32",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558909204016,
+            "id_string": "3492583558909204016",
+            "activity_id": 18597441789,
+            "name": "Volta Pista EUL (início Marca)",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "3:59",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558910277168,
+            "id_string": "3492583558910277168",
+            "activity_id": 18597441789,
+            "name": "EUL - 500m",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "3:03",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558910169648,
+            "id_string": "3492583558910169648",
+            "activity_id": 18597441789,
+            "name": "Eul velocidadw",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "2:08",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558908291632,
+            "id_string": "3492583558908291632",
+            "activity_id": 18597441789,
+            "name": "400 m EUL",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "2:18",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558906827312,
+            "id_string": "3492583558906827312",
+            "activity_id": 18597441789,
+            "name": "1KM--Pista",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "8:41",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558908182064,
+            "id_string": "3492583558908182064",
+            "activity_id": 18597441789,
+            "name": "Volta Pista EUL (início Marca)",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "4:06",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492583558909285936,
+            "id_string": "3492583558909285936",
+            "activity_id": 18597441789,
+            "name": "EUL - 500m",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "3:08",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/176983780/38877756/1/medium.jpg",
+          "athleteName": "João Lourenço",
+          "athleteId": "176983780",
+          "memberType": "premium",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/176983780\">João Lourenço</a>",
+          "sex": "M",
+          "firstName": "João"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/TYUS6JFE2QROCXTEWQCNJSB4ONW2OCVICYKTCMT7PIAPKIS22IRDPIH7KIJVE7IEJFSW5CJSTUTXVFDCXBXSPNXQTIDTQX6SZAQYCLY=",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/LFIQ2D5VSERWXNEWGI7I2D5C6ZMVSXV4HWW3CEK74XIXB3XCLYFMEX2YPJA5USPZ6IWH4YBLSR7A7337NMSHJUEPF7U3IKIP6P6TUPA= 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/TYUS6JFE2QROCXTEWQCNJSB4ONW2OCVICYKTCMT7PIAPKIS22IRDPIH7KIJVE7IEJFSW5CJSTUTXVFDCXBXSPNXQTIDTQX6SZAQYCLY= 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/2P6XFZWMSF6ROQSXSKRK6R5BL7SFLAX3UML6QM223EIGDJAGVA2I4MTHOO7PXH4THQDBXVZYDNFSBK4453RIMIBFQ33VOCYPYVMIF7A="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Lisbon"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [],
+          "kudosCount": 0,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T16:08:34Z",
+        "elapsedTime": 1879,
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779381593,
+        "rank": 1779381593.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "3.79<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "7:52<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "29<abbr class='unit' title='minute'>m</abbr> 51<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Corrida vespertina",
+        "id": "18597239645",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 78207445727,
+            "id_string": "78207445727",
+            "activity_id": 18597239645,
+            "name": "1/2 mile",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "5:45",
+            "description": "3rd best estimated 1/2 mile effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78207445726,
+            "id_string": "78207445726",
+            "activity_id": 18597239645,
+            "name": "400m",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "2:47",
+            "description": "3rd best estimated 400m effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+          "athleteName": "Tatiana Baptista",
+          "athleteId": "1334817981",
+          "memberType": "premium",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/1334817981\">Tatiana Baptista</a>",
+          "sex": "F",
+          "firstName": "Tatiana"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/GDIAGNOY6N24DYJ3DHDU6Q5LKTPZJXSCHIJHGMTBY5GAE5KUPSRD7KMRXCETU2Z5YBJ4AUMBH7PUJSW576SPSJ2SR73O37DDHG3GLSY=",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/RTWWU2ZL5RGSBDXDPIBO424XJS43EI6B7AZUYFYLDFT3MHQBSF3WYF2XTZHW4OQB7T5Y35FE34JK7GVANHGVT7OTBYI6K4ODCUKAVLQ= 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/GDIAGNOY6N24DYJ3DHDU6Q5LKTPZJXSCHIJHGMTBY5GAE5KUPSRD7KMRXCETU2Z5YBJ4AUMBH7PUJSW576SPSJ2SR73O37DDHG3GLSY= 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/HDZQ6HNRW7OPZWS755ZLV6XNZAQHUDGFEQ4OMDYCN3WFVLU4LZZ6PQ5RDTJI2LWJMIOC4UD4H4G3A4PL4OHQWA3TUDVRWPW45PW4EVY="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Tomar, Santarém"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/17896159",
+              "display_name": "Paulo R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/17896159/39804373/1/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 1,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T15:54:00Z",
+        "elapsedTime": 1861,
+        "deviceName": "Strava App",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779380701,
+        "rank": 1779380701.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "6.20<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "5:03<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "31<abbr class='unit' title='minute'>m</abbr> 21<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Afternoon Run - Base",
+        "id": "18597247698",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": "workout",
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/85471715/49410952/2/medium.jpg",
+          "athleteName": "João Mergulho 🟢⚪☭☭",
+          "athleteId": "85471715",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/85471715\">João Mergulho 🟢⚪☭☭</a>",
+          "sex": "M",
+          "firstName": "João"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/4PL5UITGBAEDIZEMN3NWHPGGNR2FTN7T5GNKPP77JUAKPP4W3GRIMNHKJ2DLC4C4OTBYODL6LHXQXRZZEZSSNMOSVM4W3SEOFF6AC===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/NNKXDJKCZLCUBOMCOFKCW54JGUUOIGN6CMBXWNMJDYKXNBGCXOQ4ICOOYXMXOTF6EOTEQUEBHCOVOWQIFQFKUUDLWL6WMTJ6WRRXQ=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/4PL5UITGBAEDIZEMN3NWHPGGNR2FTN7T5GNKPP77JUAKPP4W3GRIMNHKJ2DLC4C4OTBYODL6LHXQXRZZEZSSNMOSVM4W3SEOFF6AC=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/DIJSJ5755HX3AHVWWP4BO5J3SXHGVCHFOK6J26SYPDPIJENKVXQ7DEVD2DPZYQS5XW3KNYCDMAX2S42ZO6NOINQTQGSNOVTE3ZHSW==="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Vila Franca de Xira, Lisbon"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/17896159",
+              "display_name": "Paulo R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/17896159/39804373/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/62182432",
+              "display_name": "Nuno R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/62182432/39951954/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/155979262",
+              "display_name": "Leandro S",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/155979262/49161497/1/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 3,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T15:52:53Z",
+        "elapsedTime": 1892,
+        "deviceName": "Garmin Forerunner 255",
+        "tagKeys": [
+          "workout"
+        ]
+      },
+      "cursorData": {
+        "updated_at": 1779380665,
+        "rank": 1779380665.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "5.42<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "107<abbr class='unit' title='meters'> m</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Elev Gain",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "47<abbr class='unit' title='minute'>m</abbr> 13<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": "<p>Ups&amp;Downs</p>",
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Afternoon Run",
+        "id": "18597177982",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocLJuqGyBwfk1yYqHcXChX1Q6LZ9kRbv6eGpyWvdb7hLeawLwKcB=s96-c",
+          "athleteName": "Cláudio Vaz",
+          "athleteId": "170991427",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/170991427\">Cláudio Vaz</a>",
+          "sex": "M",
+          "firstName": "Cláudio"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/XY3GLBKCPZLJ3HHJJ4QZC62T7N565JVEZTRM4JN4E2FT7D5WMPIAWIRKDCBTO6BXHQENIA4SI5JTYQQCKMMDSGCQAKJ5E3ELWTIZO===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/FE7JMNEJ52FSXNKOP3AYO7F2GD2CF2AU22USPMTC4PACY2JFZLTQBJ27Y6UF6W4FSKDJQKU4PI4KTLMTBHN4N3R5XMRKJEI6HFGBG=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/XY3GLBKCPZLJ3HHJJ4QZC62T7N565JVEZTRM4JN4E2FT7D5WMPIAWIRKDCBTO6BXHQENIA4SI5JTYQQCKMMDSGCQAKJ5E3ELWTIZO=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/B6YD6WKI4UJXPRPYW375TQDFL2YLKDZ3CAHMEIZIG4O6INLRJGTRWIHODXWJE2H2VHGWONZYQSY23FB4SO6BXJY3SFJF434O7ZFYI==="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Loures, Lisbon"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [],
+          "kudosCount": 0,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T15:29:15Z",
+        "elapsedTime": 2962,
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779380317,
+        "rank": 1779380317.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "5.05<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "6:42<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "33<abbr class='unit' title='minute'>m</abbr> 53<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Corrida vespertina",
+        "id": "18596745650",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 3492570093908227546,
+            "id_string": "3492570093908227546",
+            "activity_id": 18596745650,
+            "name": "Volta Estádio GRD",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "2:40",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492570093910653402,
+            "id_string": "3492570093910653402",
+            "activity_id": 18596745650,
+            "name": "Volta Estádio GRD",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "2:52",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocKIbtNwdU1ZudeQrCgRhr1PcwIGfLbnEiNpJXynJd2x0-Ku4nJVUA=s96-c",
+          "athleteName": "Tânia Lopo",
+          "athleteId": "201664872",
+          "memberType": "premium",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/201664872\">Tânia Lopo</a>",
+          "sex": "F",
+          "firstName": "Tânia"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/ODCQAMSNV3D37OAOPKOSDWZTBKTUPRT7XDRV7AEDE4EQHU5KJCDVPDFE5YVTXSWKN64GUIQSOXMR63XFG5UFTHWGF7QZOENK57GVA===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/CT7E7VUG5Z54ZQ37QIM2HD5RMYMQX7XLT3V54LZVNF3IQNK4DU5W64SN4IGAEAWRKAANP7OZRRCJQEUQINX3MGLYCZNKPD2DDY5PU=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/ODCQAMSNV3D37OAOPKOSDWZTBKTUPRT7XDRV7AEDE4EQHU5KJCDVPDFE5YVTXSWKN64GUIQSOXMR63XFG5UFTHWGF7QZOENK57GVA=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/GDUKASGZX27R7MVYHGY4JOMOX6C5J3GANBLMAZC2XIZC7KCWHHYPVHKCTXKUBIPCWTH3FAVJTYLHKVTKQR6XV7PHNXWOL4PTXKIUE==="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Guarda"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/10046876",
+              "display_name": "Gonçalo V",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/10046876/41962358/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/17896159",
+              "display_name": "Paulo R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/17896159/39804373/1/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 2,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T15:07:30Z",
+        "elapsedTime": 2314,
+        "deviceName": "Strava App",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779378364,
+        "rank": 1779378364.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "2.71<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "5:29<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "14<abbr class='unit' title='minute'>m</abbr> 55<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Afternoon Run",
+        "id": "18596351447",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/33873967/36769107/3/medium.jpg",
+          "athleteName": "Bru Vicente",
+          "athleteId": "33873967",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/33873967\">Bru Vicente</a>",
+          "sex": "F",
+          "firstName": "Bru"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/NKTCGX3BJIBQSSTD54JH34WYMEAWDTWTHMGZYXYTDUTZ6PDK6IDXV5ROJYN3BR7DKB5FZXD4XQBD3CJQSBR5OUQISSYNWMMSEKDHEHI=",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/QKABTMN3IFFO6MMON5YPG33VK6TSUZU4SM5S674PGSRUHWC7FMFDZIDZCQPTW3CD7LINEKIK4MYSPGQ44UPUTEF45GYDCV6EOLSCEQI= 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/NKTCGX3BJIBQSSTD54JH34WYMEAWDTWTHMGZYXYTDUTZ6PDK6IDXV5ROJYN3BR7DKB5FZXD4XQBD3CJQSBR5OUQISSYNWMMSEKDHEHI= 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/5ZXDQTYVBDQTT7FTD7EJ4B6AONVUOKFHZEZWN3XLDP64CUPWSFRTKWG6M2LQXI3QEXNFUEAHNBTO3NFE4YCNVK5RAGKF5P4LY3UVROI="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Roques, France"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [],
+          "kudosCount": 0,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T14:55:01Z",
+        "elapsedTime": 959,
+        "deviceName": "Garmin Forerunner 165",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779376260,
+        "rank": 1779376260.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "5.01<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "5:26<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "27<abbr class='unit' title='minute'>m</abbr> 13<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Corrida da hora do almoço",
+        "id": "18594346152",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/166409722/43766069/2/medium.jpg",
+          "athleteName": "Ricardo Roque",
+          "athleteId": "166409722",
+          "memberType": "premium",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/166409722\">Ricardo Roque</a>",
+          "sex": "M",
+          "firstName": "Ricardo"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/6UEFIXGBSWBDQXGSDUQTWRJM7RGGVJMO6E52BSIHXRN46QBFYFTECYXWYLRM2P6T2OBKQBICDS7VKIVDPKX5AFPFU277EIXMM57HQWA=",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/L5TJZQ4KPYPY4ZW3I2CFAIVZVXSJ7DOQI7T3BIIGJMQQUKJXETBH652CAQUCATF7Q5SMUGIJK5M7SC2DAKSGSXT4AO2JYG2QBY5FHUQ= 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/6UEFIXGBSWBDQXGSDUQTWRJM7RGGVJMO6E52BSIHXRN46QBFYFTECYXWYLRM2P6T2OBKQBICDS7VKIVDPKX5AFPFU277EIXMM57HQWA= 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/P7JMAPZIHXBSOZB4VNTYVYPTBDYTBADHZM44EK2UKHQ3CN4WYGNCA5UP42RYAY2UJ4WF4RNRQRMJEDPQFAYHIG5PZSVLXEI4XB4BA7Y="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Oliveira do Bairro, Aveiro"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/49366983",
+              "display_name": "Miguel V",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/49366983/22556596/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/115111240",
+              "display_name": "João L",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/115111240/36305859/6/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 2,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T11:44:34Z",
+        "elapsedTime": 1633,
+        "deviceName": "Strava App",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779365507,
+        "rank": 1779365507.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "11.54<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "5:45<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "1<abbr class='unit' title='hour'>h</abbr> 6<abbr class='unit' title='minute'>m</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Corrida da hora do almoço",
+        "id": "18593920558",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": {
+          "type": "challenge_completion",
+          "image": "https://dgalywyr863hv.cloudfront.net/challenges/5859/5859-logo.png",
+          "image_caption": "May Ten Days Active Challenge",
+          "text": "Antonio completed the May Ten Days Active Challenge!",
+          "url": "https://www.strava.com/challenges/May-Ten-Days-Active-2026",
+          "analytics": {
+            "achieved_entity_type": 1,
+            "achieved_entity_type_id": 5859,
+            "achievement_type": "challenge_completion",
+            "challenge_id": 5859
+          },
+          "subtitle": "10 days"
+        },
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocLzm-WVkYCqYGiUfwE62GZtgJCEPHXEaAZ-E2pC5XaKmnvFY0rfUw=s96-c",
+          "athleteName": "Antonio Branco",
+          "athleteId": "65926324",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/65926324\">Antonio Branco</a>",
+          "sex": "M",
+          "firstName": "Antonio"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/KTMNWJHAVOX6WMQDMXYIEDBC6ARQTDOC7PPH67X7XP3LKGDV2DWI6Y2NHMUDNJNIHR6D2SJLMDD42OWWCTEKJHXUQ53KKKXE7PAJ2UY=",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/2QMJYXMIZEBOMRIMFLX5GF7EWRCCS2CPUREODXESDOWICBCKMCNMZ7ORVPRQXI73AHCS4DRV7CMFGXSYJS66Q2DOVAGSMZBOI23Y2QI= 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/KTMNWJHAVOX6WMQDMXYIEDBC6ARQTDOC7PPH67X7XP3LKGDV2DWI6Y2NHMUDNJNIHR6D2SJLMDD42OWWCTEKJHXUQ53KKKXE7PAJ2UY= 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/7SFVZACNDGOGFENK6PPLXQBP6WD5A2VW43SP6APFIFM36W6C7EAMIEKWPGSMPFSXH7OX4AYRY4HBJKUVRDWYZHHSFW4JKFBHI6EJL6Y="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Póvoa de Varzim, Porto"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/1750846",
+              "display_name": "Rui C",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/1750846/496267/20/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/4516751",
+              "display_name": "Ricardo Sousa | @",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/4516751/38120820/22/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/112343699",
+              "display_name": "Lino S",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/112343699/27679015/8/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 3,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T10:31:06Z",
+        "elapsedTime": 4021,
+        "deviceName": "Strava App",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779363487,
+        "rank": 1779363487.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "6.41<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "5:37<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "36<abbr class='unit' title='minute'>m</abbr> 0<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": "<p>5×5,15 - 2 minutos recuperaçã0 7</p>",
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Intervalos 5×5,15 - 2 minutos recuperação 7,00",
+        "id": "18593918364",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 3492507471237051358,
+            "id_string": "3492507471237051358",
+            "activity_id": 18593918364,
+            "name": "Volta ao Estádio Universitário",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "3:05",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471233645534,
+            "id_string": "3492507471233645534",
+            "activity_id": 18593918364,
+            "name": "2 Voltas Estádio Universitário",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "6:27",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471235358686,
+            "id_string": "3492507471235358686",
+            "activity_id": 18593918364,
+            "name": "1 volta Por fora da pista / alcatrão ",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "3:07",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471234017246,
+            "id_string": "3492507471234017246",
+            "activity_id": 18593918364,
+            "name": "5 Voltas Estádio Universitário",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "16:23",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471235315678,
+            "id_string": "3492507471235315678",
+            "activity_id": 18593918364,
+            "name": "2 Voltas Estádio Universitário",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "6:37",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471236112350,
+            "id_string": "3492507471236112350",
+            "activity_id": 18593918364,
+            "name": "100 m Universitário",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "33<abbr class='unit' title='second'>s</abbr>",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471234862046,
+            "id_string": "3492507471234862046",
+            "activity_id": 18593918364,
+            "name": "Volta ao Estádio Universitário",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "3:11",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471235004382,
+            "id_string": "3492507471235004382",
+            "activity_id": 18593918364,
+            "name": "1 volta Por fora da pista / alcatrão ",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "3:11",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471235973086,
+            "id_string": "3492507471235973086",
+            "activity_id": 18593918364,
+            "name": "5 Voltas Estádio Universitário",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "16:54",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471236265950,
+            "id_string": "3492507471236265950",
+            "activity_id": 18593918364,
+            "name": "100 m Universitário",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "34<abbr class='unit' title='second'>s</abbr>",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471233677278,
+            "id_string": "3492507471233677278",
+            "activity_id": 18593918364,
+            "name": "2 Voltas Estádio Universitário",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "6:41",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471234842590,
+            "id_string": "3492507471234842590",
+            "activity_id": 18593918364,
+            "name": "1 volta Por fora da pista / alcatrão ",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "3:12",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492507471237043166,
+            "id_string": "3492507471237043166",
+            "activity_id": 18593918364,
+            "name": "Volta ao Estádio Universitário",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "3:13",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 78195828762,
+            "id_string": "78195828762",
+            "activity_id": 18593918364,
+            "name": "5K",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "27:14",
+            "description": "2nd best estimated 5K effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78195828761,
+            "id_string": "78195828761",
+            "activity_id": 18593918364,
+            "name": "2 mile",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "17:20",
+            "description": "3rd best estimated 2 mile effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78195828760,
+            "id_string": "78195828760",
+            "activity_id": 18593918364,
+            "name": "1 mile",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "8:38",
+            "description": "3rd best estimated 1 mile effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78195828765,
+            "id_string": "78195828765",
+            "activity_id": 18593918364,
+            "name": "1K",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "5:04",
+            "description": "3rd best estimated 1K effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78195828764,
+            "id_string": "78195828764",
+            "activity_id": 18593918364,
+            "name": "1/2 mile",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "4:01",
+            "description": "3rd best estimated 1/2 mile effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": {
+          "type": "all_time_best_effort",
+          "image": "//d3nn82uaxijpm6.cloudfront.net/assets/svg/icon-best-effort-02-b6e69a783989391cf227f628f1b135f8df5ed958d140058c740960e06bb4d5d4.svg",
+          "image_caption": "All Time Best Effort - 5K",
+          "text": "João's 2nd fastest 5K!",
+          "url": "https://www.strava.com/activities/18593918364",
+          "analytics": {
+            "achieved_entity_type": 28,
+            "achieved_entity_type_id": 78195828762,
+            "achievement_type": "all_time_best_effort",
+            "best_effort_id": 78195828762,
+            "distance": 5000,
+            "elapsed_time": 1634.0,
+            "rank": 2
+          }
+        },
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": "workout",
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/188151043/44511325/4/medium.jpg",
+          "athleteName": "João Martins",
+          "athleteId": "188151043",
+          "memberType": "premium",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/188151043\">João Martins</a>",
+          "sex": "M",
+          "firstName": "João"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/TV2QGAJ2LG4Y5MCWCHEDJ2FAAESYW6UTJBJMME3SYT7QZZVABLTQN6IDDYWRCXBQWENJMTHEBSEHYPYZUEUJB4BSUTXZNXT4SB6MI===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/QTH5CPPPNMSLRU4F2MGJ3TE43XBP67A4B7BVXIVU4CZMTUIWWXUDQGF65CEY72YXFQYTUHYAZVDTMSNG2HWIHEO7XJ2VEP3OGKCDC=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/TV2QGAJ2LG4Y5MCWCHEDJ2FAAESYW6UTJBJMME3SYT7QZZVABLTQN6IDDYWRCXBQWENJMTHEBSEHYPYZUEUJB4BSUTXZNXT4SB6MI=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/FQDOF7IIOE7YTFE4IZDPU5DYBRXUIW7LG3EJLRTWRAVCVEPVUDX37UITELMANAFTVC2PATAIIPGYQ57E6654QI4DK2IVDJJ7QY5SK==="
+          },
+          "photoList": [
+            {
+              "photo_id": "1ca27b8f-31a3-4ec4-a17c-f101806b59a0",
+              "id": 11458098212,
+              "media_type": 1,
+              "activity_id": 18593918364,
+              "post_id": null,
+              "activity_name_escaped": null,
+              "caption_escaped": "",
+              "thumbnail": "https://dgtzuqphqg23d.cloudfront.net/d4loWp9bRJSvYLi3f5YO7U97_XY1-QQ-C07T_C4O_3k-128x79.jpg",
+              "large": "https://dgtzuqphqg23d.cloudfront.net/d4loWp9bRJSvYLi3f5YO7U97_XY1-QQ-C07T_C4O_3k-2048x1278.jpg",
+              "video": null,
+              "duration": null,
+              "lat": null,
+              "lng": null,
+              "native": true,
+              "owner_id": "188151043",
+              "viewing_athlete_id": "1165965736",
+              "editable": false,
+              "activity": {},
+              "dimensions": {
+                "large": {
+                  "height": 1278,
+                  "width": 2048
+                },
+                "thumbnail": {
+                  "height": 79,
+                  "width": 128
+                }
+              },
+              "is_sponsored_photo": false,
+              "enhanced_photo": null,
+              "parent_trackable_id": "7381fef3641d57de0e08cfb2155384288e7857ee",
+              "showEnhancedTag": false
+            }
+          ]
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Coimbra"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [],
+          "kudosCount": 0,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T11:00:55Z",
+        "elapsedTime": 2194,
+        "deviceName": "Samsung Health",
+        "tagKeys": [
+          "workout"
+        ]
+      },
+      "cursorData": {
+        "updated_at": 1779363449,
+        "rank": 1779363449.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "10.60<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "4:54<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "52<abbr class='unit' title='minute'>m</abbr> 1<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "109° Treino 2026 Cadaujac 🇫🇷",
+        "id": "18593470093",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/34130423/24574151/7/medium.jpg",
+          "athleteName": "Helder Filipe Silva",
+          "athleteId": "34130423",
+          "memberType": "premium",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/34130423\">Helder Filipe Silva</a>",
+          "sex": "M",
+          "firstName": "Helder Filipe"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/NCWFOCGNFX7VIBJUNY5Z5TD75DAWI4VWDHK2XLHSP5KZPW5KR546MG4KNORIGOZOEAURZHOQBOUATAGL3O3IUNLFOMBLRESTPTUQA===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/266W3U7RTETNK7VHBXOALAIZRJC34AFDO7L6NOPAOO5DTAN5ZGVKMN65ICODXNAL7N3WP47LLRVSFZLIGOBHF7REPGUJYRUM4R35E=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/NCWFOCGNFX7VIBJUNY5Z5TD75DAWI4VWDHK2XLHSP5KZPW5KR546MG4KNORIGOZOEAURZHOQBOUATAGL3O3IUNLFOMBLRESTPTUQA=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/4UJWWJ5IGT6H4JBVWND7RY6JH5K2DBQWCVHEOM37MQNUF5JCQIZBEI3D75LKBYBDTEABVMWXVHSYD2BPCYLDTZ2Q5MFAB5UBEN3FG==="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Cadaujac, France"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/2440752",
+              "display_name": "Flávio E",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/2440752/761235/8/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/3467412",
+              "display_name": "Pedro C",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/3467412/4825495/3/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/4516751",
+              "display_name": "Ricardo Sousa | @",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/4516751/38120820/22/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 30,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T10:10:50Z",
+        "elapsedTime": 3121,
+        "deviceName": "Garmin fēnix 7x",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779361371,
+        "rank": 1779361371.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "18.00<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "6:41<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "2<abbr class='unit' title='hour'>h</abbr> 0<abbr class='unit' title='minute'>m</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Corrida matinal",
+        "id": "18593397468",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 3492497627780438490,
+            "id_string": "3492497627780438490",
+            "activity_id": 18593397468,
+            "name": "Percurso Interior Parque",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "5:32",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 78193307418,
+            "id_string": "78193307418",
+            "activity_id": 18593397468,
+            "name": "10 mile",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "1:55:26",
+            "description": "Best estimated 10 mile effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78193307417,
+            "id_string": "78193307417",
+            "activity_id": 18593397468,
+            "name": "15K",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "1:48:07",
+            "description": "2nd best estimated 15K effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78193307416,
+            "id_string": "78193307416",
+            "activity_id": 18593397468,
+            "name": "10K",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "1:06:30",
+            "description": "Best estimated 10K effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": {
+          "type": "all_time_best_effort",
+          "image": "//d3nn82uaxijpm6.cloudfront.net/assets/svg/icon-best-effort-01-84507e357b146c649395ec17a15e9f136af15f4c025d17d226ca3aa04bff7e1a.svg",
+          "image_caption": "All Time Best Effort - 10 mile",
+          "text": "Diana's fastest 10 miles!",
+          "url": "https://www.strava.com/activities/18593397468",
+          "analytics": {
+            "achieved_entity_type": 27,
+            "achieved_entity_type_id": 78193307418,
+            "achievement_type": "all_time_best_effort",
+            "best_effort_id": 78193307418,
+            "distance": 16090,
+            "elapsed_time": 6926.0,
+            "rank": 1
+          }
+        },
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/179517570/42142298/1/medium.jpg",
+          "athleteName": "Diana Pereira",
+          "athleteId": "179517570",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/179517570\">Diana Pereira</a>",
+          "sex": "F",
+          "firstName": "Diana"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/A5H6MJPP5JR6U53SCB7TRPO4PWN5BML5TRSDNJCLATNNRDUTPOC5S37BVFRXRF6ZFCYVXTPQBP7R2EN4GAXMVUC5SUDXKHR5ZBD4O===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/524E7MIEBXA36ZQ3OQHJ7UVCWFLAHJ3IUYXZEN5M3VPOHODES6GZM4L5KE7LMOYVGUFRP54RIIM3DUBCZR2RNXBSGWIDE5QAA6KFG=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/A5H6MJPP5JR6U53SCB7TRPO4PWN5BML5TRSDNJCLATNNRDUTPOC5S37BVFRXRF6ZFCYVXTPQBP7R2EN4GAXMVUC5SUDXKHR5ZBD4O=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/B37VOJAUCWZ6ROJUN26GE5G7OPQQC2FG3DKVI22MJM62P7W5KVM7QRSCSKZ4OI6MM54Y2463IFHT6WNWKT5FBVGULVJ6NY46BRJHC==="
+          },
+          "photoList": [
+            {
+              "photo_id": "1BB55DD9-3F84-4339-AD01-73E0C5197AEE",
+              "id": 11457895848,
+              "media_type": 1,
+              "activity_id": 18593397468,
+              "post_id": null,
+              "activity_name_escaped": null,
+              "caption_escaped": "",
+              "thumbnail": "https://dgtzuqphqg23d.cloudfront.net/I1ors3PyX75qHM93xUewUXIOr9EhBTh8BZcEQiTX2ZA-96x128.jpg",
+              "large": "https://dgtzuqphqg23d.cloudfront.net/I1ors3PyX75qHM93xUewUXIOr9EhBTh8BZcEQiTX2ZA-1536x2048.jpg",
+              "video": null,
+              "duration": null,
+              "lat": null,
+              "lng": null,
+              "native": true,
+              "owner_id": "179517570",
+              "viewing_athlete_id": "1165965736",
+              "editable": false,
+              "activity": {},
+              "dimensions": {
+                "large": {
+                  "height": 2048,
+                  "width": 1536
+                },
+                "thumbnail": {
+                  "height": 128,
+                  "width": 96
+                }
+              },
+              "is_sponsored_photo": false,
+              "enhanced_photo": null,
+              "parent_trackable_id": "fa5358b14b6f18bbdfdd48e3cbd5dad22771fbc6",
+              "showEnhancedTag": false
+            },
+            {
+              "photo_id": "D95DE0FE-9438-4B34-8113-B70FAA3E708B",
+              "id": 11457895863,
+              "media_type": 1,
+              "activity_id": 18593397468,
+              "post_id": null,
+              "activity_name_escaped": null,
+              "caption_escaped": "",
+              "thumbnail": "https://dgtzuqphqg23d.cloudfront.net/1J5FG617-gm4uRfk8hOL-WRS42MvcuuXGYzUmL9u2sM-96x128.jpg",
+              "large": "https://dgtzuqphqg23d.cloudfront.net/1J5FG617-gm4uRfk8hOL-WRS42MvcuuXGYzUmL9u2sM-1536x2048.jpg",
+              "video": null,
+              "duration": null,
+              "lat": null,
+              "lng": null,
+              "native": true,
+              "owner_id": "179517570",
+              "viewing_athlete_id": "1165965736",
+              "editable": false,
+              "activity": {},
+              "dimensions": {
+                "large": {
+                  "height": 2048,
+                  "width": 1536
+                },
+                "thumbnail": {
+                  "height": 128,
+                  "width": 96
+                }
+              },
+              "is_sponsored_photo": false,
+              "enhanced_photo": null,
+              "parent_trackable_id": "fa5358b14b6f18bbdfdd48e3cbd5dad22771fbc6",
+              "showEnhancedTag": false
+            }
+          ]
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Santo Tirso, Porto"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/4516751",
+              "display_name": "Ricardo Sousa | @",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/4516751/38120820/22/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/17896159",
+              "display_name": "Paulo R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/17896159/39804373/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/25142284",
+              "display_name": "Eduarda S",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/25142284/10473716/2/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 5,
+          "commentsEnabled": true,
+          "comments": [
+            {
+              "comment_id": 2559143441,
+              "deletable": false,
+              "reportable": true,
+              "quarantinable": false,
+              "comment": "Congratulations! Pronta para uma meia marathona! 🏃❤️",
+              "timestamp": "<time class=\"timeago\" datetime=\"2026-05-21T14:44:46Z\">May 21, 2026</time>",
+              "athlete": {
+                "id": 25142284,
+                "url": "/athletes/25142284",
+                "name": "Eduarda Santos",
+                "firstname": "Eduarda",
+                "athlete_name": "Eduarda Santos",
+                "short_name": "Eduarda S",
+                "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/25142284/10473716/2/medium.jpg",
+                "member_type": ""
+              },
+              "reactions_summary": {
+                "entity_id": 2559143441,
+                "has_reacted": false,
+                "facepile": null,
+                "reaction_count": 0
+              }
+            }
+          ]
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T08:43:29Z",
+        "elapsedTime": 7693,
+        "deviceName": "Garmin Forerunner 165",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779360702,
+        "rank": 1779360702.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "5.00<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "4:14<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "21<abbr class='unit' title='minute'>m</abbr> 8<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Corrida da hora do almoço",
+        "id": "18593271275",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/139537306/31716348/4/medium.jpg",
+          "athleteName": "Fernando Silva ✌🏽",
+          "athleteId": "139537306",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/139537306\">Fernando Silva ✌🏽</a>",
+          "sex": "M",
+          "firstName": "Fernando Silva"
+        },
+        "mapAndPhotos": {
+          "isRoutable": false,
+          "activityMap": {},
+          "photoList": [
+            {
+              "photo_id": "0C7606FF-89DF-4652-B5AF-70CC571F05F6",
+              "id": 11457793002,
+              "media_type": 1,
+              "activity_id": 18593271275,
+              "post_id": null,
+              "activity_name_escaped": null,
+              "caption_escaped": "",
+              "thumbnail": "https://dgtzuqphqg23d.cloudfront.net/9VIPhHGKE6BbQmKTWLnV8rVbJYzTCqfNRID5jGeFBBo-96x128.jpg",
+              "large": "https://dgtzuqphqg23d.cloudfront.net/9VIPhHGKE6BbQmKTWLnV8rVbJYzTCqfNRID5jGeFBBo-1536x2048.jpg",
+              "video": null,
+              "duration": null,
+              "lat": null,
+              "lng": null,
+              "native": true,
+              "owner_id": "139537306",
+              "viewing_athlete_id": "1165965736",
+              "editable": false,
+              "activity": {},
+              "dimensions": {
+                "large": {
+                  "height": 2048,
+                  "width": 1536
+                },
+                "thumbnail": {
+                  "height": 128,
+                  "width": 96
+                }
+              },
+              "is_sponsored_photo": false,
+              "enhanced_photo": null,
+              "parent_trackable_id": "383d1e5d7fb448c835a7aca27ab233c01bfb9e11",
+              "showEnhancedTag": false
+            }
+          ]
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": null
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/11203517",
+              "display_name": "Eliseu R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/11203517/3396072/3/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/71280927",
+              "display_name": "ROBERTO  C",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/71280927/17464670/45/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 2,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T10:26:48Z",
+        "elapsedTime": 1268,
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779360476,
+        "rank": 1779360476.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "6.21<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "7:10<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "44<abbr class='unit' title='minute'>m</abbr> 29<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": "<p><a href=\"/clubs/2078294\" class=\"mention\">movera.</a></p>",
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [
+          2078294
+        ],
+        "flagged": null,
+        "activityName": "Desafio Movera Cresce semana 3",
+        "id": "18592874466",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 3492486381500494814,
+            "id_string": "3492486381500494814",
+            "activity_id": 18592874466,
+            "name": "Zona de Lazer - Ponte do Lago",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "32<abbr class='unit' title='second'>s</abbr>",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492486381497090014,
+            "id_string": "3492486381497090014",
+            "activity_id": 18592874466,
+            "name": "Zona de Lazer campos de futebol",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "2:13",
+            "description": "2nd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 78191051704,
+            "id_string": "78191051704",
+            "activity_id": 18592874466,
+            "name": "5K",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "35:52",
+            "description": "3rd best estimated 5K effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78191051703,
+            "id_string": "78191051703",
+            "activity_id": 18592874466,
+            "name": "2 mile",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "21:40",
+            "description": "3rd best estimated 2 mile effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78191051702,
+            "id_string": "78191051702",
+            "activity_id": 18592874466,
+            "name": "1 mile",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "10:16",
+            "description": "2nd best estimated 1 mile effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78191051707,
+            "id_string": "78191051707",
+            "activity_id": 18592874466,
+            "name": "1K",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "5:38",
+            "description": "Best estimated 1K effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78191051706,
+            "id_string": "78191051706",
+            "activity_id": 18592874466,
+            "name": "1/2 mile",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "4:26",
+            "description": "Best estimated 1/2 mile effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          },
+          {
+            "id": 78191051705,
+            "id_string": "78191051705",
+            "activity_id": 18592874466,
+            "name": "400m",
+            "sprite": "icon-at-pr-2",
+            "featured": false,
+            "elapsed_time": "2:11",
+            "description": "2nd best estimated 400m effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": {
+          "type": "all_time_best_effort",
+          "image": "//d3nn82uaxijpm6.cloudfront.net/assets/svg/icon-best-effort-03-5c6228f38e5c06184e0eff4d52edf3fefd03813551d344be155d9b13437596d4.svg",
+          "image_caption": "All Time Best Effort - 5K",
+          "text": "Joana's 3rd fastest 5K!",
+          "url": "https://www.strava.com/activities/18592874466",
+          "analytics": {
+            "achieved_entity_type": 29,
+            "achieved_entity_type_id": 78191051704,
+            "achievement_type": "all_time_best_effort",
+            "best_effort_id": 78191051704,
+            "distance": 5000,
+            "elapsed_time": 2152.0,
+            "rank": 3
+          }
+        },
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/955348960/50803856/1/medium.jpg",
+          "athleteName": "Joana Lourenço",
+          "athleteId": "955348960",
+          "memberType": "premium",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/955348960\">Joana Lourenço</a>",
+          "sex": "F",
+          "firstName": "Joana"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/U4GAN7BCWMGXNNTUERYYL4ERVEC5EDUQNKVCIZIVBEZMXTDYWQSGER2WFSY4GDCQ3UU2EHFNO7J5AHN5BPEVBSO6XTOEH26YR6NZOVI=",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/BFI26JC2LZLFGFU7V3Q4NLIDWRTOI53PNAWUJ37GSE63J7JKRMGM3J4QCM5RQ4GAFXMMATWLEQM5P73YXYCVHL3MNMUROEMT2CGX22Q= 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/U4GAN7BCWMGXNNTUERYYL4ERVEC5EDUQNKVCIZIVBEZMXTDYWQSGER2WFSY4GDCQ3UU2EHFNO7J5AHN5BPEVBSO6XTOEH26YR6NZOVI= 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/TI57Y3TQ7B3OM6YBR4JXJOXBBTTWR72WOQ5LDV2U5CEFK7ILULY3UQXSDUUB4YCZDZWGIHJLBO5MMLT3HUSHD2V4IL3FT2AUP6UGOLI="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Castelo Branco"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/4516751",
+              "display_name": "Ricardo Sousa | @",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/4516751/38120820/22/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/14949503",
+              "display_name": "Frederico S",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/14949503/49830077/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/17896159",
+              "display_name": "Paulo R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/17896159/39804373/1/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 3,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T09:19:48Z",
+        "elapsedTime": 2747,
+        "deviceName": "Garmin vívoactive 6",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779357935,
+        "rank": 1779357935.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "4.06<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "7:06<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "28<abbr class='unit' title='minute'>m</abbr> 54<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": "<p>Com um mix de dores várias,  cansaço e preguiça, foi o possível. \n<br />A tentar poupar o joelho para a prova de domingo. </p>",
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Custou mas está",
+        "id": "18592587307",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/45542163/47657206/2/medium.jpg",
+          "athleteName": "Andreia Guedes",
+          "athleteId": "45542163",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/45542163\">Andreia Guedes</a>",
+          "sex": "F",
+          "firstName": "Andreia"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/DUFRFZWESOLSFM6AUBNF5JC5EUWYGFUPRZMGYGTZQTCQB72DEZ3SEXMXRQ4VMUONJRI46G7WEASIV6DQ2WTC236VHROC277PMX63A===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/XONEITCZTHIAHNLFISQQFLJLJM5L33CXMNREJ7UXV4HAWKCMKZDA3F6PXF6O2GFTKIQGZDZSGDP5PTDGHZTHERFFUL3M63MCE7G4K=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/DUFRFZWESOLSFM6AUBNF5JC5EUWYGFUPRZMGYGTZQTCQB72DEZ3SEXMXRQ4VMUONJRI46G7WEASIV6DQ2WTC236VHROC277PMX63A=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/R75Z6PMMKKQHK2UG6O247PXXJJLF3KPKT75QLS5WRZHGOKZSUA2A5UZXHVTQOO2RNB2SIILUUIDOGXNHMZTEBRC7UYPUYTMO2BBGG==="
+          },
+          "photoList": [
+            {
+              "photo_id": "18b0837a-bc25-40d3-9742-80f5ce953f03",
+              "id": 11457548358,
+              "media_type": 1,
+              "activity_id": 18592587307,
+              "post_id": null,
+              "activity_name_escaped": null,
+              "caption_escaped": "",
+              "thumbnail": "https://dgtzuqphqg23d.cloudfront.net/7IjEgw3qBuvaPqlNcLe-MT_Kd5YNukn_yhpR6FZqNC4-96x128.jpg",
+              "large": "https://dgtzuqphqg23d.cloudfront.net/7IjEgw3qBuvaPqlNcLe-MT_Kd5YNukn_yhpR6FZqNC4-1536x2048.jpg",
+              "video": null,
+              "duration": null,
+              "lat": null,
+              "lng": null,
+              "native": true,
+              "owner_id": "45542163",
+              "viewing_athlete_id": "1165965736",
+              "editable": false,
+              "activity": {},
+              "dimensions": {
+                "large": {
+                  "height": 2048,
+                  "width": 1536
+                },
+                "thumbnail": {
+                  "height": 128,
+                  "width": 96
+                }
+              },
+              "is_sponsored_photo": false,
+              "enhanced_photo": null,
+              "parent_trackable_id": "fa371c23fc12c3ba26500fb0ccd4dc797cb5ca59",
+              "showEnhancedTag": false
+            }
+          ]
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Maia, Porto"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/4516751",
+              "display_name": "Ricardo Sousa | @",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/4516751/38120820/22/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/17896159",
+              "display_name": "Paulo R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/17896159/39804373/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/30056925",
+              "display_name": "Lucia M",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30056925/9022465/3/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 5,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T09:14:48Z",
+        "elapsedTime": 1762,
+        "deviceName": "Garmin Forerunner 165",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779356650,
+        "rank": 1779356650.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "7.13<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "5:20<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "38<abbr class='unit' title='minute'>m</abbr> 5<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Movera - Corrida matinal",
+        "id": "18593421818",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 3492498054352453934,
+            "id_string": "3492498054352453934",
+            "activity_id": 18593421818,
+            "name": "Homem do Leme - Ourigo",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "7:59",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492498054353233198,
+            "id_string": "3492498054353233198",
+            "activity_id": 18593421818,
+            "name": "Castelo Queijo - Praia Ingleses",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "10:00",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492498054349848878,
+            "id_string": "3492498054349848878",
+            "activity_id": 18593421818,
+            "name": "Sprint Castelo do Queijo ()",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "1:21",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492498054350525742,
+            "id_string": "3492498054350525742",
+            "activity_id": 18593421818,
+            "name": "Séries 900m (Sul-Norte) | Mutantes Calisténicos",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "4:14",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          },
+          {
+            "id": 3492498054352344366,
+            "id_string": "3492498054352344366",
+            "activity_id": 18593421818,
+            "name": "Rotunda - Praia da Luz",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "9:22",
+            "description": "3rd fastest time",
+            "distance_based_best_effort": false,
+            "hidden": null
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": {
+          "type": "weekly_progress_goal",
+          "image": "//d3nn82uaxijpm6.cloudfront.net/assets/svg/achievements-badge-highlighted-eaa3dd7bf3b86b5a3a6414202323d871e087dee975ac017834f686e32adad4ad.svg",
+          "image_caption": "Progress Goal Completion - week",
+          "text": "Weekly activities goal complete! Give Filipe kudos.",
+          "url": "https://www.strava.com/athlete/goals",
+          "analytics": {
+            "achieved_entity_type": 4,
+            "achieved_entity_type_id": 568647702,
+            "achievement_type": "weekly_progress_goal",
+            "period": "week",
+            "value_type": 78
+          }
+        },
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+          "athleteName": "Filipe Lopes",
+          "athleteId": "38842924",
+          "memberType": "premium",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/38842924\">Filipe Lopes</a>",
+          "sex": "M",
+          "firstName": "Filipe"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/6H3FSQUFIKHDKMSKPDRVE5HYUHBYKYVI2HYDEP5OAZMEFWAQSBQNGWWCBOGKGB27PXQLU5PGQYTUVDT55KP266Y4PDH5D2MQXSOXDGI=",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/7N62XJJWZXCSZTVGVJRDI6G5CA76MWH24QSW4CLF4UTJMRHE2VQOW3RY5C4SRESVNG5CM6TYI3A53UIQGN6FJ44PHIXTPK27SZPJBOI= 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/6H3FSQUFIKHDKMSKPDRVE5HYUHBYKYVI2HYDEP5OAZMEFWAQSBQNGWWCBOGKGB27PXQLU5PGQYTUVDT55KP266Y4PDH5D2MQXSOXDGI= 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/YCPFONJ5Z44542VK3LQCBOUOBIPLCEANCIEDBOQQ3DGU44P7YU5HWYRVS7HGBD3T6U3DE6GJMGE27X2W6L5FUOQNWMZTIAK5RP2TPXQ="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Porto"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/4516751",
+              "display_name": "Ricardo Sousa | @",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/4516751/38120820/22/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/17554005",
+              "display_name": "António T",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/17554005/6898571/3/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/106719047",
+              "display_name": "Zé M",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/106719047/25303216/1/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 4,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T08:43:35Z",
+        "elapsedTime": 2783,
+        "deviceName": "Garmin fēnix 7x",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779355798,
+        "rank": 1779355798.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "6.07<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "6:20<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "38<abbr class='unit' title='minute'>m</abbr> 30<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": "<p>2 km aquecimento + 4 × 800 m ( 5:20-5:30) + 2 desaceleração </p>",
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Morning Run 🏃🏽‍♀️",
+        "id": "18592455803",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 3492475360774165470,
+            "id_string": "3492475360774165470",
+            "activity_id": 18592455803,
+            "name": "Buçaquinho Oeste (N-S)",
+            "sprite": "icon-at-pr-1",
+            "featured": true,
+            "elapsed_time": "3:05",
+            "description": "PR",
+            "distance_based_best_effort": false,
+            "hidden": null
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/187896528/41040412/9/medium.jpg",
+          "athleteName": "Joana Jorge",
+          "athleteId": "187896528",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/187896528\">Joana Jorge</a>",
+          "sex": "F",
+          "firstName": "Joana"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/TSQDUO3ADVW6GYLJJTSF35FK73BDNWLC3QGIJRX2VWBDAXBDMSZR3AEAYT4EY3JC3OFNFOEXKPQEUCAFAIMYCFPETRPX5PZ3TQ4E6===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/3AZXF4R7QCJ5U5JUBR3G7FF2GNJWBYEVLL5PGWB273TLPGPAKRNH2H6CMOZR4HB4IH7GW7CPTAKOTUDOHDCMPCUKMNZID4AWU43RU=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/TSQDUO3ADVW6GYLJJTSF35FK73BDNWLC3QGIJRX2VWBDAXBDMSZR3AEAYT4EY3JC3OFNFOEXKPQEUCAFAIMYCFPETRPX5PZ3TQ4E6=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/3AM76RAXE5LK4SMFWBYOB73DW52F5XJUNUYRZT2ZDTLWNBWUYZQSMYKJKXJPFOUSVMEJA4JKCUJ5XGJLRAVGZOY6WCFTNTWKM7RXG==="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Ovar, Aveiro"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/17896159",
+              "display_name": "Paulo R",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/17896159/39804373/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/26759383",
+              "display_name": "Ricardo P",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/26759383/17566917/14/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/154327464",
+              "display_name": "Diana B",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/154327464/37524001/1/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 7,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T08:47:32Z",
+        "elapsedTime": 2319,
+        "deviceName": "Garmin Forerunner 165 Music",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779355571,
+        "rank": 1779355571.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "7.61<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "6:21<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "48<abbr class='unit' title='minute'>m</abbr> 20<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "Corrida matinal",
+        "id": "18592303337",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": null,
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/198768580/42452711/2/medium.jpg",
+          "athleteName": "Tiago Rodrigues Bessa",
+          "athleteId": "198768580",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/198768580\">Tiago Rodrigues Bessa</a>",
+          "sex": "M",
+          "firstName": "Tiago"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/ANRGLGZ2GR3BNUWSMNSZSNBO7NQIU3NW5CTS5UH77RCXRDXDMHGWH67OMOGPKW634YBVF2LOAWYNAF3JZHZ3GEEX5QEKIDN5B7PXBMA=",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/7F6AWRMWRGTQ4WCI5GPDCGFU4QYUG2ONS3SEBGWMSGZRT4QHQAWXDDRTQ4GEBZ34SU3MTURDXUXFOLFTPNBIHFKNPUVIOMIJTUXZOBI= 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/ANRGLGZ2GR3BNUWSMNSZSNBO7NQIU3NW5CTS5UH77RCXRDXDMHGWH67OMOGPKW634YBVF2LOAWYNAF3JZHZ3GEEX5QEKIDN5B7PXBMA= 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/UWOMK6IS64ZWIXXQKMXQNQ2LUP6EZSTLO53UE46QFOYPMODZLGDL5CWRE4TM5GY7ROQB65Q3WZ3FH3PNDOGGDBWILO7C663BEEYYDQY="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Castelo Branco"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/153778897",
+              "display_name": "Ália D",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/153778897/34427065/4/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 1,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T08:20:27Z",
+        "elapsedTime": 3021,
+        "deviceName": "Strava App",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779354648,
+        "rank": 1779354648.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "10.02<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "6:35<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "1<abbr class='unit' title='hour'>h</abbr> 5<abbr class='unit' title='minute'>m</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": null,
+        "descriptionMentionedAthleteIds": [],
+        "descriptionMentionsClubIds": [],
+        "flagged": null,
+        "activityName": "1.8 30° a sombra! 🔥\nOnde está a sombra?\nDesafio Movera - SUPERA ⚡️",
+        "id": "18592324335",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [
+          {
+            "id": 78190011993,
+            "id_string": "78190011993",
+            "activity_id": 18592324335,
+            "name": "10K",
+            "sprite": "icon-at-pr-3",
+            "featured": false,
+            "elapsed_time": "1:06:03",
+            "description": "3rd best estimated 10K effort",
+            "distance_based_best_effort": true,
+            "hidden": false
+          }
+        ],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": {
+          "type": "all_time_best_effort",
+          "image": "//d3nn82uaxijpm6.cloudfront.net/assets/svg/icon-best-effort-03-5c6228f38e5c06184e0eff4d52edf3fefd03813551d344be155d9b13437596d4.svg",
+          "image_caption": "All Time Best Effort - 10K",
+          "text": "Leonardo's 3rd fastest 10K!",
+          "url": "https://www.strava.com/activities/18592324335",
+          "analytics": {
+            "achieved_entity_type": 29,
+            "achieved_entity_type_id": 78190011993,
+            "achievement_type": "all_time_best_effort",
+            "best_effort_id": 78190011993,
+            "distance": 10000,
+            "elapsed_time": 3963.0,
+            "rank": 3
+          }
+        },
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": "workout",
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/10277829/3416148/4/medium.jpg",
+          "athleteName": "Leonardo Correia",
+          "athleteId": "10277829",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/10277829\">Leonardo Correia</a>",
+          "sex": "M",
+          "firstName": "Leonardo"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/IZFOUVA4VLH6ZL6TRLDY6I56IDEZS4RNNAW6UW22PJ4AUAGBSMQ7W67C6KDFVHSTKQ4XVIPDAVCBVOKAJVJWAUPD52UYQINPVQ6HM===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/OCMPDQYS4FTZ4UVWVDG2EYC6I4HFDSAC6CY7CPSD4FM2LMWJV3VUYC5ZYR766E5QH63O7ENF74P5KR47UGT2DXIM4YUWBA7XTGL64=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/IZFOUVA4VLH6ZL6TRLDY6I56IDEZS4RNNAW6UW22PJ4AUAGBSMQ7W67C6KDFVHSTKQ4XVIPDAVCBVOKAJVJWAUPD52UYQINPVQ6HM=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/OPOEDYXICKCWXTF3R263BLAVN63PSYYVEZU7JVRQ7QI4X7WZFTUGFRUSJ2DIKG2OWDYZOAS4O6NHCCWMERCPVS6OIVPYNEX77D6US==="
+          },
+          "photoList": [
+            {
+              "photo_id": "5D40E3B4-0707-4794-BB39-3D30011BC889",
+              "id": 100574115171,
+              "media_type": 2,
+              "activity_id": 18592324335,
+              "post_id": null,
+              "activity_name_escaped": null,
+              "caption_escaped": "",
+              "thumbnail": "https://d35tn3x5zm6xrc.cloudfront.net/J6U0o3SjtxsstToAGZ_nPqaf1HgQFTLRN0BFa2OnkHA/thumbnails/J6U0o3SjtxsstToAGZ_nPqaf1HgQFTLRN0BFa2OnkHA_600x600.jpg",
+              "large": "https://d35tn3x5zm6xrc.cloudfront.net/J6U0o3SjtxsstToAGZ_nPqaf1HgQFTLRN0BFa2OnkHA/thumbnails/J6U0o3SjtxsstToAGZ_nPqaf1HgQFTLRN0BFa2OnkHA_1080x1920.jpg",
+              "video": "https://d35tn3x5zm6xrc.cloudfront.net/J6U0o3SjtxsstToAGZ_nPqaf1HgQFTLRN0BFa2OnkHA/hls/J6U0o3SjtxsstToAGZ_nPqaf1HgQFTLRN0BFa2OnkHA.m3u8",
+              "duration": 29.56,
+              "lat": null,
+              "lng": null,
+              "native": true,
+              "owner_id": "10277829",
+              "viewing_athlete_id": "1165965736",
+              "editable": false,
+              "activity": {},
+              "dimensions": {
+                "large": {
+                  "height": 1920,
+                  "width": 1080
+                },
+                "thumbnail": {
+                  "height": 600,
+                  "width": 600
+                }
+              },
+              "is_sponsored_photo": false,
+              "enhanced_photo": null,
+              "parent_trackable_id": "619b4f414cf44ed3357f4a4a2283e4ad9edbbc25",
+              "showEnhancedTag": false
+            }
+          ]
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Santa Comba Dão, Viseu"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/37813339",
+              "display_name": "Tiago C",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/37813339/21980064/3/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/53118525",
+              "display_name": "Ricardo A",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/53118525/29927665/1/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/57170562",
+              "display_name": "Telmo P",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/57170562/45130198/1/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 7,
+          "commentsEnabled": true,
+          "comments": [
+            {
+              "comment_id": 2558892170,
+              "deletable": false,
+              "reportable": true,
+              "quarantinable": false,
+              "comment": "Orgulhoooo 💪💪💪💪",
+              "timestamp": "<time class=\"timeago\" datetime=\"2026-05-21T09:22:00Z\">May 21, 2026</time>",
+              "athlete": {
+                "id": 174037140,
+                "url": "/athletes/174037140",
+                "name": "João Barreiros",
+                "firstname": "João",
+                "athlete_name": "João Barreiros",
+                "short_name": "João B",
+                "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/174037140/50763597/1/medium.jpg",
+                "member_type": ""
+              },
+              "reactions_summary": {
+                "entity_id": 2558892170,
+                "has_reacted": false,
+                "facepile": null,
+                "reaction_count": 1
+              }
+            }
+          ]
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T08:00:26Z",
+        "elapsedTime": 3977,
+        "deviceName": "Amazfit GTR",
+        "tagKeys": [
+          "workout"
+        ]
+      },
+      "cursorData": {
+        "updated_at": 1779354403,
+        "rank": 1779354403.0
+      },
+      "callbacks": null
+    },
+    {
+      "viewingAthlete": {
+        "id": "1165965736",
+        "name": "teste testi",
+        "avatarUrl": "https://d3nn82uaxijpm6.cloudfront.net/assets/avatar/athlete/medium-9a368f25fa758e7f8b1104e9f34b0a5880f9eaf43bb8e41d4dfdaeff787beb33.png",
+        "memberType": ""
+      },
+      "entity": "Activity",
+      "activity": {
+        "stats": [
+          {
+            "key": "stat_one",
+            "value": "5.99<abbr class='unit' title='kilometers'> km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_one_subtitle",
+            "value": "Distance",
+            "value_object": null
+          },
+          {
+            "key": "stat_two",
+            "value": "6:50<abbr class='unit' title='minutes per kilometer'> /km</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_two_subtitle",
+            "value": "Pace",
+            "value_object": null
+          },
+          {
+            "key": "stat_three",
+            "value": "40<abbr class='unit' title='minute'>m</abbr> 54<abbr class='unit' title='second'>s</abbr>",
+            "value_object": null
+          },
+          {
+            "key": "stat_three_subtitle",
+            "value": "Time",
+            "value_object": null
+          }
+        ],
+        "description": "<p>62 Carga de Treino\n<br />-- de COROS ...<a href=\"/athletes/143332856\" class=\"mention\"> Sexto Sentido pT</a> \n<br /><a href=\"/clubs/2078294\" class=\"mention\">movera.</a> </p>",
+        "descriptionMentionedAthleteIds": [
+          143332856
+        ],
+        "descriptionMentionsClubIds": [
+          2078294
+        ],
+        "flagged": null,
+        "activityName": "Morning Run",
+        "id": "18592229757",
+        "ownedByCurrentAthlete": false,
+        "segAndBestEffortAchievements": [],
+        "powerAndSegmentGoalAchievements": [],
+        "type": "Run",
+        "mapVisPrompt": {},
+        "maharajAchievement": {
+          "type": "challenge_completion",
+          "image": "https://dgalywyr863hv.cloudfront.net/challenges/5859/5859-logo.png",
+          "image_caption": "May Ten Days Active Challenge",
+          "text": "Carlos completed the May Ten Days Active Challenge!",
+          "url": "https://www.strava.com/challenges/May-Ten-Days-Active-2026",
+          "analytics": {
+            "achieved_entity_type": 1,
+            "achieved_entity_type_id": 5859,
+            "achievement_type": "challenge_completion",
+            "challenge_id": 5859
+          },
+          "subtitle": "10 days"
+        },
+        "isVirtual": false,
+        "isCommute": false,
+        "workoutType": null,
+        "tags": null,
+        "privacyTagKey": null,
+        "shareable": true,
+        "twitterUrl": null,
+        "isBoosted": false,
+        "visibility": "everyone",
+        "athlete": {
+          "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocK8EGAVg_s6kGNe_59fD_czA9tYFvrS9w1sgpGhSLbVvbnsEQ=s96-c",
+          "athleteName": "Carlos Ferro",
+          "athleteId": "115564424",
+          "memberType": "",
+          "title": "<a class=\"entry-owner\" href=\"/athletes/115564424\">Carlos Ferro</a>",
+          "sex": "M",
+          "firstName": "Carlos"
+        },
+        "mapAndPhotos": {
+          "isRoutable": true,
+          "activityMap": {
+            "url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/I2MJB7DXGD4QDBV26EJQV7RBBHVOYHPMK3DQZTZMLG4JOCZTMTEFLLMQKUBB4CXEEFGPAUTOUUPYDWHPZDGYVGFPPAVV7MJTNI77I===",
+            "retina_srcset": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/A4RZHUAD4TI5FPUJA7M2LPCQHL6ICBZGQBMVP6WO3MYPTCS6KDA2AKSK6LHXRLCYT4TDIN4SCL4QNMYXXKDNTRBRDQHNKG54COYRO=== 1x, https://d3o5xota0a1fcr.cloudfront.net/v6/maps/I2MJB7DXGD4QDBV26EJQV7RBBHVOYHPMK3DQZTZMLG4JOCZTMTEFLLMQKUBB4CXEEFGPAUTOUUPYDWHPZDGYVGFPPAVV7MJTNI77I=== 2x",
+            "dark_url": "https://d3o5xota0a1fcr.cloudfront.net/v6/maps/HHF5EZSBNN2AA3EQYMBNNTZGDTEY4HIT7HA2SGWYAJCHYNDUUDMV7V4NEDJVKNOQCQ3ZF6VVRC3KCQM5UYRBTYXM35KLVEPA5DMH4==="
+          },
+          "photoList": []
+        },
+        "timeAndLocation": {
+          "timestampFormat": "date_at_time",
+          "displayDateAtTime": "Today",
+          "displayDate": "Today",
+          "location": "Sintra, Lisbon"
+        },
+        "kudosAndComments": {
+          "canKudo": true,
+          "hasKudoed": false,
+          "highlightedKudosers": [
+            {
+              "destination_url": "strava://athletes/4516751",
+              "display_name": "Ricardo Sousa | @",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/4516751/38120820/22/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/39673064",
+              "display_name": "Hélder S",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/39673064/21951487/2/medium.jpg",
+              "show_name": false
+            },
+            {
+              "destination_url": "strava://athletes/130844571",
+              "display_name": "Cláudia M",
+              "avatar_url": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/130844571/50414217/1/medium.jpg",
+              "show_name": false
+            }
+          ],
+          "kudosCount": 5,
+          "commentsEnabled": true,
+          "comments": []
+        },
+        "hiddenStatIndicatorString": null,
+        "embedDropdownEnabled": true,
+        "activityContextHeader": null,
+        "activitySuggestionType": null,
+        "startDate": "2026-05-21T08:14:59Z",
+        "elapsedTime": 2718,
+        "deviceName": "Decathlon GPS 500",
+        "tagKeys": []
+      },
+      "cursorData": {
+        "updated_at": 1779354017,
+        "rank": 1779354017.0
+      },
+      "callbacks": null
+    }
+  ],
+  "pagination": {
+    "hasMore": true
+  }
+}

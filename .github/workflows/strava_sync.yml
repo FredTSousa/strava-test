@@ -1,13 +1,10 @@
-name: 15-Minute Strava Sync
+name: Daily Strava Members Sync
 
 on:
-  
-  workflow_dispatch: # Allows you to press a button in GitHub to test run it anytime
-  push:
-    branches:
-      - master      # <-- CHANGED FROM 'main' TO 'master'
+  workflow_dispatch: # Permite que a Supabase clique no "botão" via API ou manualmente no GitHub
+
 jobs:
-  sync:
+  sync_strava_pipeline:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -16,13 +13,25 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-node-version: '3.11'
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
           pip install requests python-dotenv supabase firebase-admin
 
-      - name: Run Sync Script
+      # 🟢 PASSO 1: Sincroniza primeiro os membros do Clube do Strava
+      - name: Run Members Sync Script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+          STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
+        run: python sync_members.py
+
+      # 🟢 PASSO 2: Puxa as atividades do Strava para o Supabase (já conhece os membros novos)
+      - name: Run Strava Activities Sync
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
@@ -31,10 +40,11 @@ jobs:
           STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
           STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
         run: python cron_sync.py
-  # ⚡ NOVO PASSO: Corre logo após o Strava terminar (e depois de todos os database triggers processarem o match)
-      - name: 2. Correr o Sync de Treinos para o Firestore
+
+      # 🟢 PASSO 3: Sincroniza os treinos para o Firestore (Garante os rascunhos na App)
+      - name: Run Workouts Sync to Firestore
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }} # 🔐 O teu segredo do Firebase
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: python sync_worker.py

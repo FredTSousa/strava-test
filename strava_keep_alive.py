@@ -2,11 +2,11 @@ import os
 import time
 import random  
 import requests
-from dotenv import load_dotenv #
+
 from supabase import create_client, Client
 
 
-load_dotenv()
+
 
 print("📂 Pasta atual onde o Python está a rodar:", os.getcwd())
 print("📄 Ficheiros que o Python consegue ver nesta pasta:", os.listdir('.'))

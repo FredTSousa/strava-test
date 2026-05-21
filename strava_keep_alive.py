@@ -29,7 +29,7 @@ def update_cookie_in_supabase(novo_cookie: str):
 def run_keep_alive():
     # 🟢 ADICIONAR JITTER (Ruído aleatório)
     # Gera um tempo de espera aleatório entre 10 segundos e 15 minutos (900 segundos)
-    tempo_espera = random.randint(10, 180)
+    tempo_espera = random.randint(10, 400)
     print(f"🎲 [Segurança] A simular comportamento humano. A aguardar {tempo_espera // 60} minutos e {tempo_espera % 60} segundos antes de disparar...")
     time.sleep(tempo_espera)
     print("📡 A iniciar verificação e renovação do cookie do Strava...")

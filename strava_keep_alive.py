@@ -39,7 +39,7 @@ def run_keep_alive():
     
     session = requests.Session()
     
-    # 🟢 HEADERS TOTAIS: Cópia exata e fiel do teu cURL do Postman
+    # 1. Copiamos todos os headers do teu Postman, MAS SEM O COOKIE AQUI
     session.headers.update({
         "accept": "application/json, text/plain, */*",
         "accept-language": "en-US",
@@ -55,19 +55,23 @@ def run_keep_alive():
         "sentry-trace": "7526e228ad004a27a02585f138b0032f-af970c7c315b8da2-0",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
         "x-csrf-token": "BAIHJmyrSsY9R3I12QOK0v1SDl3d3bNaSCIgGWLyLYsAgwNJLXognYzZYMOh9P447pXJcQWnai9HcPZvVTHfIw",
-        "x-requested-with": "XMLHttpRequest",
-        "Cookie": cookie_atual  # O nosso cookie dinâmico do Supabase
+        "x-requested-with": "XMLHttpRequest"
     })
+    
+    # 2. 🟢 A MAGIA: Limpar o valor do cookie de espaços e injetar nativamente no jar da sessão
+    # Isto extrai apenas o valor limpo da hash do _strava4_session
+    cookie_limpo = cookie_atual.replace("_strava4_session=", "").replace(";", "").strip()
+    session.cookies.set("_strava4_session", cookie_limpo, domain=".strava.com")
     
     url = f"https://www.strava.com/clubs/{CLUB_ID}/feed?feed_type=club&club_id={CLUB_ID}"
     
-    # Mantemos allow_redirects=False para monitorizar o comportamento exato
+    # Mantemos allow_redirects=False para travar o 301/302 se falhar
     response = session.get(url, allow_redirects=False)
     
     print(f"📥 Código de Resposta do Strava: {response.status_code}")
     
     if response.status_code == 200:
-        print("✅ Conexão bem-sucedida! O Strava aceitou o request completo.")
+        print("✅ Conexão bem-sucedida! O Strava aceitou o request nativo.")
         
         cookies_na_sessao = session.cookies.get_dict()
         if "_strava4_session" in cookies_na_sessao:

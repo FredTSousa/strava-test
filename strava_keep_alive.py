@@ -29,47 +29,45 @@ def update_cookie_in_supabase(novo_cookie: str):
     }).execute()
 
 def run_keep_alive():
-    # 🟢 ADICIONAR JITTER (Ruído aleatório)
-    # Gera um tempo de espera aleatório entre 10 segundos e 15 minutos (900 segundos)
-    tempo_espera = random.randint(10, 400)
-    print(f"🎲 [Segurança] A simular comportamento humano. A aguardar {tempo_espera // 60} minutos e {tempo_espera % 60} segundos antes de disparar...")
+    # Jitter curto para segurança
+    tempo_espera = random.randint(10, 15)
+    print(f"🎲 [Segurança] A aguardar {tempo_espera} segundos...")
     time.sleep(tempo_espera)
-    print("📡 A iniciar verificação e renovação do cookie do Strava...")
     
-    # 1. Obter o cookie que temos atualmente guardado
+    print("📡 A iniciar verificação do cookie...")
     cookie_atual = get_current_cookie()
     
-    # 2. Configurar a sessão HTTP do requests
     session = requests.Session()
     session.headers.update({
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept": "application/json, text/plain, */*", # Mudado para aceitar JSON
         "Accept-Language": "pt-PT,pt;q=0.9",
+        "x-requested-with": "XMLHttpRequest",          # Cabeçalho que usaste no Postman
         "Cookie": cookie_atual
     })
     
-    # 3. Fazer um request simples à página do clube para forçar o Keep-Alive
-    url = f"https://www.strava.com/clubs/{CLUB_ID}/recent_activity"
+    # 🟢 MUDANÇA AQUI: Batemos direto no feed que aceita o cookie
+    url = f"https://www.strava.com/clubs/{CLUB_ID}/feed?feed_type=club&club_id={CLUB_ID}"
+    
+    # Deixamos o allow_redirects=False para apanhar se ele nos tentar mandar para o /login (302)
     response = session.get(url, allow_redirects=False)
     
     if response.status_code == 200:
-        print("✅ Conexão bem-sucedida! A sessão no Strava está ativa.")
+        print("✅ Conexão bem-sucedida! O feed respondeu com sucesso.")
         
-        # O requests.Session captura automaticamente se o Strava enviou um novo 'Set-Cookie'
         cookies_na_sessao = session.cookies.get_dict()
         if "_strava4_session" in cookies_na_sessao:
             cookie_renovado = f"_strava4_session={cookies_na_sessao['_strava4_session']};"
             
-            # Se o cookie mudou face ao que tínhamos no Supabase, guardamos o novo
             if cookie_renovado != cookie_atual:
                 update_cookie_in_supabase(cookie_renovado)
-                print("🔄 O Strava emitiu uma nova sessão. Cookie atualizado no Supabase!")
+                print("🔄 Cookie renovado guardado no Supabase!")
             else:
-                print("ℹ️ O cookie atual ainda é válido e não precisou de alteração.")
-    
+                print("ℹ️ O cookie atual ainda é o mais recente.")
+                
     elif response.status_code in [302, 401, 403]:
-        print("🚨 Erro: O cookie expirou completamente ou a sessão foi derrubada pelo Strava.")
-        print("Ação necessária: Copia um cookie novo do browser e cola na tabela 'system_config'.")
+        print(f"🚨 A sessão expirou ou foi rejeitada (Status {response.status_code}).")
+        print("Redirecionado para o login. Atualiza o cookie no Supabase.")
     else:
         print(f"⚠️ Resposta inesperada do Strava. Status Code: {response.status_code}")
 

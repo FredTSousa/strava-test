@@ -1,4 +1,6 @@
 import os
+import time
+import random  
 import requests
 from supabase import create_client, Client
 

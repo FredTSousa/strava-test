@@ -40,21 +40,31 @@ def run_keep_alive():
     session = requests.Session()
     session.headers.update({
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*", # Mudado para aceitar JSON
+        "Accept": "application/json, text/plain, */*",
         "Accept-Language": "pt-PT,pt;q=0.9",
-        "x-requested-with": "XMLHttpRequest",          # Cabeçalho que usaste no Postman
+        "x-requested-with": "XMLHttpRequest",
         "Cookie": cookie_atual
     })
     
-    # 🟢 MUDANÇA AQUI: Batemos direto no feed que aceita o cookie
+    # 🟢 GARANTIR O WWW. (Exatamente como o teu cURL do Postman)
     url = f"https://www.strava.com/clubs/{CLUB_ID}/feed?feed_type=club&club_id={CLUB_ID}"
     
-    # Deixamos o allow_redirects=False para apanhar se ele nos tentar mandar para o /login (302)
-    response = session.get(url, allow_redirects=False)
+    # 🟢 MUDANÇA: Permitimos o redirecionamento automático (True)
+    response = session.get(url, allow_redirects=True)
     
+    # Se ele foi redirecionado para a página de login, o URL final vai conter "/login"
+    if "login" in response.url:
+        print("🚨 A sessão expirou! O Strava redirecionou-nos para a página de login.")
+        print("Ação necessária: Atualiza o cookie na tabela 'system_config' do Supabase.")
+        return
+
     if response.status_code == 200:
         print("✅ Conexão bem-sucedida! O feed respondeu com sucesso.")
         
+        # Se houve um 301 pelo caminho, o requests seguiu-o e chegou ao destino
+        if response.history:
+            print(f"ℹ️ Nota: O request passou por um redirecionamento {response.history[0].status_code}")
+
         cookies_na_sessao = session.cookies.get_dict()
         if "_strava4_session" in cookies_na_sessao:
             cookie_renovado = f"_strava4_session={cookies_na_sessao['_strava4_session']};"
@@ -64,12 +74,8 @@ def run_keep_alive():
                 print("🔄 Cookie renovado guardado no Supabase!")
             else:
                 print("ℹ️ O cookie atual ainda é o mais recente.")
-                
-    elif response.status_code in [302, 401, 403]:
-        print(f"🚨 A sessão expirou ou foi rejeitada (Status {response.status_code}).")
-        print("Redirecionado para o login. Atualiza o cookie no Supabase.")
     else:
-        print(f"⚠️ Resposta inesperada do Strava. Status Code: {response.status_code}")
+        print(f"⚠️ Resposta inesperada do Strava. Status Code final: {response.status_code}")
 
 if __name__ == "__main__":
     run_keep_alive()

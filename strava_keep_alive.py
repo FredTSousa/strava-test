@@ -38,44 +38,52 @@ def run_keep_alive():
     cookie_atual = get_current_cookie()
     
     session = requests.Session()
+    
+    # 🟢 HEADERS TOTAIS: Cópia exata e fiel do teu cURL do Postman
     session.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "pt-PT,pt;q=0.9",
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "en-US",
+        "baggage": "sentry-environment=production,sentry-release=d29a634aab6043b7b8279d4da97b1d9d332748f6,sentry-public_key=6ffc1c27d92347b49d7659886aab9deb,sentry-trace_id=7526e228ad004a27a02585f138b0032f,sentry-org_id=352714,sentry-sampled=false,sentry-sample_rand=0.7808152430404058,sentry-sample_rate=0",
+        "priority": "u=1, i",
+        "referer": f"https://www.strava.com/clubs/{CLUB_ID}/recent_activity?num_entries=75",
+        "sec-ch-ua": '"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "sentry-trace": "7526e228ad004a27a02585f138b0032f-af970c7c315b8da2-0",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        "x-csrf-token": "BAIHJmyrSsY9R3I12QOK0v1SDl3d3bNaSCIgGWLyLYsAgwNJLXognYzZYMOh9P447pXJcQWnai9HcPZvVTHfIw",
         "x-requested-with": "XMLHttpRequest",
-        "Cookie": cookie_atual
+        "Cookie": cookie_atual  # O nosso cookie dinâmico do Supabase
     })
     
-    # 🟢 GARANTIR O WWW. (Exatamente como o teu cURL do Postman)
     url = f"https://www.strava.com/clubs/{CLUB_ID}/feed?feed_type=club&club_id={CLUB_ID}"
     
-    # 🟢 MUDANÇA: Permitimos o redirecionamento automático (True)
-    response = session.get(url, allow_redirects=True)
+    # Mantemos allow_redirects=False para monitorizar o comportamento exato
+    response = session.get(url, allow_redirects=False)
     
-    # Se ele foi redirecionado para a página de login, o URL final vai conter "/login"
-    if "login" in response.url:
-        print("🚨 A sessão expirou! O Strava redirecionou-nos para a página de login.")
-        print("Ação necessária: Atualiza o cookie na tabela 'system_config' do Supabase.")
-        return
-
+    print(f"📥 Código de Resposta do Strava: {response.status_code}")
+    
     if response.status_code == 200:
-        print("✅ Conexão bem-sucedida! O feed respondeu com sucesso.")
+        print("✅ Conexão bem-sucedida! O Strava aceitou o request completo.")
         
-        # Se houve um 301 pelo caminho, o requests seguiu-o e chegou ao destino
-        if response.history:
-            print(f"ℹ️ Nota: O request passou por um redirecionamento {response.history[0].status_code}")
-
         cookies_na_sessao = session.cookies.get_dict()
         if "_strava4_session" in cookies_na_sessao:
             cookie_renovado = f"_strava4_session={cookies_na_sessao['_strava4_session']};"
-            
             if cookie_renovado != cookie_atual:
                 update_cookie_in_supabase(cookie_renovado)
                 print("🔄 Cookie renovado guardado no Supabase!")
             else:
                 print("ℹ️ O cookie atual ainda é o mais recente.")
+                
+    elif response.status_code in [301, 302]:
+        print(f"🚨 Redirecionamento (Status {response.status_code}) para: {response.headers.get('Location')}")
+    elif response.status_code in [401, 403]:
+        print(f"🚨 Erro de Autenticação/Bloqueio (Status {response.status_code})")
     else:
-        print(f"⚠️ Resposta inesperada do Strava. Status Code final: {response.status_code}")
+        print(f"⚠️ Resposta inesperada: Status {response.status_code}")
 
 if __name__ == "__main__":
     run_keep_alive()

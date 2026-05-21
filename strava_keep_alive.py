@@ -46,6 +46,12 @@ from curl_cffi import requests
 
 def run_keep_alive():
     print("📡 A iniciar verificação com emulador de browser...")
+    tempo_espera = random.randint(10, 180)
+    
+    print(f"🎲 [Jitter] Para segurança, o script vai fingir-se de humano e aguardar {tempo_espera} segundos...")
+    time.sleep(tempo_espera)
+    
+    print("📡 Atraso concluído. A disparar pedido para o Strava...")
     cookie_atual = get_current_cookie()
     
     # Criamos a sessão usando o motor do Chrome limpo

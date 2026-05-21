@@ -1,0 +1,33 @@
+name: Strava Session Keep-Alive
+
+on:
+  schedule:
+    # ⏱️ Corre de 20 em 20 minutos certinhos
+    # (Minutos :00, :20 e :40 de cada hora)
+    - cron: '*/20 * * * *'
+  workflow_dispatch: # Permite-te ir ao GitHub e carregar no botão para testar sempre que quiseres
+
+jobs:
+  keep_alive:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Mantém a mesma versão do resto do projeto
+
+      - name: Install Dependencies
+        run: |
+          pip install requests supabase
+
+      - name: Run Keep Alive Script
+        env:
+          # 🔐 Segredos guardados no teu repositório do GitHub
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
+        run: python strava_keep_alive.py

@@ -119,7 +119,6 @@ export default function DashboardPage() {
   
     try {
       const db = getSupabase();
-      // 🟢 Adicionado 'athlete_id' no select inicial dos utilizadores
       const { data: userData, error: userError } = await db
         .from("users_firestore")
         .select("id, display_name, email, athlete_id")
@@ -149,7 +148,6 @@ export default function DashboardPage() {
     loadFeed();
   }, []);
 
-  // 🟢 Salva nos metadados e atualiza o 'athlete_id' do user na mesma ação
   const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
     const valueToSave = selectedUserId || null;
 
@@ -418,14 +416,37 @@ export default function DashboardPage() {
                           row.isSynced ? "bg-emerald-950/5" : "bg-slate-950"
                         }`}
                       >
+                        {/* 🟢 MODIFICADO: Link condicional para o perfil do Strava e indicação de atividade do clube */}
                         <td className="px-4 py-3 font-medium text-white align-top">
                           <div className="flex flex-col gap-0.5">
-                            <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px] text-slate-200">
-                              {row.athleteName}
+                            <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px]">
+                              {row.totalStravaClubMatches > 0 && row.athleteIdFromStrava ? (
+                                <a
+                                  href={`https://www.strava.com/athletes/${row.athleteIdFromStrava}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#fc4c02] hover:underline font-semibold flex items-center gap-1"
+                                  title="Ver perfil no Strava"
+                                >
+                                  {row.athleteName}
+                                  <span className="text-[10px] text-slate-500">🔗</span>
+                                </a>
+                              ) : (
+                                <span className="text-slate-200">
+                                  {row.athleteName}
+                                </span>
+                              )}
                             </div>
                             <div className="text-slate-500 text-[10px] truncate max-w-[142px]" title={row.deviceName}>
                               {row.deviceName}
                             </div>
+                            {row.totalStravaClubMatches > 0 && (
+                              <div className="mt-1">
+                                <span className="inline-flex items-center rounded bg-orange-950/50 px-1 py-0.5 text-[9px] font-medium text-orange-400 border border-orange-500/20">
+                                  Atividade Clube
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </td>
 
@@ -488,7 +509,6 @@ export default function DashboardPage() {
                                   return null;
                                 })()}
                               
-                                {/* ✨ Lista filtrada e enriquecida com o estado do ID do atleta */}
                                 {suggestedUsers.length > 0 && (
                                   <optgroup label="✨ Utilizadores Encontrados" className="bg-slate-900 text-[#fc4c02] font-semibold">
                                     {suggestedUsers.map((user) => {

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getSupabase } from "./utils/supabase";
 
 type StravaAthlete = {
+  id?: number; // 🟢 ID numérico do Strava extraído do JSON
   firstname?: string;
   lastname?: string;
 };
@@ -24,11 +25,12 @@ type StravaRawFeedRow = {
   fetched_at: string;
   assigned_firestore_user_id: string | null; 
   synced_to_firestore: boolean;
-  total_strava_club_matches?: number; // 🟢 FIX: Declarado aqui para o TypeScript não reclamar!
+  total_strava_club_matches?: number;
 };
 
 type ParsedActivity = {
   idVirtual: string;
+  athleteIdFromStrava: number | null; 
   athleteName: string;
   deviceName: string;
   title: string;
@@ -46,6 +48,7 @@ type FirestoreUser = {
   id: string;
   display_name: string;
   email: string;
+  athlete_id: number | null; // 🟢 Mapeado para detetar o vínculo
 };
 
 function normalizeForMatch(text: string): string {
@@ -81,6 +84,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
 
   return {
     idVirtual: row.id_virtual,
+    athleteIdFromStrava: athlete.id ? Number(athlete.id) : null,
     athleteName,
     deviceName: raw.device_name ?? "Unknown Device",
     title: raw.name ?? "Untitled",
@@ -89,8 +93,6 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     movingTimeMin: Math.round(movingSec / 60),
     elevationGain: Math.round(raw.total_elevation_gain ?? 0),
     fetchedAt: formatImportDate(row.fetched_at),
-    // 🟢 O MAPEAMENTO CORRETO: 
-    // Lê o snake_case que vem do banco e guarda no CamelCase do TypeScript
     assignedFirestoreUserId: row.assigned_firestore_user_id, 
     isSynced: row.synced_to_firestore ?? false,
     totalStravaClubMatches: row.total_strava_club_matches ?? 0,
@@ -117,15 +119,15 @@ export default function DashboardPage() {
   
     try {
       const db = getSupabase();
+      // 🟢 Adicionado 'athlete_id' no select inicial dos utilizadores
       const { data: userData, error: userError } = await db
         .from("users_firestore")
-        .select("id, display_name, email")
+        .select("id, display_name, email, athlete_id")
         .order("display_name", { ascending: true });
   
       if (userError) throw new Error(userError.message);
       setUsers(userData as FirestoreUser[]);
   
-      // 🟢 AJUSTE: Adicionada a nova coluna 'total_strava_club_matches' no .select() da View
       const { data: feedData, error: queryError } = await db
         .from("view_strava_activities") 
         .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches") 
@@ -147,8 +149,12 @@ export default function DashboardPage() {
     loadFeed();
   }, []);
 
+  // 🟢 Salva nos metadados e atualiza o 'athlete_id' do user na mesma ação
   const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
     const valueToSave = selectedUserId || null;
+
+    const currentActivity = rows.find(r => r.idVirtual === idVirtual);
+    const stravaAthleteId = currentActivity?.athleteIdFromStrava;
 
     setRows((prev) =>
       prev.map((row) =>
@@ -158,8 +164,17 @@ export default function DashboardPage() {
       )
     );
 
+    if (valueToSave && stravaAthleteId) {
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u.id === valueToSave ? { ...u, athlete_id: stravaAthleteId } : u
+        )
+      );
+    }
+
     try {
       const db = getSupabase();
+      
       const { error: updateError } = await db
         .from("strava_activities_metadata")
         .upsert({ 
@@ -169,11 +184,22 @@ export default function DashboardPage() {
           last_assign_timestamp: new Date().toISOString()
         });
   
-      if (updateError) {
-        alert("Erro ao gravar automaticamente: " + updateError.message);
+      if (updateError) throw updateError;
+
+      if (valueToSave && stravaAthleteId) {
+        const { error: userUpdateError } = await db
+          .from("users_firestore")
+          .update({ athlete_id: stravaAthleteId })
+          .eq("id", valueToSave);
+
+        if (userUpdateError) {
+          console.warn("⚠️ Atividade guardada, falhou ao atualizar athlete_id:", userUpdateError.message);
+        }
       }
+
     } catch (e) {
-      alert("Erro na ligação para gravação automática.");
+      alert("Erro ao gravar os dados na base de dados.");
+      loadFeed();
     }
   };
 
@@ -444,13 +470,12 @@ export default function DashboardPage() {
                                 onChange={(e) => handleDropdownUserChange(row.idVirtual, e.target.value)}
                                 className={`rounded-lg border text-xs bg-slate-950 px-2 py-1.5 text-slate-200 outline-none focus:border-[#fc4c02]/50 w-full truncate transition-all duration-200 ${
                                   !hasUser 
-                                    ? "border-amber-500/80 text-amber-400 font-bold bg-amber-950/30 shadow-md shadow-amber-500/10 animate-pulse hover:animate-none" 
+                                    ? "border-amber-500/80 text-amber-400 font-bold bg-amber-950/30 shadow-md shadow-amber-500/10" 
                                     : "border-slate-700 text-slate-200 hover:border-slate-600" 
                                 }`}
                               >
                                 <option value="" className="text-amber-400 font-bold">-- Escolher User --</option>
                                 
-                                {/* ⚠️ AVISO DINÂMICO: Mostra quantos membros do clube do Strava com este nome ainda NÃO têm conta */}
                                 {(() => {
                                   const semContaCount = row.totalStravaClubMatches - suggestedUsers.length;
                                   if (semContaCount > 0) {
@@ -463,14 +488,19 @@ export default function DashboardPage() {
                                   return null;
                                 })()}
                               
-                                {/* ✨ LISTA EXCLUSIVA: Só mostra os utilizadores sugeridos da base de dados */}
+                                {/* ✨ Lista filtrada e enriquecida com o estado do ID do atleta */}
                                 {suggestedUsers.length > 0 && (
                                   <optgroup label="✨ Utilizadores Encontrados" className="bg-slate-900 text-[#fc4c02] font-semibold">
-                                    {suggestedUsers.map((user) => (
-                                      <option key={`sug-${user.id}`} value={user.id} className="bg-slate-950 text-white font-normal">
-                                        {user.display_name} ({user.email})
-                                      </option>
-                                    ))}
+                                    {suggestedUsers.map((user) => {
+                                      const hasIdLinked = user.athlete_id !== null;
+                                      
+                                      return (
+                                        <option key={`sug-${user.id}`} value={user.id} className="bg-slate-950 text-white font-normal">
+                                          {hasIdLinked ? "🆔 " : "⬜ "} 
+                                          {user.display_name} ({user.email})
+                                        </option>
+                                      );
+                                    })}
                                   </optgroup>
                                 )}
                               </select>
@@ -489,6 +519,10 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+// =========================================================================
+// 🟢 SUB-COMPONENTES REINTEGRADOS (Garantem que o ficheiro compila a 100%)
+// =========================================================================
 
 function FilterField({
   id,

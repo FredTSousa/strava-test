@@ -4,9 +4,9 @@ import random
 import re
 import json
 from supabase import create_client, Client
-from curl_cffi import requests # Mantemos a tua curl_cffi para o bypass
+from curl_cffi import requests # Mantemos a curl_cffi para o bypass da Cloudflare
 
-# Prints de diagnóstico (podes apagar mais tarde se quiseres limpar o log)
+# Prints de diagnóstico para o terminal/GitHub Actions log
 print("📂 Pasta atual onde o Python está a rodar:", os.getcwd())
 print("📄 Ficheiros que o Python consegue ver nesta pasta:", os.listdir('.'))
 print(f"🔍 O que foi lido do SUPABASE_URL: {os.getenv('SUPABASE_URL')}")
@@ -39,7 +39,6 @@ def update_cookie_in_supabase(novo_cookie: str):
         "value": novo_cookie
     }).execute()
 
-# 🟢 NOVA FUNÇÃO: Processa o JSON dinâmico e faz Upsert das atividades
 def process_and_save_activities(json_data):
     """Varre as entries do feed, limpa a distância com Regex e envia para o Supabase."""
     atividades_limpas = []
@@ -75,7 +74,8 @@ def process_and_save_activities(json_data):
         }
         atividades_limpas.append(dados_formatados)
         
-    if sorted(atividades_limpas, key=lambda x: x['activity_id']):
+    # 🟢 CORREÇÃO CRUCIAL DA SINTAXE AQUI:
+    if len(atividades_limpas) > 0:
         try:
             print(f"🚀 A enviar {len(atividades_limpas)} atividades extraídas para o Supabase...")
             supabase.table("atividades_clube").upsert(atividades_limpas).execute()
@@ -89,4 +89,73 @@ def run_keep_alive():
     print("📡 A iniciar verificação com emulador de browser...")
     tempo_espera = random.randint(10, 180)
     
-    print(f"🎲 [Jitter] Para segurança,
+    print(f"🎲 [Jitter] Para segurança, o script vai fingir-se de humano e aguardar {tempo_espera} segundos...")
+    time.sleep(tempo_espera)
+    
+    print("📡 Atraso concluído. A disparar pedido para o Strava...")
+    cookie_atual = get_current_cookie()
+    
+    session = requests.Session(impersonate="chrome120")
+    
+    session.headers.update({
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "en-US,pt-PT;q=0.9,pt;q=0.8",
+        "referer": f"https://www.strava.com/clubs/{CLUB_ID}/recent_activity",
+        "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "x-requested-with": "XMLHttpRequest",
+        "Cookie": cookie_atual 
+    })
+    
+    url = f"https://www.strava.com/clubs/{CLUB_ID}/feed?feed_type=club&club_id={CLUB_ID}"
+    
+    response = session.get(url, allow_redirects=False)
+    print(f"📥 Código de Resposta do Strava: {response.status_code}")
+    
+    if response.status_code == 200:
+        print("✅ CONSEGUIMOS! O Strava achou que o Python era o Chrome real.")
+        
+        try:
+            dados_do_feed = response.json()
+            json_bonito = json.dumps(dados_do_feed, indent=2, ensure_ascii=False)
+            
+            # Executa o processamento do feed dinâmico e salva no Supabase
+            process_and_save_activities(dados_do_feed)
+            
+            # Só cria ficheiros locais se NÃO estiver a correr no GitHub Actions
+            if not os.getenv("GITHUB_ACTIONS"):
+                print("\n📦 --- CONTEÚDO DO FEED COMPLETO (JSON) ---")
+                print(json_bonito[:1000] + "... (cortado para o log)")
+                with open("resposta_strava.json", "w", encoding="utf-8") as f:
+                    f.write(json_bonito)
+                print("💾 Gravação concluída localmente em 'resposta_strava.json'")
+                
+        except Exception as e:
+            html_completo = response.text
+            print(f"⚠️ Resposta não era o JSON esperado: {e}")
+            if not os.getenv("GITHUB_ACTIONS"):
+                with open("resposta_strava.html", "w", encoding="utf-8") as f:
+                    f.write(html_completo)
+                print("💾 Conteúdo HTML guardado em 'resposta_strava.html'")
+                
+        # Mantém a verificação e renovação original do cookie intacta
+        cookies_na_sessao = session.cookies.get_dict()
+        if "_strava4_session" in cookies_na_sessao:
+            cookie_renovado = f"_strava4_session={cookies_na_sessao['_strava4_session']};"
+            if cookie_renovado != cookie_atual:
+                update_cookie_in_supabase(cookie_renovado)
+                print("🔄 Cookie renovado guardado no Supabase!")
+            else:
+                print("ℹ️ O cookie atual ainda é o mais recente.")
+                
+    elif response.status_code in [301, 302]:
+        print(f"🚨 Redirecionado para: {response.headers.get('Location')}")
+    else:
+        print(f"⚠️ Status inesperado: {response.status_code}")
+
+if __name__ == "__main__":
+    run_keep_alive()

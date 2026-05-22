@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getSupabase } from "./utils/supabase";
 
 type StravaAthlete = {
-  id?: number; // 🟢 ID numérico do Strava extraído do JSON
+  id?: number; 
   firstname?: string;
   lastname?: string;
 };
@@ -26,6 +26,8 @@ type StravaRawFeedRow = {
   assigned_firestore_user_id: string | null; 
   synced_to_firestore: boolean;
   total_strava_club_matches?: number;
+  firestore_user_athlete_id?: number | null; 
+  activity_clube_id?: number | null; // 🟢 Mapeado aqui vindo da View
 };
 
 type ParsedActivity = {
@@ -42,13 +44,14 @@ type ParsedActivity = {
   assignedFirestoreUserId: string | null; 
   isSynced: boolean;
   totalStravaClubMatches: number;
+  hasActivityClube: boolean; // 🟢 Guardamos se existe atividade do clube vinculada
 };
 
 type FirestoreUser = {
   id: string;
   display_name: string;
   email: string;
-  athlete_id: number | null; // 🟢 Mapeado para detetar o vínculo
+  athlete_id: number | null; 
 };
 
 function normalizeForMatch(text: string): string {
@@ -96,6 +99,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     assignedFirestoreUserId: row.assigned_firestore_user_id, 
     isSynced: row.synced_to_firestore ?? false,
     totalStravaClubMatches: row.total_strava_club_matches ?? 0,
+    hasActivityClube: row.activity_clube_id !== null && row.activity_clube_id !== undefined, // 🟢 Booleano para a UI
   };
 }
 
@@ -127,14 +131,26 @@ export default function DashboardPage() {
       if (userError) throw new Error(userError.message);
       setUsers(userData as FirestoreUser[]);
   
+      // 🟢 Adicionado 'activity_clube_id' no select da View
       const { data: feedData, error: queryError } = await db
         .from("view_strava_activities") 
-        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches") 
+        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id") 
         .order("fetched_at", { ascending: false });
   
       if (queryError) throw new Error(queryError.message);
       
-      setRows((feedData as StravaRawFeedRow[]).map(parseRow));
+      const rawRows = feedData as StravaRawFeedRow[];
+      rawRows.forEach(row => {
+        if (row.assigned_firestore_user_id && row.firestore_user_athlete_id) {
+          userData?.forEach(u => {
+            if (u.id === row.assigned_firestore_user_id) {
+              u.athlete_id = row.firestore_user_athlete_id;
+            }
+          });
+        }
+      });
+      
+      setRows(rawRows.map(parseRow));
   
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -416,16 +432,16 @@ export default function DashboardPage() {
                           row.isSynced ? "bg-emerald-950/5" : "bg-slate-950"
                         }`}
                       >
-                        {/* 🟢 MODIFICADO: Link condicional para o perfil do Strava e indicação de atividade do clube */}
+                        {/* 🟢 CORRIGIDO: Link focado no ID e tag "Atividade Clube" controlada apenas se m.activity_clube_id existir */}
                         <td className="px-4 py-3 font-medium text-white align-top">
                           <div className="flex flex-col gap-0.5">
                             <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px]">
-                              {row.totalStravaClubMatches > 0 && row.athleteIdFromStrava ? (
+                              {row.athleteIdFromStrava ? (
                                 <a
                                   href={`https://www.strava.com/athletes/${row.athleteIdFromStrava}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-[#fc4c02] hover:underline font-semibold flex items-center gap-1"
+                                  className="text-[#fc4c02] hover:underline font-semibold inline-flex items-center gap-1"
                                   title="Ver perfil no Strava"
                                 >
                                   {row.athleteName}
@@ -440,7 +456,8 @@ export default function DashboardPage() {
                             <div className="text-slate-500 text-[10px] truncate max-w-[142px]" title={row.deviceName}>
                               {row.deviceName}
                             </div>
-                            {row.totalStravaClubMatches > 0 && (
+                            {/* 🟢 A TAG AGORA ESTÁ CONTROLADA COM 100% DE CERTEZA */}
+                            {row.hasActivityClube && (
                               <div className="mt-1">
                                 <span className="inline-flex items-center rounded bg-orange-950/50 px-1 py-0.5 text-[9px] font-medium text-orange-400 border border-orange-500/20">
                                   Atividade Clube
@@ -541,7 +558,7 @@ export default function DashboardPage() {
 }
 
 // =========================================================================
-// 🟢 SUB-COMPONENTES REINTEGRADOS (Garantem que o ficheiro compila a 100%)
+// SUB-COMPONENTES REINTEGRADOS
 // =========================================================================
 
 function FilterField({

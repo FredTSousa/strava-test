@@ -27,7 +27,7 @@ type StravaRawFeedRow = {
   synced_to_firestore: boolean;
   total_strava_club_matches?: number;
   firestore_user_athlete_id?: number | null; 
-  activity_clube_id?: number | null; // 🟢 Mapeado aqui vindo da View
+  activity_clube_id?: number | null; 
 };
 
 type ParsedActivity = {
@@ -44,7 +44,7 @@ type ParsedActivity = {
   assignedFirestoreUserId: string | null; 
   isSynced: boolean;
   totalStravaClubMatches: number;
-  hasActivityClube: boolean; // 🟢 Guardamos se existe atividade do clube vinculada
+  hasActivityClube: boolean; 
 };
 
 type FirestoreUser = {
@@ -75,6 +75,8 @@ function formatImportDate(isoString: string): string {
   }
 }
 
+// Nota: Como o strava_raw_feed não traz o ID, o athleteIdFromStrava aqui virá nulo do JSON, 
+// o que já não afeta a interface porque passámos a ler o ID do perfil do user.
 function parseRow(row: StravaRawFeedRow): ParsedActivity {
   const raw = row.raw_json ?? {};
   const athlete = raw.athlete ?? {};
@@ -99,7 +101,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     assignedFirestoreUserId: row.assigned_firestore_user_id, 
     isSynced: row.synced_to_firestore ?? false,
     totalStravaClubMatches: row.total_strava_club_matches ?? 0,
-    hasActivityClube: row.activity_clube_id !== null && row.activity_clube_id !== undefined, // 🟢 Booleano para a UI
+    hasActivityClube: row.activity_clube_id !== null && row.activity_clube_id !== undefined, 
   };
 }
 
@@ -131,7 +133,6 @@ export default function DashboardPage() {
       if (userError) throw new Error(userError.message);
       setUsers(userData as FirestoreUser[]);
   
-      // 🟢 Adicionado 'activity_clube_id' no select da View
       const { data: feedData, error: queryError } = await db
         .from("view_strava_activities") 
         .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id") 
@@ -425,6 +426,10 @@ export default function DashboardPage() {
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
                     const hasUser = !!row.assignedFirestoreUserId;
 
+                    // 🟢 SOLUÇÃO DO COMPONENTE: Procura o athlete_id real carimbado no perfil do user associado
+                    const associadoAoUser = users.find(u => u.id === row.assignedFirestoreUserId);
+                    const targetAthleteId = associadoAoUser?.athlete_id || null;
+
                     return (
                       <tr
                         key={row.idVirtual}
@@ -432,23 +437,23 @@ export default function DashboardPage() {
                           row.isSynced ? "bg-emerald-950/5" : "bg-slate-950"
                         }`}
                       >
-                        {/* 🟢 CORRIGIDO: Link focado no ID e tag "Atividade Clube" controlada apenas se m.activity_clube_id existir */}
                         <td className="px-4 py-3 font-medium text-white align-top">
                           <div className="flex flex-col gap-0.5">
                             <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px]">
-                              {row.athleteIdFromStrava ? (
+                              {/* 🟢 O Nome vira link laranja se a atividade tiver o carimbo do clube e houver ID do Strava mapeado no utilizador */}
+                              {row.hasActivityClube && targetAthleteId ? (
                                 <a
-                                  href={`https://www.strava.com/athletes/${row.athleteIdFromStrava}`}
+                                  href={`https://www.strava.com/athletes/${targetAthleteId}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-[#fc4c02] hover:underline font-semibold inline-flex items-center gap-1"
-                                  title="Ver perfil no Strava"
+                                  title="Ver atleta no Strava Club"
                                 >
                                   {row.athleteName}
                                   <span className="text-[10px] text-slate-500">🔗</span>
                                 </a>
                               ) : (
-                                <span className="text-slate-200">
+                                <span className="text-slate-400">
                                   {row.athleteName}
                                 </span>
                               )}
@@ -456,14 +461,6 @@ export default function DashboardPage() {
                             <div className="text-slate-500 text-[10px] truncate max-w-[142px]" title={row.deviceName}>
                               {row.deviceName}
                             </div>
-                            {/* 🟢 A TAG AGORA ESTÁ CONTROLADA COM 100% DE CERTEZA */}
-                            {row.hasActivityClube && (
-                              <div className="mt-1">
-                                <span className="inline-flex items-center rounded bg-orange-950/50 px-1 py-0.5 text-[9px] font-medium text-orange-400 border border-orange-500/20">
-                                  Atividade Clube
-                                </span>
-                              </div>
-                            )}
                           </div>
                         </td>
 
@@ -495,7 +492,7 @@ export default function DashboardPage() {
                                 ✓ Sincronizado
                               </span>
                             </div>
-                          ) : !hasUser && suggestedUsers.length === 0 ? (
+                          ) : !hasUser && Math.max(suggestedUsers.length, 0) === 0 ? (
                             <div className="flex items-center">
                               <span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide whitespace-nowrap">
                                 ❌ Sem user no Movera

@@ -173,12 +173,19 @@ export default function DashboardPage() {
 const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
   const valueToSave = selectedUserId || null;
 
-  // 1. Resgata a atividade para saber qual é o athlete_id real que veio do Strava Club
+  console.log("=== 🚀 INÍCIO DO ASSIGN MANUAL ===");
+  console.log("ID Virtual da Atividade:", idVirtual);
+  console.log("ID do User Firestore Selecionado (valueToSave):", valueToSave);
+
+  // 1. Resgata a atividade para saber o ID real que veio do Strava
   const currentActivity = rows.find(r => r.idVirtual === idVirtual);
   const realStravaAthleteId = currentActivity?.athleteIdFromStrava ?? null;
 
-  // 🟢 CORREÇÃO 1: Atualiza a linha APENAS com o ID do utilizador escolhido.
-  // Não mexe, não força, nem altera o ID do atleta na linha!
+  console.log("Dados da atividade encontrada no estado local:", currentActivity);
+  console.log("athleteIdFromStrava resgatado da linha:", realStravaAthleteId);
+
+  // 2. Atualiza a linha apenas com o ID do utilizador escolhido
+  console.log("🔄 A atualizar estado local das linhas (setRows)...");
   setRows((prev) =>
     prev.map((row) =>
       row.idVirtual === idVirtual
@@ -187,19 +194,26 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
     )
   );
 
-  // 🟢 CORREÇÃO 2: Quem muda de ID é o Utilizador do Firestore no estado local!
+  // 3. Quem muda de ID é o Utilizador do Firestore no estado local
   if (valueToSave && realStravaAthleteId) {
+    console.log(`🔄 A injetar athlete_id (${realStravaAthleteId}) no user (${valueToSave}) no estado local (setUsers)...`);
     setUsers((prevUsers) =>
       prevUsers.map((u) =>
         u.id === valueToSave ? { ...u, athlete_id: realStravaAthleteId } : u
       )
     );
+  } else {
+    console.warn("⚠️ Estado local do User NÃO atualizado. Motivo:", {
+      temUser: !!valueToSave,
+      temStravaId: !!realStravaAthleteId
+    });
   }
 
   try {
     const db = getSupabase();
     
-    // 3. Guarda o vínculo da atividade na metadata
+    // 4. Guarda o vínculo da atividade na metadata
+    console.log("📡 A enviar UPSERT para 'strava_activities_metadata'...");
     const { error: updateError } = await db
       .from("strava_activities_metadata")
       .upsert({ 
@@ -209,24 +223,40 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
         last_assign_timestamp: new Date().toISOString()
       });
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error("❌ Erro no UPSERT da metadata:", updateError);
+      throw updateError;
+    }
+    console.log("🟢 'strava_activities_metadata' atualizada com sucesso!");
 
-    // 4. MUDANÇA NA DB: Quem recebe o ID do Strava é o utilizador do Firestore!
+    // 5. MUDANÇA NA DB: Quem recebe o ID do Strava é o utilizador do Firestore
     if (valueToSave && realStravaAthleteId) {
-      const { error: userUpdateError } = await db
+      console.log(`📡 A enviar UPDATE para 'users_firestore' -> set athlete_id = ${realStravaAthleteId} onde id = ${valueToSave}`);
+      
+      const { data, error: userUpdateError, status } = await db
         .from("users_firestore")
         .update({ athlete_id: realStravaAthleteId })
-        .eq("id", valueToSave);
+        .eq("id", valueToSave)
+        .select(); // O select força o Supabase a devolver a linha alterada para o log
 
       if (userUpdateError) {
-        console.warn("⚠️ Falhou ao atualizar o athlete_id no utilizador:", userUpdateError.message);
+        console.error("❌ Erro no UPDATE do users_firestore:", userUpdateError);
+      } else {
+        console.log(`🟢 Sucesso total na BD! Status HTTP: ${status}`);
+        console.log("Dados retornados após o update no user:", data);
       }
+    } else {
+      console.warn("🚫 Bloco de UPDATE na BD do utilizador foi IGNORADO.");
+      console.log("Motivo: Falta o valueToSave ou o realStravaAthleteId está a null/undefined.");
     }
 
   } catch (e) {
+    console.error("💥 Erro crítico apanhado no bloco try/catch:", e);
     alert("Erro ao gravar os dados na base de dados.");
     loadFeed();
   }
+  
+  console.log("=== 🏁 FIM DO ASSIGN MANUAL ===");
 };
   // 🟢 CORRIGIDO: Lógica robusta com suporte estável a nomes compostos e acentos
   const getSuggestedUsers = (athleteName: string) => {

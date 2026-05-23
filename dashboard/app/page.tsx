@@ -171,18 +171,20 @@ export default function DashboardPage() {
   }, []);
 
   const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
-    const valueToSave = selectedUserId || null;
+  const valueToSave = selectedUserId || null;
 
-    const currentActivity = rows.find(r => r.idVirtual === idVirtual);
-    const stravaAthleteId = currentActivity?.athleteIdFromStrava;
+  const currentActivity = rows.find(r => r.idVirtual === idVirtual);
+  
+  // 🟢 CORREÇÃO: Força o fallback para 'null' caso seja undefined
+  const stravaAthleteId = currentActivity?.athleteIdFromStrava ?? null;
 
-    setRows((prev) =>
-      prev.map((row) =>
-        row.idVirtual === idVirtual
-          ? { ...row, assignedFirestoreUserId: valueToSave, firestoreUserAthleteId: stravaAthleteId }
-          : row
-      )
-    );
+  setRows((prev) =>
+    prev.map((row) =>
+      row.idVirtual === idVirtual
+        ? { ...row, assignedFirestoreUserId: valueToSave, firestoreUserAthleteId: stravaAthleteId }
+        : row
+    )
+  );
 
     if (valueToSave && stravaAthleteId) {
       setUsers((prevUsers) =>

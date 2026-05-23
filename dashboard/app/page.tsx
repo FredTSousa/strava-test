@@ -553,9 +553,18 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
                                   return null;
                                 })()}
                               
-                                {suggestedUsers.length > 0 && (
-                                  <optgroup label="✨ Utilizadores Encontrados" className="bg-slate-900 text-[#fc4c02] font-semibold">
-                                    {suggestedUsers.map((user) => {
+                               {suggestedUsers.length > 0 && (
+                                <optgroup label="✨ Utilizadores Encontrados" className="bg-slate-900 text-[#fc4c02] font-semibold">
+                                  {suggestedUsers
+                                    // 🟢 O TRUQUE: Filtra os utilizadores antes de os listar
+                                    .filter((user) => {
+                                      // Se o utilizador não tem ID do Strava, está livre para qualquer atividade
+                                      if (user.athlete_id === null || user.athlete_id === undefined) return true;
+                                      
+                                      // Se já tem ID, só aparece se for o MESMO ID da atividade atual
+                                      return Number(user.athlete_id) === Number(row.firestoreUserAthleteId);
+                                    })
+                                    .map((user) => {
                                       const hasIdLinked = user.athlete_id !== null;
                                       
                                       return (
@@ -565,8 +574,8 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
                                         </option>
                                       );
                                     })}
-                                  </optgroup>
-                                )}
+                                </optgroup>
+                              )}
                               </select>
                             </div>
                           )}

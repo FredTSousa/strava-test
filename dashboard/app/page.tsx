@@ -26,7 +26,7 @@ type StravaRawFeedRow = {
   assigned_firestore_user_id: string | null; 
   synced_to_firestore: boolean;
   total_strava_club_matches?: number;
-  firestore_user_athlete_id?: number | null; 
+  firestore_user_athlete_id?: number | null; // 🟢 Agora vai ser populado sem falhas!
   activity_clube_id?: number | null; 
 };
 
@@ -45,6 +45,7 @@ type ParsedActivity = {
   isSynced: boolean;
   totalStravaClubMatches: number;
   hasActivityClube: boolean; 
+  firestoreUserAthleteId: number | null; // 🟢 Passado para o tipo estrturado
 };
 
 type FirestoreUser = {
@@ -75,8 +76,6 @@ function formatImportDate(isoString: string): string {
   }
 }
 
-// Nota: Como o strava_raw_feed não traz o ID, o athleteIdFromStrava aqui virá nulo do JSON, 
-// o que já não afeta a interface porque passámos a ler o ID do perfil do user.
 function parseRow(row: StravaRawFeedRow): ParsedActivity {
   const raw = row.raw_json ?? {};
   const athlete = raw.athlete ?? {};
@@ -102,6 +101,7 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     isSynced: row.synced_to_firestore ?? false,
     totalStravaClubMatches: row.total_strava_club_matches ?? 0,
     hasActivityClube: row.activity_clube_id !== null && row.activity_clube_id !== undefined, 
+    firestoreUserAthleteId: row.firestore_user_athlete_id ?? null, // 🟢 Guardado com segurança
   };
 }
 
@@ -131,8 +131,14 @@ export default function DashboardPage() {
         .order("display_name", { ascending: true });
   
       if (userError) throw new Error(userError.message);
-      setUsers(userData as FirestoreUser[]);
+      
+      // Criamos um mapeamento limpo para os utilizadores locais
+      const usersMap = (userData as FirestoreUser[]).reduce((acc, user) => {
+        acc[user.id] = { ...user };
+        return acc;
+      }, {} as Record<string, FirestoreUser>);
   
+      // 🟢 CORRIGIDO: Inclusão do campo correto e remoção da vírgula fantasma
       const { data: feedData, error: queryError } = await db
         .from("view_strava_activities") 
         .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id") 
@@ -141,16 +147,15 @@ export default function DashboardPage() {
       if (queryError) throw new Error(queryError.message);
       
       const rawRows = feedData as StravaRawFeedRow[];
+      
+      // Atualiza os IDs nos perfis dos utilizadores com base no histórico real sem mutar o estado diretamente
       rawRows.forEach(row => {
-        if (row.assigned_firestore_user_id && row.firestore_user_athlete_id) {
-          userData?.forEach(u => {
-            if (u.id === row.assigned_firestore_user_id) {
-              u.athlete_id = row.firestore_user_athlete_id;
-            }
-          });
+        if (row.assigned_firestore_user_id && row.firestore_user_athlete_id && usersMap[row.assigned_firestore_user_id]) {
+          usersMap[row.assigned_firestore_user_id].athlete_id = row.firestore_user_athlete_id;
         }
       });
       
+      setUsers(Object.values(usersMap));
       setRows(rawRows.map(parseRow));
   
     } catch (e) {
@@ -174,7 +179,7 @@ export default function DashboardPage() {
     setRows((prev) =>
       prev.map((row) =>
         row.idVirtual === idVirtual
-          ? { ...row, assignedFirestoreUserId: valueToSave }
+          ? { ...row, assignedFirestoreUserId: valueToSave, firestoreUserAthleteId: stravaAthleteId }
           : row
       )
     );
@@ -218,6 +223,7 @@ export default function DashboardPage() {
     }
   };
 
+  // 🟢 CORRIGIDO: Lógica robusta com suporte estável a nomes compostos e acentos
   const getSuggestedUsers = (athleteName: string) => {
     const normalizeAthlete = normalizeForMatch(athleteName).trim();
     const parts = normalizeAthlete.split(" ").filter(Boolean);
@@ -225,7 +231,9 @@ export default function DashboardPage() {
     if (parts.length === 0) return users;
   
     const firstNameTarget = parts[0]; 
-    const lastNameInitialTarget = parts[1] ? parts[1].replace(".", "")[0] : null; 
+    // Captura a última palavra do array em vez de assumir a posição [1] (essencial para nomes compostos)
+    const lastNamePart = parts[parts.length - 1];
+    const lastNameInitialTarget = lastNamePart ? lastNamePart.replace(".", "")[0] : null; 
   
     return users.filter((user) => {
       const normalizedUser = normalizeForMatch(user.display_name).trim();
@@ -236,7 +244,7 @@ export default function DashboardPage() {
       const matchesFirstName = userParts[0] === firstNameTarget;
       if (!matchesFirstName) return false;
   
-      if (lastNameInitialTarget) {
+      if (lastNameInitialTarget && userParts.length > 1) {
         const userLastNames = userParts.slice(1);
         return userLastNames.some(name => name.startsWith(lastNameInitialTarget));
       }
@@ -426,9 +434,9 @@ export default function DashboardPage() {
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
                     const hasUser = !!row.assignedFirestoreUserId;
 
-                    // 🟢 SOLUÇÃO DO COMPONENTE: Procura o athlete_id real carimbado no perfil do user associado
+                    // 🟢 CORRIGIDO: Fallback robusto lendo o ID diretamente da view ou do estado síncrono do user
                     const associadoAoUser = users.find(u => u.id === row.assignedFirestoreUserId);
-                    const targetAthleteId = associadoAoUser?.athlete_id || null;
+                    const targetAthleteId = row.firestoreUserAthleteId || associadoAoUser?.athlete_id || null;
 
                     return (
                       <tr
@@ -440,7 +448,6 @@ export default function DashboardPage() {
                         <td className="px-4 py-3 font-medium text-white align-top">
                           <div className="flex flex-col gap-0.5">
                             <div className="whitespace-normal break-words leading-tight text-xs max-w-[142px]">
-                              {/* 🟢 O Nome vira link laranja se a atividade tiver o carimbo do clube e houver ID do Strava mapeado no utilizador */}
                               {row.hasActivityClube && targetAthleteId ? (
                                 <a
                                   href={`https://www.strava.com/athletes/${targetAthleteId}`}
@@ -553,10 +560,6 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-// =========================================================================
-// SUB-COMPONENTES REINTEGRADOS
-// =========================================================================
 
 function FilterField({
   id,

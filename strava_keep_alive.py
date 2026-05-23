@@ -39,67 +39,114 @@ def update_cookie_in_supabase(novo_cookie: str):
 
 # 🟢 FUNÇÃO MELHORADA: Processa um bloco de entradas e extrai o próximo cursor
 def parse_entries_block(json_data):
-    """Varre as entries de um request, desmembra GroupActivities e extrai tudo de forma plana."""
+    """Varre as entries de um request, desmembra GroupActivities e mapeia as árvores corretamente."""
     bloco_atividades = []
     ultimo_timestamp = None
     
     entries = json_data.get("entries", [])
     for entry in entries:
-        # Guarda o timestamp do cursor para a paginação
         if entry.get("cursorData") and entry.get("cursorData").get("updated_at"):
             ultimo_timestamp = entry.get("cursorData").get("updated_at")
             
         entity_type = entry.get("entity")
         
-        # Criamos uma lista temporária para normalizar os dados, quer venham de atividade individual ou grupo
-        atividades_para_processar = []
-        
-        # CENÁRIO 1: É uma atividade individual normal
+        # 1. IDENTIFICA E EXTRAI AS ATIVIDADES DE ACORDO COMA ÁRVORE
         if entity_type == "Activity":
-            if entry.get("activity"):
-                atividades_para_processar.append(entry.get("activity"))
-                
-        # CENÁRIO 2: É uma atividade de grupo (Vários atletas juntos) 🏃‍♂️🏃‍♀️
-        elif entity_type == "GroupActivity":
-            group_data = entry.get("rowData", {})
-            if group_data and isinstance(group_data.get("activities"), list):
-                print(f"👥 Detetada atividade de grupo com {len(group_data['activities'])} atletas. A desmembrar...")
-                atividades_para_processar.extend(group_data.get("activities"))
-        else:
-            continue
-            
-        # Agora processamos a lista normalizada (seja 1 ou várias)
-        for act in atividades_para_processar:
+            act = entry.get("activity")
             if not act:
                 continue
                 
             athlete_data = act.get("athlete", {})
             stats_list = act.get("stats", [])
             
-            # Extração limpa da distância
-            distancia_bruta = "0"
-            if isinstance(stats_list, list):
-                for stat in stats_list:
-                    if stat.get("key") == "stat_one":
-                        match = re.search(r"([0-9.]+)", stat.get("value", ""))
-                        if match:
-                            distancia_bruta = match.group(1)
-                        break
+            # Mapeamento para a árvore normal
+            act_id = act.get("id")
+            act_name = act.get("activityName")
+            ath_id = athlete_data.get("athleteId")
+            ath_name = athlete_data.get("athleteName")
+            first_name = athlete_data.get("firstName")
+            device_name = act.get("deviceName", "Desconhecido")
+            start_date = act.get("startDate")
+            elapsed_time = act.get("elapsedTime")
+
+        elif entity_type == "GroupActivity":
+            group_data = entry.get("rowData", {})
+            if not group_data or not isinstance(group_data.get("activities"), list):
+                continue
+                
+            print(f"👥 Detetada atividade de grupo com {len(group_data['activities'])} atletas. A processar árvore de grupo...")
             
-            # Formata o dicionário exatamente como a tua tabela Supabase espera
-            dados_formatados = {
-                "activity_id": str(act.get("activity_id") or act.get("id")), # Suporta as duas nomenclaturas do JSON
-                "activity_name": act.get("name") or act.get("activityName"),
-                "athlete_id": str(athlete_data.get("athlete_id") or athlete_data.get("athleteId")),
-                "athlete_name": athlete_data.get("athlete_name") or athlete_data.get("athleteName"),
-                "first_name": athlete_data.get("athlete_firstname") or athlete_data.get("firstName"),
-                "start_date": act.get("start_date") or act.get("startDate"),
-                "elapsed_time": int(act.get("elapsed_time") or act.get("elapsedTime") or 0),
-                "device_name": act.get("device_name") or act.get("deviceName") or "Desconhecido",
-                "distance": float(distancia_bruta)
-            }
+            for act in group_data.get("activities"):
+                if not act:
+                    continue
+                
+                stats_list = act.get("stats", [])
+                
+                # Mapeamento com o device_name resgatado da raiz do grupo!
+                act_id = act.get("activity_id")
+                act_name = act.get("name") or "Corrida"
+                ath_id = act.get("athlete_id")
+                ath_name = act.get("athlete_name")
+                first_name = act.get("athlete_firstname")
+                
+                # 🟢 CAPTURA DO RELÓGIO DA ATIVIDADE DE GRUPO
+                device_name = act.get("device_name") or "Desconhecido"
+                
+                start_date = act.get("start_date")
+                elapsed_time = act.get("elapsed_time")
+                
+                # Processa a distância interna do loop de grupo
+                distancia_bruta = "0"
+                if isinstance(stats_list, list):
+                    for stat in stats_list:
+                        if stat.get("key") == "stat_one":
+                            match = re.search(r"([0-9.]+)", stat.get("value", ""))
+                            if match:
+                                distancia_bruta = match.group(1)
+                            break
+                
+                if not act_id or str(act_id).lower() == "none":
+                    continue
+                    
+                bloco_atividades.append({
+                    "activity_id": int(act_id),
+                    "activity_name": act_name,
+                    "athlete_id": int(ath_id) if ath_id and str(ath_id).lower() != "none" else None,
+                    "athlete_name": ath_name,
+                    "first_name": first_name,
+                    "start_date": start_date,
+                    "elapsed_time": int(elapsed_time or 0),
+                    "device_name": device_name, # 🟢 Grava o relógio real ou 'Desconhecido'
+                    "distance": float(distancia_bruta)
+                })
+            continue
+        else:
+            continue
             
-            bloco_atividades.append(dados_formatados)
+        # 2. PROCESSAMENTO FINAL APENAS PARA AS ATIVIDADES NORMAIS
+        if not act_id or str(act_id).lower() == "none":
+            continue
+            
+        distancia_bruta = "0"
+        if isinstance(stats_list, list):
+            for stat in stats_list:
+                if stat.get("key") == "stat_one":
+                    match = re.search(r"([0-9.]+)", stat.get("value", ""))
+                    if match:
+                        distancia_bruta = match.group(1)
+                    break
+                    
+        bloco_atividades.append({
+            "activity_id": int(act_id),
+            "activity_name": act_name,
+            "athlete_id": int(ath_id) if ath_id and str(ath_id).lower() != "none" else None,
+            "athlete_name": ath_name,
+            "first_name": first_name,
+            "start_date": start_date,
+            "elapsed_time": int(elapsed_time or 0),
+            "device_name": device_name,
+            "distance": float(distancia_bruta)
+        })
         
     has_more = json_data.get("pagination", {}).get("hasMore", False)
     return bloco_atividades, ultimo_timestamp if has_more else None

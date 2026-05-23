@@ -6,6 +6,9 @@ on:
 jobs:
   sync_strava_pipeline:
     runs-on: ubuntu-latest
+    # 🟢 BOAS PRÁTICAS: Define um timeout global para o job não ficar preso a gastar minutos do GitHub se a API do Strava falhar
+    timeout-minutes: 15 
+    
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -41,8 +44,8 @@ jobs:
           STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
         run: python cron_sync.py
 
-      # 🟢 PASSO 3: Sincroniza os treinos para o Firestore (Garante os rascunhos na App)
-       - name: Run Workouts Sync to Firestore
+      # 🟢 PASSO 3: CORRIGIDO! Alinhamento de espaços ajustado à esquerda
+      - name: Run Workouts Sync to Firestore
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}

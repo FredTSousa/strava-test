@@ -1,11 +1,7 @@
 name: Strava Session Keep-Alive
 
 on:
-  schedule:
-    # ⏱️ Corre de 20 em 20 minutos certinhos
-    # (Minutos :00, :20 e :40 de cada hora)
-    - cron: '*/20 * * * *'
-  workflow_dispatch: # Permite-te ir ao GitHub e carregar no botão para testar sempre que quiseres
+  workflow_dispatch: # 🟢 Ativado remotamente pelo Supabase ou manualmente no GitHub
 
 jobs:
   keep_alive:

@@ -286,7 +286,9 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
       const suggestedUsers = getSuggestedUsers(row.athleteName);
       const isMissingMoveraUser = !hasUserChosen && suggestedUsers.length === 0;
 
-      if (unassignedOnlyFilter && (hasUserChosen || isMissingMoveraUser)) return false;
+      if (unassignedOnlyFilter && (hasUserChosen || row.isSynced || isMissingMoveraUser)) {
+        return false;
+      }
 
       if (noMoveraUserFilter && !isMissingMoveraUser) return false;
 

@@ -45,9 +45,9 @@ jobs:
         run: python cron_sync.py
 
       # 🟢 PASSO 3: CORRIGIDO! Alinhamento de espaços ajustado à esquerda
-      - name: Run Workouts Sync to Firestore
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: python sync_worker.py
+      #- name: Run Workouts Sync to Firestore
+       # env:
+        #  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+         # SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          #FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        #run: python sync_worker.py

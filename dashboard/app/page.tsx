@@ -174,18 +174,18 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
   const valueToSave = selectedUserId || null;
 
   console.log("=== 🚀 INÍCIO DO ASSIGN MANUAL ===");
-  console.log("ID Virtual da Atividade:", idVirtual);
-  console.log("ID do User Firestore Selecionado (valueToSave):", valueToSave);
 
-  // 1. Resgata a atividade para saber o ID real que veio do Strava
+  // 1. Encontra a atividade atual no estado local
   const currentActivity = rows.find(r => r.idVirtual === idVirtual);
-  const realStravaAthleteId = currentActivity?.athleteIdFromStrava ?? null;
+  
+  // 🟢 CORREÇÃO CRUCIAL: Lemos o ID do Strava do campo que a view extraiu da tabela atividades_clube!
+  const realStravaAthleteId = currentActivity?.firestoreUserAthleteId ?? null;
 
-  console.log("Dados da atividade encontrada no estado local:", currentActivity);
-  console.log("athleteIdFromStrava resgatado da linha:", realStravaAthleteId);
+  console.log("Nome do Atleta da linha:", currentActivity?.athleteName);
+  console.log("ID do Strava resgatado da View (atividades_clube):", realStravaAthleteId);
+  console.log("ID do Utilizador Firestore para associar:", valueToSave);
 
-  // 2. Atualiza a linha apenas com o ID do utilizador escolhido
-  console.log("🔄 A atualizar estado local das linhas (setRows)...");
+  // 2. Atualiza o estado local das linhas (Apenas associa o dono, não mexe nos IDs do Strava da linha!)
   setRows((prev) =>
     prev.map((row) =>
       row.idVirtual === idVirtual
@@ -194,19 +194,13 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
     )
   );
 
-  // 3. Quem muda de ID é o Utilizador do Firestore no estado local
+  // 3. Injeta o ID do Strava no utilizador do estado local para o link continuar aceso
   if (valueToSave && realStravaAthleteId) {
-    console.log(`🔄 A injetar athlete_id (${realStravaAthleteId}) no user (${valueToSave}) no estado local (setUsers)...`);
     setUsers((prevUsers) =>
       prevUsers.map((u) =>
         u.id === valueToSave ? { ...u, athlete_id: realStravaAthleteId } : u
       )
     );
-  } else {
-    console.warn("⚠️ Estado local do User NÃO atualizado. Motivo:", {
-      temUser: !!valueToSave,
-      temStravaId: !!realStravaAthleteId
-    });
   }
 
   try {
@@ -223,35 +217,29 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
         last_assign_timestamp: new Date().toISOString()
       });
 
-    if (updateError) {
-      console.error("❌ Erro no UPSERT da metadata:", updateError);
-      throw updateError;
-    }
-    console.log("🟢 'strava_activities_metadata' atualizada com sucesso!");
+    if (updateError) throw updateError;
 
-    // 5. MUDANÇA NA DB: Quem recebe o ID do Strava é o utilizador do Firestore
+    // 5. O QUE ESTAVA A FALHAR: Atualiza o perfil do utilizador na tabela users_firestore com o ID do Strava
     if (valueToSave && realStravaAthleteId) {
-      console.log(`📡 A enviar UPDATE para 'users_firestore' -> set athlete_id = ${realStravaAthleteId} onde id = ${valueToSave}`);
+      console.log(`📡 A enviar UPDATE para 'users_firestore' -> set athlete_id = ${realStravaAthleteId} onde id = '${valueToSave}'`);
       
       const { data, error: userUpdateError, status } = await db
         .from("users_firestore")
         .update({ athlete_id: realStravaAthleteId })
         .eq("id", valueToSave)
-        .select(); // O select força o Supabase a devolver a linha alterada para o log
+        .select();
 
       if (userUpdateError) {
-        console.error("❌ Erro no UPDATE do users_firestore:", userUpdateError);
+        console.error("❌ Erro ao atualizar athlete_id em 'users_firestore':", userUpdateError);
       } else {
-        console.log(`🟢 Sucesso total na BD! Status HTTP: ${status}`);
-        console.log("Dados retornados após o update no user:", data);
+        console.log(`🟢 SUCESSO NA BD! O utilizador ganhou o ID do Strava. Status HTTP: ${status}`, data);
       }
     } else {
-      console.warn("🚫 Bloco de UPDATE na BD do utilizador foi IGNORADO.");
-      console.log("Motivo: Falta o valueToSave ou o realStravaAthleteId está a null/undefined.");
+      console.warn("🚫 O UPDATE no utilizador foi ignorado porque o realStravaAthleteId está a null.");
     }
 
   } catch (e) {
-    console.error("💥 Erro crítico apanhado no bloco try/catch:", e);
+    console.error("💥 Erro crítico no catch:", e);
     alert("Erro ao gravar os dados na base de dados.");
     loadFeed();
   }

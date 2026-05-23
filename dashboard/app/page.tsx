@@ -115,21 +115,21 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    authLoading(true);
-    setAuthError(null);
+  e.preventDefault();
+  setAuthLoading(true); // 🟢 CORRIGIDO: Agora chama a função certa!
+  setAuthError(null);
 
-    try {
-      const db = getSupabase(); // 🟢 Agora vai usar o import correto da linha 4
-      const { error } = await db.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      onLoginSuccess();
-    } catch (err: any) {
-      setAuthError(err.message || "Erro no Login.");
-    } finally {
-      setAuthLoading(false);
-    }
-  };
+  try {
+    const db = getSupabase();
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    onLoginSuccess();
+  } catch (err: any) {
+    setAuthError(err.message || "Erro no Login.");
+  } finally {
+    setAuthLoading(false); // 🟢 Aqui já estava correto
+  }
+};
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-950 p-4 text-slate-100">

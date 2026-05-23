@@ -170,61 +170,72 @@ export default function DashboardPage() {
     loadFeed();
   }, []);
 
-  const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
+const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
   const valueToSave = selectedUserId || null;
 
+  // 1. Resgata a atividade atual do estado
   const currentActivity = rows.find(r => r.idVirtual === idVirtual);
   
-  // 🟢 CORREÇÃO: Força o fallback para 'null' caso seja undefined
+  // 2. Garante o ID do Strava (se não veio da View, tenta o ID que possa estar no estado)
   const stravaAthleteId = currentActivity?.athleteIdFromStrava ?? null;
 
+  // 🟢 PASSO 1: Atualiza o estado das linhas mantendo o ID vivo para o link não apagar!
   setRows((prev) =>
     prev.map((row) =>
       row.idVirtual === idVirtual
-        ? { ...row, assignedFirestoreUserId: valueToSave, firestoreUserAthleteId: stravaAthleteId }
+        ? { 
+            ...row, 
+            assignedFirestoreUserId: valueToSave, 
+            // Injeta o ID aqui diretamente para forçar o link a ficar aceso/acender
+            firestoreUserAthleteId: valueToSave ? stravaAthleteId : null 
+          }
         : row
     )
   );
 
+  // 🟢 PASSO 2: Atualiza a lista de utilizadores local para o "find" da tabela não falhar
+  if (valueToSave && stravaAthleteId) {
+    setUsers((prevUsers) =>
+      prevUsers.map((u) =>
+        u.id === valueToSave ? { ...u, athlete_id: stravaAthleteId } : u
+      )
+    );
+  }
+
+  try {
+    const db = getSupabase();
+    
+    // PASSO 3: Grava na metadata
+    const { error: updateError } = await db
+      .from("strava_activities_metadata")
+      .upsert({ 
+        id_virtual: idVirtual, 
+        assigned_firestore_user_id: valueToSave,
+        synced_to_firestore: false, 
+        last_assign_timestamp: new Date().toISOString()
+      });
+
+    if (updateError) throw updateError;
+
+    // PASSO 4: Grava o ID do Strava no perfil do utilizador na BD
     if (valueToSave && stravaAthleteId) {
-      setUsers((prevUsers) =>
-        prevUsers.map((u) =>
-          u.id === valueToSave ? { ...u, athlete_id: stravaAthleteId } : u
-        )
-      );
-    }
+      const { error: userUpdateError } = await db
+        .from("users_firestore")
+        .update({ athlete_id: stravaAthleteId })
+        .eq("id", valueToSave);
 
-    try {
-      const db = getSupabase();
-      
-      const { error: updateError } = await db
-        .from("strava_activities_metadata")
-        .upsert({ 
-          id_virtual: idVirtual, 
-          assigned_firestore_user_id: valueToSave,
-          synced_to_firestore: false, 
-          last_assign_timestamp: new Date().toISOString()
-        });
-  
-      if (updateError) throw updateError;
-
-      if (valueToSave && stravaAthleteId) {
-        const { error: userUpdateError } = await db
-          .from("users_firestore")
-          .update({ athlete_id: stravaAthleteId })
-          .eq("id", valueToSave);
-
-        if (userUpdateError) {
-          console.warn("⚠️ Atividade guardada, falhou ao atualizar athlete_id:", userUpdateError.message);
-        }
+      if (userUpdateError) {
+        console.warn("⚠️ Atividade guardada, falhou ao atualizar athlete_id na BD:", userUpdateError.message);
+      } else {
+        console.log(`✅ athlete_id ${stravaAthleteId} gravado com sucesso na DB para o user ${valueToSave}`);
       }
-
-    } catch (e) {
-      alert("Erro ao gravar os dados na base de dados.");
-      loadFeed();
     }
-  };
 
+  } catch (e) {
+    alert("Erro ao gravar os dados na base de dados.");
+    loadFeed(); // Em caso de erro, faz rollback e recarrega o feed original
+  }
+};
   // 🟢 CORRIGIDO: Lógica robusta com suporte estável a nomes compostos e acentos
   const getSuggestedUsers = (athleteName: string) => {
     const normalizeAthlete = normalizeForMatch(athleteName).trim();

@@ -173,31 +173,25 @@ export default function DashboardPage() {
 const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
   const valueToSave = selectedUserId || null;
 
-  // 1. Resgata a atividade atual do estado
+  // 1. Resgata a atividade para saber qual é o athlete_id real que veio do Strava Club
   const currentActivity = rows.find(r => r.idVirtual === idVirtual);
-  
-  // 2. Garante o ID do Strava (se não veio da View, tenta o ID que possa estar no estado)
-  const stravaAthleteId = currentActivity?.athleteIdFromStrava ?? null;
+  const realStravaAthleteId = currentActivity?.athleteIdFromStrava ?? null;
 
-  // 🟢 PASSO 1: Atualiza o estado das linhas mantendo o ID vivo para o link não apagar!
+  // 🟢 CORREÇÃO 1: Atualiza a linha APENAS com o ID do utilizador escolhido.
+  // Não mexe, não força, nem altera o ID do atleta na linha!
   setRows((prev) =>
     prev.map((row) =>
       row.idVirtual === idVirtual
-        ? { 
-            ...row, 
-            assignedFirestoreUserId: valueToSave, 
-            // Injeta o ID aqui diretamente para forçar o link a ficar aceso/acender
-            firestoreUserAthleteId: valueToSave ? stravaAthleteId : null 
-          }
+        ? { ...row, assignedFirestoreUserId: valueToSave }
         : row
     )
   );
 
-  // 🟢 PASSO 2: Atualiza a lista de utilizadores local para o "find" da tabela não falhar
-  if (valueToSave && stravaAthleteId) {
+  // 🟢 CORREÇÃO 2: Quem muda de ID é o Utilizador do Firestore no estado local!
+  if (valueToSave && realStravaAthleteId) {
     setUsers((prevUsers) =>
       prevUsers.map((u) =>
-        u.id === valueToSave ? { ...u, athlete_id: stravaAthleteId } : u
+        u.id === valueToSave ? { ...u, athlete_id: realStravaAthleteId } : u
       )
     );
   }
@@ -205,7 +199,7 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
   try {
     const db = getSupabase();
     
-    // PASSO 3: Grava na metadata
+    // 3. Guarda o vínculo da atividade na metadata
     const { error: updateError } = await db
       .from("strava_activities_metadata")
       .upsert({ 
@@ -217,23 +211,21 @@ const handleDropdownUserChange = async (idVirtual: string, selectedUserId: strin
 
     if (updateError) throw updateError;
 
-    // PASSO 4: Grava o ID do Strava no perfil do utilizador na BD
-    if (valueToSave && stravaAthleteId) {
+    // 4. MUDANÇA NA DB: Quem recebe o ID do Strava é o utilizador do Firestore!
+    if (valueToSave && realStravaAthleteId) {
       const { error: userUpdateError } = await db
         .from("users_firestore")
-        .update({ athlete_id: stravaAthleteId })
+        .update({ athlete_id: realStravaAthleteId })
         .eq("id", valueToSave);
 
       if (userUpdateError) {
-        console.warn("⚠️ Atividade guardada, falhou ao atualizar athlete_id na BD:", userUpdateError.message);
-      } else {
-        console.log(`✅ athlete_id ${stravaAthleteId} gravado com sucesso na DB para o user ${valueToSave}`);
+        console.warn("⚠️ Falhou ao atualizar o athlete_id no utilizador:", userUpdateError.message);
       }
     }
 
   } catch (e) {
     alert("Erro ao gravar os dados na base de dados.");
-    loadFeed(); // Em caso de erro, faz rollback e recarrega o feed original
+    loadFeed();
   }
 };
   // 🟢 CORRIGIDO: Lógica robusta com suporte estável a nomes compostos e acentos

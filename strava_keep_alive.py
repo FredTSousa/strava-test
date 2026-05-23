@@ -170,10 +170,10 @@ def run_keep_alive():
         try:
             print(f"\n🚀 Concluído! A enviar o total acumulado de {len(todas_atividades_encontradas)} atividades para o Supabase...")
             # 🟢 CORREÇÃO: Força o Supabase a fazer UPDATE sempre que o activity_id já existir na tabela
-                supabase.table("atividades_clube").upsert(
-                    todas_atividades_encontradas, 
-                    on_conflict="activity_id"
-                ).execute()
+            supabase.table("atividades_clube").upsert(
+                todas_atividades_encontradas, 
+                on_conflict="activity_id"
+            ).execute()
             print("✅ Sincronização em massa concluída com sucesso na base de dados!")
         except Exception as e:
             print(f"❌ Erro ao fazer upsert na DB: {e}")

@@ -105,7 +105,9 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
   };
 }
 
-// 🔐 ADIÇÃO 1: Painel Visual de Login (Alinhado com o teu CSS)
+// =========================================================================
+// COMPONENTE DE LOGIN INTERNALIZADO (Estilo do teu Dashboard 🎨)
+// =========================================================================
 function LoginPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -114,11 +116,11 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAuthLoading(true);
+    authLoading(true);
     setAuthError(null);
 
     try {
-      const db = getSupabase();
+      const db = getSupabase(); // 🟢 Agora vai usar o import correto da linha 4
       const { error } = await db.auth.signInWithPassword({ email, password });
       if (error) throw error;
       onLoginSuccess();

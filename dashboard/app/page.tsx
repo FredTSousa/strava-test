@@ -105,9 +105,6 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
   };
 }
 
-// =========================================================================
-// COMPONENTE DE LOGIN INTERNALIZADO (Estilo do teu Dashboard 🎨)
-// =========================================================================
 function LoginPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -115,21 +112,21 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setAuthLoading(true); // 🟢 CORRIGIDO: Agora chama a função certa!
-  setAuthError(null);
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError(null);
 
-  try {
-    const db = getSupabase();
-    const { error } = await db.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    onLoginSuccess();
-  } catch (err: any) {
-    setAuthError(err.message || "Erro no Login.");
-  } finally {
-    setAuthLoading(false); // 🟢 Aqui já estava correto
-  }
-};
+    try {
+      const db = getSupabase();
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      onLoginSuccess();
+    } catch (err: any) {
+      setAuthError(err.message || "Erro no Login.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-950 p-4 text-slate-100">
@@ -156,7 +153,6 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
 }
 
 export default function DashboardPage() {
-  // 🔐 ADIÇÃO 2: States para gerir a sessão de utilizador logado
   const [session, setSession] = useState<any>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
@@ -172,6 +168,9 @@ export default function DashboardPage() {
   
   const [unassignedOnlyFilter, setUnassignedOnlyFilter] = useState(false); 
   const [noMoveraUserFilter, setNoMoveraUserFilter] = useState(false);
+
+  // 📱 Estado para abrir/fechar os filtros no telemóvel
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   async function loadFeed() {
     setLoading(true);
@@ -217,7 +216,6 @@ export default function DashboardPage() {
     }
   }
 
-  // 🔐 ADIÇÃO 3: Substituição do useEffect antigo para verificar sessão em real-time
   useEffect(() => {
     const db = getSupabase();
 
@@ -235,7 +233,6 @@ export default function DashboardPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // 🔐 ADIÇÃO 4: Handler para fazer Logout e limpar estados da memória
   const handleLogout = async () => {
     setLoading(true);
     const db = getSupabase();
@@ -246,7 +243,6 @@ export default function DashboardPage() {
     setLoading(false);
   };
 
-  // ⚠️ TODO O TEU RESTO DE CÓDIGO (handleDropdownUserChange original, getSuggestedUsers, filteredRows) INTEGRALMENTE IGUAL:
   const handleDropdownUserChange = async (idVirtual: string, selectedUserId: string) => {
     const valueToSave = selectedUserId || null;
 
@@ -369,7 +365,6 @@ export default function DashboardPage() {
     });
   }, [rows, memberFilter, titleFilter, minDistanceKm, runsFilter, unassignedOnlyFilter, noMoveraUserFilter]);
 
-  // 🔐 ADIÇÃO 5: Bloqueadores de interface durante splash ou ausência de sessão
   if (checkingAuth) {
     return <div className="h-screen w-screen flex items-center justify-center bg-slate-950 text-slate-400 text-sm">A verificar sessão...</div>;
   }
@@ -381,22 +376,23 @@ export default function DashboardPage() {
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur shrink-0">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:py-6 sm:px-6 lg:px-8">
+          
+          {/* Topo do Header: Título e Botões Responsivos */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <p className="text-sm font-medium uppercase tracking-wider text-[#fc4c02]">
                 Strava Club
               </p>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight text-white">
+              <h1 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-white">
                 Activity Feed
               </h1>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-slate-400 hidden sm:block">
                 Live view of synced club activities from Supabase
               </p>
             </div>
 
-            {/* 🔐 ADIÇÃO 6: Botão de Sair adicionado no alinhamento do contador */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto border-t border-slate-800/60 pt-3 sm:pt-0 sm:border-none">
               <button
                 onClick={handleLogout}
                 className="rounded-lg border border-slate-700 hover:border-red-500/40 hover:text-red-400 bg-slate-950 px-3 py-1.5 text-xs font-medium transition focus:outline-none"
@@ -408,32 +404,47 @@ export default function DashboardPage() {
                 <span className="font-semibold text-[#fc4c02]">{filteredRows.length}</span>
                 <span className="text-slate-500"> / </span>
                 <span>{rows.length}</span>
-                <span className="ml-1 text-slate-500">activities</span>
+                <span className="ml-1 text-slate-500 hidden sm:inline">activities</span>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-            <FilterField id="member" label="Member Name" placeholder="Search athlete…" value={memberFilter} onChange={setMemberFilter} />
-            <FilterField id="title" label="Title Keyword" placeholder="Search activity title…" value={titleFilter} onChange={setTitleFilter} />
-            <FilterField id="distance" label="Minimum Distance (km)" placeholder="e.g. 5" type="number" min={0} step="0.1" value={minDistanceKm} onChange={setMinDistanceKm} />
-            <div className="flex flex-col justify-end">
-              <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">Filtrar Desafios</span>
-              <button type="button" onClick={() => setRunsFilter((on) => !on)} aria-pressed={runsFilter} className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#fc4c02]/30 truncate ${runsFilter ? "border-[#fc4c02] bg-[#fc4c02]/20 text-[#fc4c02]" : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"}`}>Prováveis Desafios</button>
-            </div>
-            <div className="flex flex-col justify-end">
-              <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">Falta Tratar</span>
-              <button type="button" onClick={() => setUnassignedOnlyFilter((on) => !on)} aria-pressed={unassignedOnlyFilter} className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-amber-500/30 truncate ${unassignedOnlyFilter ? "border-amber-500 bg-amber-500/20 text-amber-400 font-semibold" : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"}`}>Por Escolher</button>
-            </div>
-            <div className="flex flex-col justify-end">
-              <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">Incompatíveis</span>
-              <button type="button" onClick={() => setNoMoveraUserFilter((on) => !on)} aria-pressed={noMoveraUserFilter} className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500/30 truncate ${noMoveraUserFilter ? "border-red-500 bg-red-500/20 text-red-400 font-semibold" : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"}`}>Sem User Movera</button>
+          {/* 📱 Botão Compressível de Filtros visível apenas em Mobile */}
+          <button 
+            type="button"
+            onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+            className="flex items-center justify-center gap-2 w-full lg:hidden rounded-lg border border-slate-800 bg-slate-900/50 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-900 focus:outline-none"
+          >
+            {mobileFiltersOpen ? "Ocultar Painel de Filtros ▴" : "Filtrar Resultados ⚙️ ▾"}
+          </button>
+
+          {/* Zona de Filtros: Grelha nativa PC / Colapsável em Mobile */}
+          <div className={`${mobileFiltersOpen ? "block" : "hidden"} lg:block mt-1 lg:mt-0`}>
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 bg-slate-900/40 lg:bg-transparent p-3 lg:p-0 rounded-xl border border-slate-850 lg:border-none">
+              <FilterField id="member" label="Member Name" placeholder="Search athlete…" value={memberFilter} onChange={setMemberFilter} />
+              <FilterField id="title" label="Title Keyword" placeholder="Search activity title…" value={titleFilter} onChange={setTitleFilter} />
+              <FilterField id="distance" label="Minimum Distance (km)" placeholder="e.g. 5" type="number" min={0} step="0.1" value={minDistanceKm} onChange={setMinDistanceKm} />
+              
+              <div className="flex flex-col justify-end">
+                <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">Filtrar Desafios</span>
+                <button type="button" onClick={() => setRunsFilter((on) => !on)} aria-pressed={runsFilter} className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#fc4c02]/30 truncate ${runsFilter ? "border-[#fc4c02] bg-[#fc4c02]/20 text-[#fc4c02]" : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"}`}>Prováveis Desafios</button>
+              </div>
+              <div className="flex flex-col justify-end">
+                <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">Falta Tratar</span>
+                <button type="button" onClick={() => setUnassignedOnlyFilter((on) => !on)} aria-pressed={unassignedOnlyFilter} className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-amber-500/30 truncate ${unassignedOnlyFilter ? "border-amber-500 bg-amber-500/20 text-amber-400 font-semibold" : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"}`}>Por Escolher</button>
+              </div>
+              <div className="flex flex-col justify-end">
+                <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">Incompatíveis</span>
+                <button type="button" onClick={() => setNoMoveraUserFilter((on) => !on)} aria-pressed={noMoveraUserFilter} className={`rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500/30 truncate ${noMoveraUserFilter ? "border-red-500 bg-red-500/20 text-red-400 font-semibold" : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-600"}`}>Sem User Movera</button>
+              </div>
             </div>
           </div>
+
         </div>
       </header>
 
-      <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 min-h-0 flex flex-col">
+      {/* Tabela de Dados: Invólucro com overflow isolado anti-quebra */}
+      <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-4 sm:py-6 sm:px-6 lg:px-8 min-h-0 flex flex-col">
         {loading && <p className="py-16 text-center text-slate-400">Loading activities…</p>}
         {error && <div className="rounded-lg border border-red-900/50 bg-red-950/40 px-4 py-3 text-red-300">{error}</div>}
 
@@ -441,16 +452,17 @@ export default function DashboardPage() {
 
         {!loading && !error && filteredRows.length > 0 && (
           <div className="flex-1 flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 shadow-xl shadow-black/20 min-h-0">
-            <div className="flex-1 overflow-auto min-h-0">
-              <table className="min-w-full divide-y divide-slate-800 text-left text-sm table-fixed">
+            {/* 🟢 O TRUQUE MOBILE: overflow-x-auto permite arrastar horizontalmente em ecrãs pequenos sem partir o dashboard */}
+            <div className="flex-1 overflow-auto min-h-0 universal-scrollbar">
+              <table className="min-w-[1050px] lg:min-w-full divide-y divide-slate-800 text-left text-sm table-fixed">
                 <colgroup>
-                  <col className="w-[150px]" />
+                  <col className="w-[160px]" />
                   <col className="w-auto" />
-                  <col className="w-[70px]" />
+                  <col className="w-[80px]" />
+                  <col className="w-[95px]" />
+                  <col className="w-[100px]" />
                   <col className="w-[85px]" />
-                  <col className="w-[90px]" />
-                  <col className="w-[75px]" />
-                  <col className="w-[120px]" />
+                  <col className="w-[130px]" />
                   <col className="w-[190px]" />
                 </colgroup>
                 <thead className="sticky top-0 z-10 bg-slate-900 shadow-md">

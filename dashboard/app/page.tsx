@@ -311,25 +311,41 @@ export default function DashboardPage() {
   };
 
   const getSuggestedUsers = (athleteName: string) => {
-    const normalizeAthlete = normalizeForMatch(athleteName).trim();
-    const parts = normalizeAthlete.split(" ").filter(Boolean);
-    if (parts.length === 0) return users;
-    const firstNameTarget = parts[0]; 
-    const lastNamePart = parts[parts.length - 1];
-    const lastNameInitialTarget = lastNamePart ? lastNamePart.replace(".", "")[0] : null; 
-    return users.filter((user) => {
-      const normalizedUser = normalizeForMatch(user.display_name).trim();
-      const userParts = normalizedUser.split(" ").filter(Boolean);
-      if (userParts.length === 0) return false;
-      const matchesFirstName = userParts[0] === firstNameTarget;
-      if (!matchesFirstName) return false;
-      if (lastNameInitialTarget && userParts.length > 1) {
-        const userLastNames = userParts.slice(1);
-        return userLastNames.some(name => name.startsWith(lastNameInitialTarget));
-      }
-      return true;
-    });
-  };
+  // 1. Limpa e normaliza o nome vindo do Strava (ex: "João M." -> "joao m")
+  const normalizeAthlete = normalizeForMatch(athleteName).trim();
+  const parts = normalizeAthlete.split(" ").filter(Boolean);
+  
+  if (parts.length === 0) return users;
+
+  const firstNameTarget = parts[0]; 
+  // Retira pontos finais que o Strava coloca (ex: "M." -> "m")
+  const lastNamePart = parts[parts.length - 1];
+  const lastNameInitialTarget = lastNamePart ? lastNamePart.replace(/\./g, "").trim()[0] : null; 
+
+  return users.filter((user) => {
+    // 2. Limpa e normaliza o nome do utilizador do Firestore (ex: "João Mergulho")
+    const normalizedUser = normalizeForMatch(user.display_name).trim();
+    const userParts = normalizedUser.split(" ").filter(Boolean);
+    
+    if (userParts.length === 0) return false;
+
+    // 🟢 CRITÉRIO 1: O primeiro nome tem de ser igual (ex: "joao" === "joao")
+    const matchesFirstName = userParts[0] === firstNameTarget;
+    if (!matchesFirstName) return false;
+
+    // 🟢 CRITÉRIO 2: Se o Strava enviou uma inicial ou apelido (ex: "M"),
+    // verificamos se QUALQUER um dos apelidos do utilizador começa por essa letra
+    if (lastNameInitialTarget && userParts.length > 1) {
+      const userLastNames = userParts.slice(1); // Pega em todos os apelidos (ex: ["martins"], ["mergulho"])
+      
+      // Se o utilizador só tiver o primeiro nome no registo, ou se bater com a inicial, deixa passar
+      return userLastNames.some(name => name.startsWith(lastNameInitialTarget));
+    }
+
+    // Se o atleta do Strava só tiver um nome (raro), mostra todos os que têm esse primeiro nome
+    return true;
+  });
+};
 
   const filteredRows = useMemo(() => {
     const memberQ = memberFilter.trim().toLowerCase();

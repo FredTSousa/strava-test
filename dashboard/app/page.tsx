@@ -511,7 +511,25 @@ export default function DashboardPage() {
                         <Td className="text-slate-400 text-xs tabular-nums whitespace-nowrap align-top">{row.fetchedAt}</Td>
                         <td className="px-4 py-3 pl-6 pr-4 align-top">
                           {row.isSynced ? (
-                            <div className="flex items-center"><span className="inline-flex items-center rounded-lg bg-emerald-950/80 px-3 py-1.5 text-xs font-bold text-emerald-400 border border-emerald-500/30 tracking-wide whitespace-nowrap">✓ Sincronizado</span></div>
+                            <div className="flex items-center">
+                              <span className="inline-flex flex-col rounded-lg bg-emerald-950/80 px-3 py-1.5 text-xs text-emerald-400 border border-emerald-500/30 tracking-wide max-w-[170px]">
+                                <span className="font-bold text-[10px] uppercase tracking-wider text-emerald-500 mb-0.5">
+                                  ✓ Sincronizado com:
+                                </span>
+                                {associadoAoUser ? (
+                                  <>
+                                    <span className="font-semibold truncate block" title={associadoAoUser.display_name}>
+                                      {associadoAoUser.display_name}
+                                    </span>
+                                    <span className="text-[10px] text-emerald-500/80 truncate block" title={associadoAoUser.email}>
+                                      {associadoAoUser.email}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="italic text-slate-400">Utilizador desconhecido</span>
+                                )}
+                              </span>
+                            </div>
                           ) : !hasUser && Math.max(suggestedUsers.length, 0) === 0 ? (
                             <div className="flex items-center"><span className="inline-flex items-center rounded-lg bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-900/30 tracking-wide whitespace-nowrap">❌ Sem user no Movera</span></div>
                           ) : (

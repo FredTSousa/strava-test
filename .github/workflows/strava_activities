@@ -1,0 +1,35 @@
+name: Strava only activities
+
+on:
+  workflow_dispatch: # Permite que a Supabase clique no "botão" via API ou manualmente no GitHub 
+
+jobs:
+  sync_strava_pipeline:
+    runs-on: ubuntu-latest
+    # 🟢 BOAS PRÁTICAS: Define um timeout global para o job não ficar preso a gastar minutos do GitHub se a API do Strava falhar
+    timeout-minutes: 15 
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests python-dotenv supabase firebase-admin
+
+
+      # 🟢 PASSO 2: Puxa as atividades do Strava para o Supabase (já conhece os membros novos)
+      - name: Run Strava Activities Sync
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+          STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
+        run: python cron_sync.py

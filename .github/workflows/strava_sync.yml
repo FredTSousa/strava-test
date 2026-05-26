@@ -1,7 +1,7 @@
 name: Daily Strava Members Sync
 
 on:
-  workflow_dispatch: # Permite que a Supabase clique no "botão" via API ou manualmente no GitHub
+  workflow_dispatch: # Permite que a Supabase clique no "botão" via API ou manualmente no GitHub 
 
 jobs:
   sync_strava_pipeline:

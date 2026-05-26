@@ -173,48 +173,45 @@ export default function DashboardPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   async function loadFeed() {
-    setLoading(true);
-    setError(null);
-  
-    try {
-      const db = getSupabase();
-      const { data: userData, error: userError } = await db
-        .from("users_firestore")
-        .select("id, display_name, email, athlete_id")
-        .order("display_name", { ascending: true });
-  
-      if (userError) throw new Error(userError.message);
-      
-      const usersMap = (userData as FirestoreUser[]).reduce((acc, user) => {
-        acc[user.id] = { ...user };
-        return acc;
-      }, {} as Record<string, FirestoreUser>);
-  
-      const { data: feedData, error: queryError } = await db
-        .from("view_strava_activities") 
-        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id") 
-        .order("fetched_at", { ascending: false });
-  
-      if (queryError) throw new Error(queryError.message);
-      
-      const rawRows = feedData as StravaRawFeedRow[];
-      
-      rawRows.forEach(row => {
-        if (row.assigned_firestore_user_id && row.firestore_user_athlete_id && usersMap[row.assigned_firestore_user_id]) {
-          usersMap[row.assigned_firestore_user_id].athlete_id = row.firestore_user_athlete_id;
-        }
-      });
-      
-      setUsers(Object.values(usersMap));
-      setRows(rawRows.map(parseRow));
-  
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setRows([]);
-    } finally {
-      setLoading(false);
-    }
+  setLoading(true);
+  setError(null);
+
+  try {
+    const db = getSupabase();
+    const { data: userData, error: userError } = await db
+      .from("users_firestore")
+      .select("id, display_name, email, athlete_id")
+      .order("display_name", { ascending: true });
+
+    if (userError) throw new Error(userError.message);
+    
+    // 🟢 Keep the users map clean and untouched by activity history
+    const usersMap = (userData as FirestoreUser[]).reduce((acc, user) => {
+      acc[user.id] = { ...user };
+      return acc;
+    }, {} as Record<string, FirestoreUser>);
+
+    const { data: feedData, error: queryError } = await db
+      .from("view_strava_activities") 
+      .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id") 
+      .order("fetched_at", { ascending: false });
+
+    if (queryError) throw new Error(queryError.message);
+    
+    const rawRows = feedData as StravaRawFeedRow[];
+    
+    // 🟢 DELETED THE FOREACH LOOP THAT WAS OVERWRITING USER ATHLETE_IDS 🟢
+
+    setUsers(Object.values(usersMap));
+    setRows(rawRows.map(parseRow));
+
+  } catch (e) {
+    setError(e instanceof Error ? e.message : String(e));
+    setRows([]);
+  } finally {
+    setLoading(false);
   }
+}
 
   useEffect(() => {
     const db = getSupabase();

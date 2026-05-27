@@ -495,7 +495,7 @@ export default function DashboardPage() {
                     const suggestedUsers = getSuggestedUsers(row.athleteName);
                     const hasUser = !!row.assignedFirestoreUserId;
                     const associadoAoUser = users.find(u => u.id === row.assignedFirestoreUserId);
-                    const targetAthleteId = row.firestoreUserAthleteId || associadoAoUser?.athlete_id || null;
+                    const targetAthleteId = row.firestoreUserAthleteId || row.athleteIdFromStrava || null;
 
                     return (
                       <tr key={row.idVirtual} className={`transition-colors hover:bg-slate-800/40 ${row.isSynced ? "bg-emerald-950/5" : "bg-slate-950"}`}>

@@ -22,7 +22,23 @@ jobs:
         run: |
           pip install requests python-dotenv supabase firebase-admin
 
-      # 🟢 PASSO 1: Sincroniza primeiro os membros do Clube do Strava
+      # 🟢 PASSO 1: Puxa as atividades (agora via crawler/atividades_clube, já não depende da API oficial)
+      - name: Run Strava Activities Sync
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: python cron_sync.py
+
+      # 🟢 PASSO 2: Espelha os treinos atribuídos para o Firestore
+      - name: Run Workouts Sync to Firestore
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python sync_worker.py
+
+      # 🟢 PASSO 3: Sincroniza os membros do Clube (ainda depende da API oficial da Strava - bloqueada).
+      # Colocado por último de propósito: se falhar, não impede os passos acima de correr.
       - name: Run Members Sync Script
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -32,22 +48,3 @@ jobs:
           STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
           STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
         run: python sync_members.py
-
-      # 🟢 PASSO 2: Puxa as atividades do Strava para o Supabase (já conhece os membros novos)
-      - name: Run Strava Activities Sync
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
-          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
-          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
-          STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
-        run: python cron_sync.py
-
-      # 🟢 PASSO 3: CORRIGIDO! Alinhamento de espaços ajustado à esquerda
-      - name: Run Workouts Sync to Firestore
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: python sync_worker.py

@@ -1,0 +1,29 @@
+name: Strava Activity Enrichment
+
+on:
+  workflow_dispatch: # Disparado externamente (Supabase) ou manualmente no GitHub
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install python-dotenv supabase curl_cffi
+
+      - name: Run Activity Enrichment Script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          ENRICH_BATCH_SIZE: "3"
+        run: python enrich_activities.py

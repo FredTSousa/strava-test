@@ -27,81 +27,74 @@ def get_valid_access_token():
         "grant_type": "refresh_token",
         "refresh_token": INITIAL_REFRESH_TOKEN
     }
-    res = requests.post(url, data=payload)
+    res = requests.post(url, data=payload, timeout=30)
     if res.status_code == 200:
         return res.json().get("access_token")
     else:
         raise Exception(f"Failed to refresh token: {res.text}")
 
 def sync_club_feed():
-    try:
-        access_token = get_valid_access_token()
-    except Exception as e:
-        print(e)
-        return
-
-    headers = {"Authorization": f"Bearer {access_token}"}
-    
-    # 🔄 VARIÁVEIS DE PAGINAÇÃO
-    page = 1
-    per_page = 100  # 100 é o limite recomendado por página pelo Strava para estabilidade
-    
+    # 🟢 Fonte trocada da API oficial (bloqueada pela Strava) para a tabela
+    # 'atividades_clube', já alimentada pelo crawler (strava_keep_alive.py).
     new_items_count = 0
     duplicate_items_count = 0
     failed_items_count = 0
 
-    print("Starting deep sync of club feed from Strava...")
+    print("Starting sync of club feed from atividades_clube (crawler-sourced) into strava_raw_feed...")
+
+    page_size = 500
+    offset = 0
 
     while True:
-        url = f"https://www.strava.com/api/v3/clubs/{CLUB_ID}/activities"
-        params = {"page": page, "per_page": per_page}
-        
-        print(f"📡 Fetching page {page}...")
-        res = requests.get(url, headers=headers, params=params)
-        
-        if res.status_code != 200:
-            print(f"Strava API Error on page {page}: {res.status_code}")
+        res = supabase.table("atividades_clube").select("*").range(offset, offset + page_size - 1).execute()
+        rows = res.data or []
+
+        if not rows:
+            print("Reached the end of atividades_clube.")
             break
 
-        activities = res.json()
-        
-        # 🏁 CONDIÇÃO DE PARAGEM DA API: Se a página vier vazia, terminámos o feed!
-        if not activities or len(activities) == 0:
-            print("Reached the end of the Strava club feed.")
-            break
+        print(f"Processing {len(rows)} activities from atividades_clube (offset {offset})...")
 
-        print(f"Processing {len(activities)} activities from page {page}...")
-
-        for act in activities:
+        for row in rows:
             # Build the virtual fingerprint
-            firstname = act.get('athlete', {}).get('firstname', '')
-            lastname = act.get('athlete', {}).get('lastname', '')
+            firstname = row.get('first_name') or ''
+            athlete_name = row.get('athlete_name') or ''
+            lastname = athlete_name[len(firstname):].strip() if firstname and athlete_name.startswith(firstname) else athlete_name
             atleta = f"{firstname}_{lastname}"
-            titulo = act.get('name', '')
-            distancia = str(act.get('distance', 0))
-            tempo = str(act.get('moving_time', 0))
-            elevacao = str(act.get('total_elevation_gain', 0))
-            
+            titulo = row.get('activity_name') or ''
+            # Crawler stores distance in km and doesn't expose elevation gain, unlike the official API.
+            distancia = str((row.get('distance') or 0) * 1000)
+            tempo = str(row.get('elapsed_time') or 0)
+            elevacao = "0"
+
             string_unica = f"{atleta}_{titulo}_{distancia}_{tempo}_{elevacao}"
             id_virtual = hashlib.md5(string_unica.encode('utf-8')).hexdigest()
 
             payload = {
                 "id_virtual": id_virtual,
-                "raw_json": act 
+                "raw_json": {
+                    "activity_id": row.get('activity_id'),
+                    "name": titulo,
+                    "distance": float(distancia),
+                    "moving_time": row.get('elapsed_time') or 0,
+                    "total_elevation_gain": 0,
+                    "start_date": row.get('start_date'),
+                    "athlete": {"firstname": firstname, "lastname": lastname},
+                },
             }
-            
+
             # 🚀 TENTATIVA DIRETA DE INSERÇÃO
             try:
                 supabase.table("strava_raw_feed").insert(payload).execute()
                 new_items_count += 1
                 print(f"  [NEW] Saved: '{titulo}' ({firstname})")
-                
+
             except APIError as db_err:
                 # Se o erro for 23505 (Chave Duplicada), ignoramos em silêncio e CONTINUAMOS o loop!
                 if db_err.code == "23505":
                     duplicate_items_count += 1
                     continue
-                
+
                 # Qualquer outro erro real (ex: crash de triggers, etc.) entra aqui para auditoria
                 failed_items_count += 1
                 print("\n" + "="*60)
@@ -111,14 +104,17 @@ def sync_club_feed():
                 print(f"  Atividade: '{titulo}' de {firstname}")
                 print("="*60 + "\n")
                 continue
-                
+
             except Exception as general_err:
                 failed_items_count += 1
                 print(f"Unexpected Python Error: {general_err}")
                 continue
 
-        # Avança para a página seguinte do Strava
-        page += 1
+        if len(rows) < page_size:
+            print("Reached the end of atividades_clube.")
+            break
+
+        offset += page_size
 
     print("\n" + "═"*40)
     print("🏁 SYNC PROCESS COMPLETE")

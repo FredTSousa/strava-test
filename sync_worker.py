@@ -61,15 +61,22 @@ def run_batch_sync():
 
             # Puxar dados brutos da View do Supabase
             resposta_view = supabase.table("view_strava_activities") \
-                .select("raw_json") \
+                .select("raw_json, enriched") \
                 .eq("id_virtual", id_virtual) \
                 .single() \
                 .execute()
-            
+
             if not resposta_view.data:
                 print(f"⚠️ Warning: Raw JSON not found for activity {id_virtual}. Skipping...")
                 continue
-                
+
+            # 🟢 Só sincroniza para o Firestore depois do crawler enriquecer a atividade
+            # (caso contrário fica a elevação a 0 gravada permanentemente, já que este
+            # registo é marcado como sincronizado e nunca mais é revisitado).
+            if not resposta_view.data.get("enriched"):
+                print(f"⏳ Activity {id_virtual} not yet enriched. Skipping until next run.")
+                continue
+
             raw = resposta_view.data.get("raw_json", {})
             if not raw:
                 print(f"⚠️ Warning: raw_json field is empty for activity {id_virtual}. Skipping...")

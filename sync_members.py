@@ -21,7 +21,7 @@ def sync_club_members():
     strava_members = []
     page = 1
     while True:
-        res = requests.get(url, headers=headers, params={"page": page, "per_page": 200})
+        res = requests.get(url, headers=headers, params={"page": page, "per_page": 200}, timeout=30)
         data = res.json()
         if not data:
             break

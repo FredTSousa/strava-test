@@ -61,7 +61,8 @@ def extract_activity_detail(html: str):
     # more than once (e.g. a later no-op call with just adjusting_elevation/map_start_index),
     # so pick whichever match actually has the fields we need instead of just the first one.
     blocks = re.findall(r"pageView\.activity\(\)\.set\(\{(.*?)\}\);", html, re.S)
-    block = next((b for b in blocks if "distance:" in b and "elev_gain:" in b and "moving_time:" in b), None)
+    # elev_gain is absent on trainer/indoor activities, so it can't be a required marker here.
+    block = next((b for b in blocks if "distance:" in b and "moving_time:" in b), None)
     if not block:
         return None
 
@@ -80,8 +81,12 @@ def extract_activity_detail(html: str):
     elev_gain = num("elev_gain")
     moving_time = num("moving_time")
 
-    if distance is None or elev_gain is None or moving_time is None:
+    if distance is None or moving_time is None:
         return None
+
+    # 🟢 Strava omite elev_gain para atividades de trainer/indoor (não há elevação real).
+    if elev_gain is None:
+        elev_gain = 0.0
 
     title = text("title", lightbox)
     firstname = text("athlete_firstname", lightbox)

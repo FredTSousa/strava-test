@@ -10,6 +10,7 @@ load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+CLUB_ID = os.getenv("STRAVA_CLUB_ID")
 BATCH_SIZE = int(os.getenv("ENRICH_BATCH_SIZE", "20"))
 # 🟢 No need to burn requests enriching the pre-crawler backlog; only activities from this date onward matter.
 MIN_START_DATE = os.getenv("ENRICH_MIN_START_DATE", "2026-06-30")
@@ -29,17 +30,25 @@ def update_cookie_in_supabase(novo_cookie: str):
 
 
 def build_session(cookie: str):
-    session = curl_requests.Session(impersonate="chrome120")
+    # 🟢 Cabeçalhos copiados de uma requisição real (Postman) para /activities/{id},
+    # trocando apenas o cookie pelo guardado na DB. chrome146 é o perfil mais próximo
+    # do Chrome 149 real disponível no curl_cffi instalado.
+    session = curl_requests.Session(impersonate="chrome146")
     session.headers.update({
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "accept-language": "en-US,pt-PT;q=0.9,pt;q=0.8",
-        "referer": "https://www.strava.com/dashboard",
-        "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "accept-language": "pt-PT,pt;q=0.9,en-PT;q=0.8,en-GB;q=0.7,en-US;q=0.6,en;q=0.5",
+        "cache-control": "max-age=0",
+        "priority": "u=0, i",
+        "referer": f"https://www.strava.com/clubs/{CLUB_ID}/recent_activity?num_entries=60",
+        "sec-ch-ua": '"Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"',
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": '"Windows"',
         "sec-fetch-dest": "document",
         "sec-fetch-mode": "navigate",
         "sec-fetch-site": "same-origin",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
         "Cookie": cookie,
     })
     return session

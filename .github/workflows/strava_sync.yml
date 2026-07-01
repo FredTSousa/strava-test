@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install requests python-dotenv supabase firebase-admin
+          pip install requests python-dotenv supabase firebase-admin curl_cffi
 
       # 🟢 PASSO 1: Puxa as atividades (agora via crawler/atividades_clube, já não depende da API oficial)
       - name: Run Strava Activities Sync
@@ -29,15 +29,25 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: python cron_sync.py
 
-      # 🟢 PASSO 2: Espelha os treinos atribuídos para o Firestore
-      - name: Run Workouts Sync to Firestore
+      # 🟢 PASSO 2: Enriquece as atividades novas (elevação, etc.) visitando cada uma uma única vez
+      - name: Run Activity Enrichment
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: python sync_worker.py
+          ENRICH_BATCH_SIZE: "20"
+        run: python enrich_activities.py
 
-      # 🟢 PASSO 3: Sincroniza os membros do Clube (ainda depende da API oficial da Strava - bloqueada).
+      # 🟢 PASSO 3 (temporariamente desligado): Espelha os treinos atribuídos para o Firestore.
+      # Desligado de propósito para conferir os dados importados pelo novo código antes de deixar
+      # o Firestore recebê-los.
+      # - name: Run Workouts Sync to Firestore
+      #   env:
+      #     SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      #     SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      #     FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      #   run: python sync_worker.py
+
+      # 🟢 PASSO 4: Sincroniza os membros do Clube (ainda depende da API oficial da Strava - bloqueada).
       # Colocado por último de propósito: se falhar, não impede os passos acima de correr.
       - name: Run Members Sync Script
         env:

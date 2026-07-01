@@ -57,11 +57,13 @@ def build_session(cookie: str):
 
 def extract_activity_detail(html: str):
     # 🟢 Strava embeds the real stats server-side as a plain JS object literal
-    # (not JSON, not a separate API call) in these two <script> blocks.
-    set_match = re.search(r"pageView\.activity\(\)\.set\(\{(.*?)\}\);", html, re.S)
-    if not set_match:
+    # (not JSON, not a separate API call). Some pages call pageView.activity().set(...)
+    # more than once (e.g. a later no-op call with just adjusting_elevation/map_start_index),
+    # so pick whichever match actually has the fields we need instead of just the first one.
+    blocks = re.findall(r"pageView\.activity\(\)\.set\(\{(.*?)\}\);", html, re.S)
+    block = next((b for b in blocks if "distance:" in b and "elev_gain:" in b and "moving_time:" in b), None)
+    if not block:
         return None
-    block = set_match.group(1)
 
     def num(key):
         m = re.search(rf"\b{key}:\s*([\d.]+)", block)

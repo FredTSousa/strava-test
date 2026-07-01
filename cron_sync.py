@@ -145,8 +145,13 @@ def sync_club_feed():
         offset += page_size
 
     if max_activity_id_seen > last_synced_id:
-        set_last_synced_activity_id(max_activity_id_seen)
-        print(f"Watermark advanced to activity_id {max_activity_id_seen}.")
+        try:
+            set_last_synced_activity_id(max_activity_id_seen)
+            print(f"Watermark advanced to activity_id {max_activity_id_seen}.")
+        except Exception as watermark_err:
+            # Não deixar uma falha ao gravar o watermark derrubar o run inteiro:
+            # as atividades já foram guardadas em strava_raw_feed nesta altura.
+            print(f"⚠️ Warning: failed to persist watermark: {watermark_err}")
 
     print("\n" + "═"*40)
     print("🏁 SYNC PROCESS COMPLETE")

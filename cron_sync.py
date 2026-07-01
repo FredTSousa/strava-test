@@ -14,6 +14,8 @@ CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
 CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
 INITIAL_REFRESH_TOKEN = os.getenv("STRAVA_REFRESH_TOKEN")
 CLUB_ID = os.getenv("STRAVA_CLUB_ID")
+# 🟢 Nunca sincronizar atividades anteriores a esta data, independentemente do watermark.
+MIN_START_DATE = os.getenv("CRON_SYNC_MIN_START_DATE", "2026-06-30")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -33,27 +35,49 @@ def get_valid_access_token():
     else:
         raise Exception(f"Failed to refresh token: {res.text}")
 
+def get_last_synced_activity_id():
+    res = supabase.table("system_config").select("value").eq("key", "cron_sync_last_activity_id").execute()
+    if res.data:
+        return int(res.data[0]["value"])
+    return 0
+
+
+def set_last_synced_activity_id(activity_id):
+    supabase.table("system_config").upsert({"key": "cron_sync_last_activity_id", "value": str(activity_id)}).execute()
+
+
 def sync_club_feed():
     # 🟢 Fonte trocada da API oficial (bloqueada pela Strava) para a tabela
     # 'atividades_clube', já alimentada pelo crawler (strava_keep_alive.py).
+    # Usa um watermark de activity_id para não reprocessar a tabela toda em cada run
+    # (senão fica cada vez mais lento à medida que atividades_clube cresce).
     new_items_count = 0
     duplicate_items_count = 0
     failed_items_count = 0
 
-    print("Starting sync of club feed from atividades_clube (crawler-sourced) into strava_raw_feed...")
+    last_synced_id = get_last_synced_activity_id()
+    max_activity_id_seen = last_synced_id
+
+    print(f"Starting sync of club feed from atividades_clube (activity_id > {last_synced_id}) into strava_raw_feed...")
 
     page_size = 500
     offset = 0
 
     while True:
-        res = supabase.table("atividades_clube").select("*").range(offset, offset + page_size - 1).execute()
+        res = supabase.table("atividades_clube") \
+            .select("*") \
+            .gt("activity_id", last_synced_id) \
+            .gte("start_date", MIN_START_DATE) \
+            .order("activity_id") \
+            .range(offset, offset + page_size - 1) \
+            .execute()
         rows = res.data or []
 
         if not rows:
-            print("Reached the end of atividades_clube.")
+            print("No new activities since last sync.")
             break
 
-        print(f"Processing {len(rows)} activities from atividades_clube (offset {offset})...")
+        print(f"Processing {len(rows)} new activities from atividades_clube (offset {offset})...")
 
         for row in rows:
             # Build the virtual fingerprint
@@ -69,6 +93,10 @@ def sync_club_feed():
 
             string_unica = f"{atleta}_{titulo}_{distancia}_{tempo}_{elevacao}"
             id_virtual = hashlib.md5(string_unica.encode('utf-8')).hexdigest()
+
+            activity_id = row.get('activity_id')
+            if activity_id and activity_id > max_activity_id_seen:
+                max_activity_id_seen = activity_id
 
             payload = {
                 "id_virtual": id_virtual,
@@ -115,6 +143,10 @@ def sync_club_feed():
             break
 
         offset += page_size
+
+    if max_activity_id_seen > last_synced_id:
+        set_last_synced_activity_id(max_activity_id_seen)
+        print(f"Watermark advanced to activity_id {max_activity_id_seen}.")
 
     print("\n" + "═"*40)
     print("🏁 SYNC PROCESS COMPLETE")

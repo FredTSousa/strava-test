@@ -38,15 +38,13 @@ jobs:
           ENRICH_BATCH_SIZE: "20"
         run: python enrich_activities.py
 
-      # 🟢 PASSO 3 (temporariamente desligado): Espelha os treinos atribuídos para o Firestore.
-      # Desligado de propósito para conferir os dados importados pelo novo código antes de deixar
-      # o Firestore recebê-los.
-      # - name: Run Workouts Sync to Firestore
-      #   env:
-      #     SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      #     SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      #     FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      #   run: python sync_worker.py
+      # 🟢 PASSO 3: Espelha os treinos atribuídos para o Firestore
+      - name: Run Workouts Sync to Firestore
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python sync_worker.py
 
       # 🟢 PASSO 4 (temporariamente desligado): Sincroniza os membros do Clube.
       # Ainda depende da API oficial da Strava (bloqueada) e continua a ficar preso/lento.

@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install requests python-dotenv supabase firebase-admin curl_cffi
+          pip install requests python-dotenv supabase firebase-admin curl_cffi beautifulsoup4
 
       # 🟢 PASSO 1: Puxa as atividades (agora via crawler/atividades_clube, já não depende da API oficial)
       - name: Run Strava Activities Sync
@@ -46,15 +46,10 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: python sync_worker.py
 
-      # 🟢 PASSO 4 (temporariamente desligado): Sincroniza os membros do Clube.
-      # Ainda depende da API oficial da Strava (bloqueada) e continua a ficar preso/lento.
-      # Desligado até resolvermos isto -- reordenar para último já não chegava.
-      # - name: Run Members Sync Script
-      #   env:
-      #     SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      #     SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      #     STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
-      #     STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
-      #     STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
-      #     STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
-      #   run: python sync_members.py
+      # 🟢 PASSO 4: Sincroniza os membros do Clube (agora via crawler, já não depende da API oficial)
+      - name: Run Members Sync Script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
+        run: python sync_members.py

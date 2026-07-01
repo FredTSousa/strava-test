@@ -17,14 +17,11 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install requests python-dotenv supabase
+          pip install python-dotenv supabase curl_cffi beautifulsoup4
 
       - name: Run Members Sync Script
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
-          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
-          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
           STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
         run: python sync_members.py

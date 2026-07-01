@@ -25,5 +25,6 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
           ENRICH_BATCH_SIZE: "3"
         run: python enrich_activities.py

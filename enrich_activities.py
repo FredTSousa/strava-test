@@ -170,76 +170,90 @@ def record_enrichment(id_virtual: str, status: str, detail=None):
 
 
 def enrich_pending_activities():
-    print(f"Looking for up to {BATCH_SIZE} not-yet-enriched activities...")
+    # 🟢 Corre em lotes de BATCH_SIZE até esgotar tudo o que ainda não foi tentado
+    # (ou até o cookie expirar), em vez de parar depois de um único lote.
+    permanently_processed_ids = get_processed_id_virtuals()
+    attempted_this_run = set()
 
-    processed_ids = get_processed_id_virtuals()
-    rows = fetch_candidates(processed_ids, BATCH_SIZE)
+    total_enriched = 0
+    total_skipped = 0
+    stop = False
 
-    if not rows:
-        print("Nothing to enrich.")
-        return
+    while not stop:
+        exclude_ids = permanently_processed_ids | attempted_this_run
+        rows = fetch_candidates(exclude_ids, BATCH_SIZE)
 
-    cookie = get_current_cookie()
-    session = build_session(cookie)
-
-    enriched_count = 0
-    skipped_count = 0
-
-    for i, row in enumerate(rows):
-        id_virtual = row["id_virtual"]
-        raw_json = row.get("raw_json") or {}
-        activity_id = raw_json.get("activity_id")
-
-        if not activity_id:
-            print(f"  [SKIP] {id_virtual} has no activity_id stored, recording as permanently unenrichable.")
-            record_enrichment(id_virtual, "no_activity_id")
-            skipped_count += 1
-            continue
-
-        if i > 0:
-            delay = random.uniform(5, 7)
-            print(f"  Waiting {delay:.1f}s before next visit...")
-            time.sleep(delay)
-
-        url = f"https://www.strava.com/activities/{activity_id}"
-        print(f"  Visiting activity {activity_id}...")
-
-        try:
-            response = session.get(url, allow_redirects=False, timeout=30)
-        except Exception as req_err:
-            print(f"  Request failed for activity {activity_id}: {req_err}")
-            skipped_count += 1
-            continue
-
-        if response.status_code in (301, 302):
-            print("  Redirected (cookie likely expired). Stopping this run.")
+        if not rows:
+            print("Nothing left to enrich.")
             break
 
-        if response.status_code != 200:
-            print(f"  Unexpected status {response.status_code} for activity {activity_id}. Skipping.")
-            skipped_count += 1
-            continue
+        print(f"Processing a batch of {len(rows)} activities...")
+        cookie = get_current_cookie()
+        session = build_session(cookie)
 
-        detail = extract_activity_detail(response.text)
-        if not detail:
-            print(f"  Could not parse activity {activity_id} (may be private/group/removed). Recording as unparseable.")
-            record_enrichment(id_virtual, "unparseable")
-            skipped_count += 1
-            continue
+        for i, row in enumerate(rows):
+            id_virtual = row["id_virtual"]
+            # Marca já como tentada nesta run, quer corra bem quer não --
+            # evita reprocessar o mesmo item várias vezes na mesma run se ele falhar.
+            attempted_this_run.add(id_virtual)
 
-        record_enrichment(id_virtual, "enriched", detail)
+            raw_json = row.get("raw_json") or {}
+            activity_id = raw_json.get("activity_id")
 
-        print(f"  [ENRICHED] {id_virtual} -> elev_gain={detail['elev_gain']}m")
-        enriched_count += 1
+            if not activity_id:
+                print(f"  [SKIP] {id_virtual} has no activity_id stored, recording as permanently unenrichable.")
+                record_enrichment(id_virtual, "no_activity_id")
+                permanently_processed_ids.add(id_virtual)
+                total_skipped += 1
+                continue
 
-        novo_cookie_cookies = session.cookies.get_dict()
-        if novo_cookie_cookies.get("_strava4_session"):
-            novo_cookie = f"_strava4_session={novo_cookie_cookies['_strava4_session']};"
-            if novo_cookie != cookie:
-                update_cookie_in_supabase(novo_cookie)
-                cookie = novo_cookie
+            if i > 0:
+                delay = random.uniform(5, 7)
+                print(f"  Waiting {delay:.1f}s before next visit...")
+                time.sleep(delay)
 
-    print(f"Done. Enriched: {enriched_count}, Skipped: {skipped_count}")
+            url = f"https://www.strava.com/activities/{activity_id}"
+            print(f"  Visiting activity {activity_id}...")
+
+            try:
+                response = session.get(url, allow_redirects=False, timeout=30)
+            except Exception as req_err:
+                print(f"  Request failed for activity {activity_id}: {req_err} (will retry on a future run)")
+                total_skipped += 1
+                continue
+
+            if response.status_code in (301, 302):
+                print("  Redirected (cookie likely expired). Stopping.")
+                stop = True
+                break
+
+            if response.status_code != 200:
+                print(f"  Unexpected status {response.status_code} for activity {activity_id}. Skipping.")
+                total_skipped += 1
+                continue
+
+            detail = extract_activity_detail(response.text)
+            if not detail:
+                print(f"  Could not parse activity {activity_id} (may be private/group/removed). Recording as unparseable.")
+                record_enrichment(id_virtual, "unparseable")
+                permanently_processed_ids.add(id_virtual)
+                total_skipped += 1
+                continue
+
+            record_enrichment(id_virtual, "enriched", detail)
+            permanently_processed_ids.add(id_virtual)
+
+            print(f"  [ENRICHED] {id_virtual} -> elev_gain={detail['elev_gain']}m")
+            total_enriched += 1
+
+            novo_cookie_cookies = session.cookies.get_dict()
+            if novo_cookie_cookies.get("_strava4_session"):
+                novo_cookie = f"_strava4_session={novo_cookie_cookies['_strava4_session']};"
+                if novo_cookie != cookie:
+                    update_cookie_in_supabase(novo_cookie)
+                    cookie = novo_cookie
+
+    print(f"Done. Enriched: {total_enriched}, Skipped: {total_skipped}")
 
 
 if __name__ == "__main__":

@@ -61,7 +61,7 @@ def run_batch_sync():
 
             # Puxar dados brutos da View do Supabase
             resposta_view = supabase.table("view_strava_activities") \
-                .select("raw_json, enriched, enriched_distance, enriched_moving_time, enriched_elevation_gain, enriched_name") \
+                .select("raw_json, enriched, enriched_distance, enriched_moving_time, enriched_elevation_gain, enriched_name, enriched_sport_type") \
                 .eq("id_virtual", id_virtual) \
                 .single() \
                 .execute()
@@ -90,9 +90,10 @@ def run_batch_sync():
             segundos = moving_seconds % 60
             dur_min = round(moving_seconds / 60)
 
-            # Mapeamento do tipo de desporto
+            # Mapeamento do tipo de desporto (só existe depois de enriquecido -- o feed do
+            # clube nunca expôs isto, por isso raw.get("sport_type") nunca funcionou aqui)
             tipo = "outro"
-            sport_type = raw.get("sport_type")
+            sport_type = resposta_view.data.get("enriched_sport_type")
             if sport_type == "Run":
                 tipo = "corrida"
             elif sport_type == "TrailRun":

@@ -88,6 +88,11 @@ def extract_activity_detail(html: str):
     full_name = text("athlete_name", lightbox)
     lastname = full_name[len(firstname):].strip() if firstname and full_name and full_name.startswith(firstname) else full_name
 
+    # 🟢 O tipo de desporto (Run/Ride/etc.) só existe na página da atividade, nunca no feed do clube.
+    sport_type_match = re.search(r"Strava\.Labs\.Activities\.Pages\.\w+PageView\(\d+,\s*'([^']+)'", html)
+    sport_type = sport_type_match.group(1) if sport_type_match else None
+    workout_type = int(num("workout_type")) if num("workout_type") is not None else None
+
     return {
         "distance": distance,
         "elev_gain": elev_gain,
@@ -95,6 +100,8 @@ def extract_activity_detail(html: str):
         "title": title,
         "firstname": firstname,
         "lastname": lastname,
+        "sport_type": sport_type,
+        "workout_type": workout_type,
     }
 
 
@@ -157,6 +164,8 @@ def record_enrichment(id_virtual: str, status: str, detail=None):
             "name": detail["title"],
             "athlete_firstname": detail["firstname"],
             "athlete_lastname": detail["lastname"],
+            "sport_type": detail["sport_type"],
+            "workout_type": detail["workout_type"],
         })
 
     try:

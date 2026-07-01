@@ -105,8 +105,10 @@ def sync_club_feed():
                     "name": titulo,
                     "distance": float(distancia),
                     "moving_time": row.get('elapsed_time') or 0,
+                    "elapsed_time": row.get('elapsed_time') or 0,
                     "total_elevation_gain": 0,
                     "start_date": row.get('start_date'),
+                    "device_name": row.get('device_name'),
                     "athlete": {"firstname": firstname, "lastname": lastname},
                 },
             }

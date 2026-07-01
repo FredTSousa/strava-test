@@ -61,7 +61,7 @@ def run_batch_sync():
 
             # Puxar dados brutos da View do Supabase
             resposta_view = supabase.table("view_strava_activities") \
-                .select("raw_json, enriched") \
+                .select("raw_json, enriched, enriched_distance, enriched_moving_time, enriched_elevation_gain, enriched_name") \
                 .eq("id_virtual", id_virtual) \
                 .single() \
                 .execute()
@@ -71,8 +71,8 @@ def run_batch_sync():
                 continue
 
             # 🟢 Só sincroniza para o Firestore depois do crawler enriquecer a atividade
-            # (caso contrário fica a elevação a 0 gravada permanentemente, já que este
-            # registo é marcado como sincronizado e nunca mais é revisitado).
+            # (strava_raw_feed é write-once, por isso o resultado do enriquecimento vive
+            # em strava_activity_enrichment, não no próprio raw_feed).
             if not resposta_view.data.get("enriched"):
                 print(f"⏳ Activity {id_virtual} not yet enriched. Skipping until next run.")
                 continue
@@ -82,14 +82,14 @@ def run_batch_sync():
                 print(f"⚠️ Warning: raw_json field is empty for activity {id_virtual}. Skipping...")
                 continue
 
-            moving_seconds = raw.get("moving_time", 0)
-            
+            moving_seconds = resposta_view.data.get("enriched_moving_time") or 0
+
             # Cálculos de tempo para o teu modelo Firestore
             horas = moving_seconds // 3600
             minutos = (moving_seconds % 3600) // 60
             segundos = moving_seconds % 60
             dur_min = round(moving_seconds / 60)
-            
+
             # Mapeamento do tipo de desporto
             tipo = "outro"
             sport_type = raw.get("sport_type")
@@ -103,12 +103,12 @@ def run_batch_sync():
                 "criadoEm": firestore.SERVER_TIMESTAMP,
                 "data": raw.get("start_date"),
                 "durMin": dur_min,
-                "elev": round(raw.get("total_elevation_gain", 0)),
-                "km": round((raw.get("distance", 0) / 1000), 2),
+                "elev": round(resposta_view.data.get("enriched_elevation_gain") or 0),
+                "km": round((resposta_view.data.get("enriched_distance") or 0) / 1000, 2),
                 "horas": horas,
                 "minutos": minutos,
                 "segundos": segundos,
-                "nome": raw.get("name", "Treino Sem Nome"),
+                "nome": resposta_view.data.get("enriched_name") or raw.get("name", "Treino Sem Nome"),
                 "tipo": tipo,
                 "externalId": id_virtual,
                 "status": "draft"  # Mantém a regra de rascunho

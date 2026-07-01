@@ -4,6 +4,7 @@ import random
 import time
 from dotenv import load_dotenv
 from supabase import create_client, Client
+from postgrest.exceptions import APIError
 from curl_cffi import requests as curl_requests
 
 load_dotenv()
@@ -95,17 +96,83 @@ def extract_activity_detail(html: str):
     }
 
 
+def get_processed_id_virtuals() -> set:
+    # 🟢 strava_raw_feed é write-once (trigger de DB impede update/delete), por isso os
+    # resultados do enriquecimento vivem numa tabela à parte, nunca no próprio raw_feed.
+    processed = set()
+    page_size = 1000
+    offset = 0
+    while True:
+        res = supabase.table("strava_activity_enrichment") \
+            .select("id_virtual") \
+            .range(offset, offset + page_size - 1) \
+            .execute()
+        rows = res.data or []
+        if not rows:
+            break
+        processed.update(r["id_virtual"] for r in rows)
+        if len(rows) < page_size:
+            break
+        offset += page_size
+    return processed
+
+
+def fetch_candidates(processed_ids: set, batch_size: int):
+    candidates = []
+    page_size = 500
+    offset = 0
+    while len(candidates) < batch_size:
+        res = supabase.table("strava_raw_feed") \
+            .select("id_virtual, raw_json") \
+            .gte("raw_json->>start_date", MIN_START_DATE) \
+            .order("fetched_at") \
+            .range(offset, offset + page_size - 1) \
+            .execute()
+        rows = res.data or []
+        if not rows:
+            break
+
+        for row in rows:
+            if row["id_virtual"] not in processed_ids:
+                candidates.append(row)
+                if len(candidates) >= batch_size:
+                    break
+
+        if len(rows) < page_size:
+            break
+        offset += page_size
+
+    return candidates
+
+
+def record_enrichment(id_virtual: str, status: str, detail=None):
+    payload = {"id_virtual": id_virtual, "status": status}
+    if detail:
+        payload.update({
+            "distance": detail["distance"],
+            "moving_time": detail["moving_time"],
+            "total_elevation_gain": detail["elev_gain"],
+            "name": detail["title"],
+            "athlete_firstname": detail["firstname"],
+            "athlete_lastname": detail["lastname"],
+        })
+
+    try:
+        supabase.table("strava_activity_enrichment").insert(payload).execute()
+    except APIError as db_err:
+        if db_err.code == "23505":
+            # Já foi registado por outro run em paralelo -- nada a fazer.
+            print(f"  {id_virtual} already recorded, skipping insert.")
+            return
+        raise
+
+
 def enrich_pending_activities():
     print(f"Looking for up to {BATCH_SIZE} not-yet-enriched activities...")
 
-    res = supabase.table("strava_raw_feed") \
-        .select("id_virtual, raw_json") \
-        .eq("enriched", False) \
-        .gte("raw_json->>start_date", MIN_START_DATE) \
-        .limit(BATCH_SIZE) \
-        .execute()
+    processed_ids = get_processed_id_virtuals()
+    rows = fetch_candidates(processed_ids, BATCH_SIZE)
 
-    rows = res.data or []
     if not rows:
         print("Nothing to enrich.")
         return
@@ -122,8 +189,8 @@ def enrich_pending_activities():
         activity_id = raw_json.get("activity_id")
 
         if not activity_id:
-            print(f"  [SKIP] {id_virtual} has no activity_id stored, marking enriched to avoid retrying forever.")
-            supabase.table("strava_raw_feed").update({"enriched": True}).eq("id_virtual", id_virtual).execute()
+            print(f"  [SKIP] {id_virtual} has no activity_id stored, recording as permanently unenrichable.")
+            record_enrichment(id_virtual, "no_activity_id")
             skipped_count += 1
             continue
 
@@ -153,28 +220,12 @@ def enrich_pending_activities():
 
         detail = extract_activity_detail(response.text)
         if not detail:
-            print(f"  Could not parse activity {activity_id} (may be private/group/removed). Marking enriched to avoid retrying forever.")
-            supabase.table("strava_raw_feed").update({"enriched": True}).eq("id_virtual", id_virtual).execute()
+            print(f"  Could not parse activity {activity_id} (may be private/group/removed). Recording as unparseable.")
+            record_enrichment(id_virtual, "unparseable")
             skipped_count += 1
             continue
 
-        existing_athlete = raw_json.get("athlete") or {}
-        merged_raw_json = dict(raw_json)
-        merged_raw_json.update({
-            "name": detail["title"] or merged_raw_json.get("name"),
-            "distance": detail["distance"],
-            "moving_time": detail["moving_time"],
-            "total_elevation_gain": detail["elev_gain"],
-            "athlete": {
-                "firstname": detail["firstname"] or existing_athlete.get("firstname"),
-                "lastname": detail["lastname"] or existing_athlete.get("lastname"),
-            },
-        })
-
-        supabase.table("strava_raw_feed").update({
-            "raw_json": merged_raw_json,
-            "enriched": True,
-        }).eq("id_virtual", id_virtual).execute()
+        record_enrichment(id_virtual, "enriched", detail)
 
         print(f"  [ENRICHED] {id_virtual} -> elev_gain={detail['elev_gain']}m")
         enriched_count += 1

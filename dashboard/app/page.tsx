@@ -23,11 +23,14 @@ type StravaRawFeedRow = {
   id_virtual: string;
   raw_json: StravaActivityJson;
   fetched_at: string;
-  assigned_firestore_user_id: string | null; 
+  assigned_firestore_user_id: string | null;
   synced_to_firestore: boolean;
   total_strava_club_matches?: number;
   firestore_user_athlete_id?: number | null;
-  activity_clube_id?: number | null; 
+  activity_clube_id?: number | null;
+  enriched?: boolean;
+  enriched_elevation_gain?: number | null;
+  enriched_sport_type?: string | null;
 };
 
 type ParsedActivity = {
@@ -92,10 +95,12 @@ function parseRow(row: StravaRawFeedRow): ParsedActivity {
     athleteName,
     deviceName: raw.device_name ?? "Unknown Device",
     title: raw.name ?? "Untitled",
-    sportType: raw.sport_type ?? "—",
+    // 🟢 Elevação e tipo de desporto só existem depois do enriquecimento (não vêm no feed do
+    // clube, por isso raw_json nunca os tem de verdade -- vêm da view, não do raw_json).
+    sportType: row.enriched_sport_type ?? "—",
     distanceKm: Math.round((distanceM / 1000) * 100) / 100,
     movingTimeMin: Math.round(movingSec / 60),
-    elevationGain: Math.round(raw.total_elevation_gain ?? 0),
+    elevationGain: Math.round(row.enriched_elevation_gain ?? 0),
     fetchedAt: formatImportDate(row.fetched_at),
     assignedFirestoreUserId: row.assigned_firestore_user_id, 
     isSynced: row.synced_to_firestore ?? false,
@@ -173,45 +178,43 @@ export default function DashboardPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   async function loadFeed() {
-  setLoading(true);
-  setError(null);
+    setLoading(true);
+    setError(null);
 
-  try {
-    const db = getSupabase();
-    const { data: userData, error: userError } = await db
-      .from("users_firestore")
-      .select("id, display_name, email, athlete_id")
-      .order("display_name", { ascending: true });
+    try {
+      const db = getSupabase();
+      const { data: userData, error: userError } = await db
+        .from("users_firestore")
+        .select("id, display_name, email, athlete_id")
+        .order("display_name", { ascending: true });
 
-    if (userError) throw new Error(userError.message);
-    
-    // 🟢 Keep the users map clean and untouched by activity history
-    const usersMap = (userData as FirestoreUser[]).reduce((acc, user) => {
-      acc[user.id] = { ...user };
-      return acc;
-    }, {} as Record<string, FirestoreUser>);
+      if (userError) throw new Error(userError.message);
 
-    const { data: feedData, error: queryError } = await db
-      .from("view_strava_activities") 
-      .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id") 
-      .order("fetched_at", { ascending: false });
+      // 🟢 Keep the users map clean and untouched by activity history
+      const usersMap = (userData as FirestoreUser[]).reduce((acc, user) => {
+        acc[user.id] = { ...user };
+        return acc;
+      }, {} as Record<string, FirestoreUser>);
 
-    if (queryError) throw new Error(queryError.message);
-    
-    const rawRows = feedData as StravaRawFeedRow[];
-    
-    // 🟢 DELETED THE FOREACH LOOP THAT WAS OVERWRITING USER ATHLETE_IDS 🟢
+      const { data: feedData, error: queryError } = await db
+        .from("view_strava_activities")
+        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id, enriched, enriched_elevation_gain, enriched_sport_type")
+        .order("fetched_at", { ascending: false });
 
-    setUsers(Object.values(usersMap));
-    setRows(rawRows.map(parseRow));
+      if (queryError) throw new Error(queryError.message);
 
-  } catch (e) {
-    setError(e instanceof Error ? e.message : String(e));
-    setRows([]);
-  } finally {
-    setLoading(false);
+      const rawRows = feedData as StravaRawFeedRow[];
+
+      setUsers(Object.values(usersMap));
+      setRows(rawRows.map(parseRow));
+
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   useEffect(() => {
     const db = getSupabase();

@@ -192,6 +192,11 @@ def enrich_pending_activities():
     total_enriched = 0
     total_skipped = 0
     stop = False
+    consecutive_redirects = 0
+    # 🟢 Um único redirect não significa cookie morto -- pode só ser uma atividade específica
+    # (apagada, dona ficou privada, etc.). Só paramos a run inteira se virmos vários redirects
+    # SEGUIDOS, o que é um sinal muito mais forte de que a sessão morreu de vez.
+    MAX_CONSECUTIVE_REDIRECTS = 3
 
     while not stop:
         exclude_ids = permanently_processed_ids | attempted_this_run
@@ -237,9 +242,16 @@ def enrich_pending_activities():
                 continue
 
             if response.status_code in (301, 302):
-                print("  Redirected (cookie likely expired). Stopping.")
-                stop = True
-                break
+                consecutive_redirects += 1
+                if consecutive_redirects >= MAX_CONSECUTIVE_REDIRECTS:
+                    print(f"  Redirected {consecutive_redirects}x in a row -- cookie likely expired. Stopping.")
+                    stop = True
+                    break
+                print(f"  Redirected for activity {activity_id} (may just be this activity, not the cookie). Skipping for now.")
+                total_skipped += 1
+                continue
+
+            consecutive_redirects = 0
 
             if response.status_code != 200:
                 print(f"  Unexpected status {response.status_code} for activity {activity_id}. Skipping.")

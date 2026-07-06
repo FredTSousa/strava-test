@@ -110,6 +110,14 @@ def extract_activity_detail(html: str):
     }
 
 
+def is_cookie_valid(session) -> bool:
+    # 🟢 Verificação independente da saúde da sessão, feita uma vez por lote, ANTES de
+    # visitar atividades individuais. Sem isto não há forma de distinguir "a sessão morreu"
+    # de "esta atividade específica está inacessível" só a partir de um redirect isolado.
+    response = session.get("https://www.strava.com/dashboard", allow_redirects=False, timeout=30)
+    return response.status_code == 200
+
+
 def get_processed_id_virtuals() -> set:
     # 🟢 strava_raw_feed é write-once (trigger de DB impede update/delete), por isso os
     # resultados do enriquecimento vivem numa tabela à parte, nunca no próprio raw_feed.
@@ -197,11 +205,6 @@ def enrich_pending_activities():
     total_enriched = 0
     total_skipped = 0
     stop = False
-    consecutive_redirects = 0
-    # 🟢 Um único redirect não significa cookie morto -- pode só ser uma atividade específica
-    # (apagada, dona ficou privada, etc.). Só paramos a run inteira se virmos vários redirects
-    # SEGUIDOS, o que é um sinal muito mais forte de que a sessão morreu de vez.
-    MAX_CONSECUTIVE_REDIRECTS = 3
 
     while not stop:
         exclude_ids = permanently_processed_ids | attempted_this_run
@@ -211,9 +214,14 @@ def enrich_pending_activities():
             print("Nothing left to enrich.")
             break
 
-        print(f"Processing a batch of {len(rows)} activities...")
         cookie = get_current_cookie()
         session = build_session(cookie)
+
+        if not is_cookie_valid(session):
+            print("Cookie sanity check against /dashboard failed -- session is actually dead. Stopping until it's refreshed.")
+            break
+
+        print(f"Processing a batch of {len(rows)} activities...")
 
         for i, row in enumerate(rows):
             id_virtual = row["id_virtual"]
@@ -247,16 +255,14 @@ def enrich_pending_activities():
                 continue
 
             if response.status_code in (301, 302):
-                consecutive_redirects += 1
-                if consecutive_redirects >= MAX_CONSECUTIVE_REDIRECTS:
-                    print(f"  Redirected {consecutive_redirects}x in a row -- cookie likely expired. Stopping.")
-                    stop = True
-                    break
-                print(f"  Redirected for activity {activity_id} (may just be this activity, not the cookie). Skipping for now.")
+                # 🟢 A sessão já foi confirmada válida no início deste lote, por isso um redirect
+                # aqui é sobre esta atividade especificamente (apagada, dona foi privada/desativou
+                # a conta, etc.), não sobre o cookie. Regista como permanente para não bloquear a fila.
+                print(f"  Redirected for activity {activity_id} (session is healthy, so this activity itself is inaccessible). Recording as permanently unenrichable.")
+                record_enrichment(id_virtual, "redirected")
+                permanently_processed_ids.add(id_virtual)
                 total_skipped += 1
                 continue
-
-            consecutive_redirects = 0
 
             if response.status_code != 200:
                 print(f"  Unexpected status {response.status_code} for activity {activity_id}. Skipping.")

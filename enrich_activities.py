@@ -117,8 +117,12 @@ def get_processed_id_virtuals() -> set:
     page_size = 1000
     offset = 0
     while True:
+        # 🟢 .order() é obrigatório aqui -- sem ele, o Postgres não garante uma ordem estável
+        # entre pedidos .range() sucessivos, o que já andava a saltar linhas assim que esta
+        # tabela cresceu para lá de uma página.
         res = supabase.table("strava_activity_enrichment") \
             .select("id_virtual") \
+            .order("id_virtual") \
             .range(offset, offset + page_size - 1) \
             .execute()
         rows = res.data or []
@@ -175,11 +179,12 @@ def record_enrichment(id_virtual: str, status: str, detail=None):
 
     try:
         supabase.table("strava_activity_enrichment").insert(payload).execute()
+        return True
     except APIError as db_err:
         if db_err.code == "23505":
             # Já foi registado por outro run em paralelo -- nada a fazer.
             print(f"  {id_virtual} already recorded, skipping insert.")
-            return
+            return False
         raise
 
 
@@ -266,10 +271,16 @@ def enrich_pending_activities():
                 total_skipped += 1
                 continue
 
-            record_enrichment(id_virtual, "enriched", detail)
+            was_new = record_enrichment(id_virtual, "enriched", detail)
             permanently_processed_ids.add(id_virtual)
 
-            print(f"  [ENRICHED] {id_virtual} -> elev_gain={detail['elev_gain']}m")
+            if was_new:
+                print(f"  [ENRICHED] {id_virtual} -> elev_gain={detail['elev_gain']}m")
+            else:
+                # Já estava enriquecida (visto na mesma run por causa do bug da paginação, ou
+                # por outra run em paralelo) -- não é um novo sucesso, só um pedido desperdiçado.
+                total_skipped += 1
+                continue
             total_enriched += 1
 
             novo_cookie_cookies = session.cookies.get_dict()

@@ -55,6 +55,38 @@ def build_session(cookie: str):
     return session
 
 
+def _locale_number(s: str) -> float:
+    # 🟢 pt-PT: '.' é separador de milhares, ',' é separador decimal (ex: "1.234,56").
+    return float(s.replace(".", "").replace(",", "."))
+
+
+def _parse_static_stats(html: str):
+    # 🟢 Atividades manuais/importadas de apps (ex: Runna) usam ManualPageView e nunca
+    # emitem pageView.activity().set({...}); os stats só existem na marcação estática
+    # da secção "inline-stats" / "more-stats". A ordem dos <li> é estável entre tipos
+    # de atividade: distância, depois tempo, depois ritmo/velocidade.
+    stats_match = re.search(r'<ul class="inline-stats section">(.*?)</ul>', html, re.S)
+    lis = re.findall(r"<li>(.*?)</li>", stats_match.group(1), re.S) if stats_match else []
+
+    distance = None
+    if len(lis) >= 1:
+        m = re.search(r"<strong>([\d.,]+)", lis[0])
+        if m:
+            distance = _locale_number(m.group(1)) * 1000  # km -> m
+
+    moving_time = None
+    if len(lis) >= 2:
+        m = re.search(r"<strong>([\d:]+)</strong>", lis[1])
+        if m:
+            parts = [int(p) for p in m.group(1).split(":")]
+            moving_time = parts[0] * 60 + parts[1] if len(parts) == 2 else parts[0] * 3600 + parts[1] * 60 + parts[2]
+
+    elev_match = re.search(r"Elevação\s*</div>\s*<div class=\"spans3\">\s*<strong>([\d.,]+)", html, re.S)
+    elev_gain = _locale_number(elev_match.group(1)) if elev_match else None
+
+    return distance, moving_time, elev_gain
+
+
 def extract_activity_detail(html: str):
     # 🟢 Strava embeds the real stats server-side as a plain JS object literal
     # (not JSON, not a separate API call). Some pages call pageView.activity().set(...)
@@ -63,12 +95,6 @@ def extract_activity_detail(html: str):
     blocks = re.findall(r"pageView\.activity\(\)\.set\(\{(.*?)\}\);", html, re.S)
     # elev_gain is absent on trainer/indoor activities, so it can't be a required marker here.
     block = next((b for b in blocks if "distance:" in b and "moving_time:" in b), None)
-    if not block:
-        return None
-
-    def num(key):
-        m = re.search(rf"\b{key}:\s*([\d.]+)", block)
-        return float(m.group(1)) if m else None
 
     lightbox_match = re.search(r"var lightboxData\s*=\s*\{(.*?)\}", html, re.S)
     lightbox = lightbox_match.group(1) if lightbox_match else ""
@@ -77,9 +103,22 @@ def extract_activity_detail(html: str):
         m = re.search(rf"{key}:\s*[\"']([^\"']*)[\"']", source)
         return m.group(1) if m else None
 
-    distance = num("distance")
-    elev_gain = num("elev_gain")
-    moving_time = num("moving_time")
+    if block is not None:
+        def num(key):
+            m = re.search(rf"\b{key}:\s*([\d.]+)", block)
+            return float(m.group(1)) if m else None
+
+        distance = num("distance")
+        elev_gain = num("elev_gain")
+        moving_time = num("moving_time")
+        # 🟢 O tipo de desporto (Run/Ride/etc.) só existe na página da atividade, nunca no feed do clube.
+        sport_type_match = re.search(r"Strava\.Labs\.Activities\.Pages\.\w+PageView\(\d+,\s*'([^']+)'", html)
+        sport_type = sport_type_match.group(1) if sport_type_match else None
+        workout_type = int(num("workout_type")) if num("workout_type") is not None else None
+    else:
+        distance, moving_time, elev_gain = _parse_static_stats(html)
+        sport_type = text("activity_type", lightbox)
+        workout_type = None
 
     if distance is None or moving_time is None:
         return None
@@ -92,11 +131,6 @@ def extract_activity_detail(html: str):
     firstname = text("athlete_firstname", lightbox)
     full_name = text("athlete_name", lightbox)
     lastname = full_name[len(firstname):].strip() if firstname and full_name and full_name.startswith(firstname) else full_name
-
-    # 🟢 O tipo de desporto (Run/Ride/etc.) só existe na página da atividade, nunca no feed do clube.
-    sport_type_match = re.search(r"Strava\.Labs\.Activities\.Pages\.\w+PageView\(\d+,\s*'([^']+)'", html)
-    sport_type = sport_type_match.group(1) if sport_type_match else None
-    workout_type = int(num("workout_type")) if num("workout_type") is not None else None
 
     return {
         "distance": distance,

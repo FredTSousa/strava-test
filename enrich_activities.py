@@ -305,7 +305,16 @@ def enrich_pending_activities():
 
             detail = extract_activity_detail(response.text)
             if not detail:
+                html = response.text
                 print(f"  Could not parse activity {activity_id} (may be private/group/removed). Recording as unparseable.")
+                print(
+                    f"    debug: len={len(html)} "
+                    f"has_pageview_block={'pageView.activity().set(' in html} "
+                    f"has_inline_stats={'inline-stats section' in html} "
+                    f"has_lightbox={'lightboxData' in html} "
+                    f"has_manualpageview={'ManualPageView' in html} "
+                    f"title_snippet={html[html.find('<title>'):html.find('<title>')+80]!r}"
+                )
                 record_enrichment(id_virtual, "unparseable")
                 permanently_processed_ids.add(id_virtual)
                 total_skipped += 1

@@ -65,7 +65,9 @@ def _parse_static_stats(html: str):
     # emitem pageView.activity().set({...}); os stats só existem na marcação estática
     # da secção "inline-stats" / "more-stats". A ordem dos <li> é estável entre tipos
     # de atividade: distância, depois tempo, depois ritmo/velocidade.
-    stats_match = re.search(r'<ul class="inline-stats section">(.*?)</ul>', html, re.S)
+    # 🟢 Strava's server-rendered attributes are single-quoted here (class='...'),
+    # unlike the double-quoted JS-string style used elsewhere on the page -- accept both.
+    stats_match = re.search(r"<ul class=[\"']inline-stats section[\"']>(.*?)</ul>", html, re.S)
     lis = re.findall(r"<li>(.*?)</li>", stats_match.group(1), re.S) if stats_match else []
 
     distance = None
@@ -81,7 +83,7 @@ def _parse_static_stats(html: str):
             parts = [int(p) for p in m.group(1).split(":")]
             moving_time = parts[0] * 60 + parts[1] if len(parts) == 2 else parts[0] * 3600 + parts[1] * 60 + parts[2]
 
-    elev_match = re.search(r"Elevação\s*</div>\s*<div class=\"spans3\">\s*<strong>([\d.,]+)", html, re.S)
+    elev_match = re.search(r"Elevação\s*</div>\s*<div class=[\"']spans3[\"']>\s*<strong>([\d.,]+)", html, re.S)
     elev_gain = _locale_number(elev_match.group(1)) if elev_match else None
 
     return distance, moving_time, elev_gain
@@ -305,18 +307,7 @@ def enrich_pending_activities():
 
             detail = extract_activity_detail(response.text)
             if not detail:
-                html = response.text
                 print(f"  Could not parse activity {activity_id} (may be private/group/removed). Recording as unparseable.")
-                stats_idx = html.find("inline-stats section")
-                stats_snippet = html[max(0, stats_idx - 40):stats_idx + 500] if stats_idx != -1 else ""
-                print(
-                    f"    debug: len={len(html)} "
-                    f"has_pageview_block={'pageView.activity().set(' in html} "
-                    f"has_inline_stats={'inline-stats section' in html} "
-                    f"has_lightbox={'lightboxData' in html} "
-                    f"has_manualpageview={'ManualPageView' in html}"
-                )
-                print(f"    debug stats_snippet: {stats_snippet!r}")
                 record_enrichment(id_virtual, "unparseable")
                 permanently_processed_ids.add(id_virtual)
                 total_skipped += 1

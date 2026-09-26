@@ -2,6 +2,11 @@ name: Strava only activities
 
 on:
   workflow_dispatch: # Permite que a Supabase clique no "botão" via API ou manualmente no GitHub 
+    inputs:
+      lookback_days:
+        description: "Quantos dias de atividades_clube re-verificar contra strava_raw_feed"
+        required: false
+        default: "30"
 
 jobs:
   sync_strava_pipeline:
@@ -32,4 +37,5 @@ jobs:
           STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
           STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
           STRAVA_CLUB_ID: ${{ secrets.STRAVA_CLUB_ID }}
+          CRON_SYNC_LOOKBACK_DAYS: ${{ inputs.lookback_days || '30' }}
         run: python cron_sync.py

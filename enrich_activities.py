@@ -294,7 +294,7 @@ def enrich_pending_activities():
                 # 🟢 A sessão já foi confirmada válida no início deste lote, por isso um redirect
                 # aqui é sobre esta atividade especificamente (apagada, dona foi privada/desativou
                 # a conta, etc.), não sobre o cookie. Regista como permanente para não bloquear a fila.
-                print(f"  Redirected for activity {activity_id} (session is healthy, so this activity itself is inaccessible). Recording as permanently unenrichable.")
+                print(f"  Redirected for activity {activity_id} -> {response.headers.get('Location')} (session is healthy, so this activity itself is inaccessible). Recording as permanently unenrichable.")
                 record_enrichment(id_virtual, "redirected")
                 permanently_processed_ids.add(id_virtual)
                 total_skipped += 1

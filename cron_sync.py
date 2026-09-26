@@ -1,6 +1,7 @@
 import os
 import requests
 import hashlib
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from supabase import create_client, Client
 from postgrest.exceptions import APIError
@@ -35,30 +36,47 @@ def get_valid_access_token():
     else:
         raise Exception(f"Failed to refresh token: {res.text}")
 
-def get_last_synced_activity_id():
-    res = supabase.table("system_config").select("value").eq("key", "cron_sync_last_activity_id").execute()
-    if res.data:
-        return int(res.data[0]["value"])
-    return 0
+# 🟢 Quantos dias para trás se re-verifica atividades_clube em cada run.
+LOOKBACK_DAYS = int(os.getenv("CRON_SYNC_LOOKBACK_DAYS", "30"))
 
 
-def set_last_synced_activity_id(activity_id):
-    supabase.table("system_config").upsert({"key": "cron_sync_last_activity_id", "value": str(activity_id)}).execute()
+def get_synced_activity_ids(cutoff: str) -> set:
+    """activity_ids que já estão em strava_raw_feed a partir de 'cutoff' (inclusive)."""
+    synced = set()
+    page_size = 1000
+    offset = 0
+    while True:
+        res = supabase.table("strava_raw_feed") \
+            .select("id_virtual, activity_id:raw_json->>activity_id") \
+            .gte("raw_json->>start_date", cutoff) \
+            .order("id_virtual") \
+            .range(offset, offset + page_size - 1) \
+            .execute()
+        rows = res.data or []
+        synced.update(int(r["activity_id"]) for r in rows if r.get("activity_id"))
+        if len(rows) < page_size:
+            break
+        offset += page_size
+    return synced
 
 
 def sync_club_feed():
     # 🟢 Fonte trocada da API oficial (bloqueada pela Strava) para a tabela
     # 'atividades_clube', já alimentada pelo crawler (strava_keep_alive.py).
-    # Usa um watermark de activity_id para não reprocessar a tabela toda em cada run
-    # (senão fica cada vez mais lento à medida que atividades_clube cresce).
+    # 🟢 Antes usava um watermark de activity_id (só processava activity_id > máximo já visto),
+    # mas as atividades NÃO chegam a atividades_clube por ordem de id: uma atividade que entra
+    # no feed do clube horas depois de ser carregada (ex: visibilidade/título alterados mais tarde,
+    # ou lote do crawler que falhou) já tinha o watermark à frente dela e era saltada para sempre.
+    # Agora compara-se uma janela de LOOKBACK_DAYS com o que já existe em strava_raw_feed.
     new_items_count = 0
     duplicate_items_count = 0
     failed_items_count = 0
 
-    last_synced_id = get_last_synced_activity_id()
-    max_activity_id_seen = last_synced_id
+    lookback_start = (datetime.now(timezone.utc) - timedelta(days=LOOKBACK_DAYS)).date().isoformat()
+    cutoff = max(lookback_start, MIN_START_DATE)
+    synced_ids = get_synced_activity_ids(cutoff)
 
-    print(f"Starting sync of club feed from atividades_clube (activity_id > {last_synced_id}) into strava_raw_feed...")
+    print(f"Starting sync of club feed from atividades_clube (start_date >= {cutoff}, {len(synced_ids)} already in strava_raw_feed) into strava_raw_feed...")
 
     page_size = 500
     offset = 0
@@ -66,18 +84,18 @@ def sync_club_feed():
     while True:
         res = supabase.table("atividades_clube") \
             .select("*") \
-            .gt("activity_id", last_synced_id) \
-            .gte("start_date", MIN_START_DATE) \
+            .gte("start_date", cutoff) \
             .order("activity_id") \
             .range(offset, offset + page_size - 1) \
             .execute()
-        rows = res.data or []
+        page = res.data or []
+        rows = [r for r in page if r.get("activity_id") not in synced_ids]
 
-        if not rows:
-            print("No new activities since last sync.")
+        if not page:
             break
 
-        print(f"Processing {len(rows)} new activities from atividades_clube (offset {offset})...")
+        if rows:
+            print(f"Processing {len(rows)} missing activities from atividades_clube (offset {offset})...")
 
         for row in rows:
             # Build the virtual fingerprint
@@ -93,10 +111,6 @@ def sync_club_feed():
 
             string_unica = f"{atleta}_{titulo}_{distancia}_{tempo}_{elevacao}"
             id_virtual = hashlib.md5(string_unica.encode('utf-8')).hexdigest()
-
-            activity_id = row.get('activity_id')
-            if activity_id and activity_id > max_activity_id_seen:
-                max_activity_id_seen = activity_id
 
             payload = {
                 "id_virtual": id_virtual,
@@ -140,20 +154,10 @@ def sync_club_feed():
                 print(f"Unexpected Python Error: {general_err}")
                 continue
 
-        if len(rows) < page_size:
-            print("Reached the end of atividades_clube.")
+        if len(page) < page_size:
             break
 
         offset += page_size
-
-    if max_activity_id_seen > last_synced_id:
-        try:
-            set_last_synced_activity_id(max_activity_id_seen)
-            print(f"Watermark advanced to activity_id {max_activity_id_seen}.")
-        except Exception as watermark_err:
-            # Não deixar uma falha ao gravar o watermark derrubar o run inteiro:
-            # as atividades já foram guardadas em strava_raw_feed nesta altura.
-            print(f"⚠️ Warning: failed to persist watermark: {watermark_err}")
 
     print("\n" + "═"*40)
     print("🏁 SYNC PROCESS COMPLETE")

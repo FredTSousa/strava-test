@@ -211,6 +211,9 @@ def run_gap_backfill():
             break
 
         atividades_bloco, proximo_cursor = parse_entries_block(dados_do_feed)
+        # 🟢 Um activity_id repetido no mesmo upsert faz o Postgres rejeitar a página toda (erro 21000).
+        vistos = set()
+        atividades_bloco = [a for a in atividades_bloco if not (a["activity_id"] in vistos or vistos.add(a["activity_id"]))]
         print(f"📦 Extraídas {len(atividades_bloco)} atividades desta página.")
 
         if atividades_bloco:

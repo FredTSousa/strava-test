@@ -150,6 +150,24 @@ def parse_entries_block(json_data):
         
     has_more = json_data.get("pagination", {}).get("hasMore", False)
     return bloco_atividades, ultimo_timestamp if has_more else None
+
+
+def dedupe_by_activity_id(atividades):
+    """Remove activity_ids repetidos, mantendo a primeira ocorrência (a mais recente no feed)."""
+    # 🟢 O feed pagina por updated_at, por isso uma atividade editada/com kudos entre dois
+    # pedidos (ou que aparece sozinha e dentro de um GroupActivity) vem repetida. O Postgres
+    # rejeita o upsert INTEIRO se o mesmo activity_id aparecer duas vezes no mesmo comando
+    # (erro 21000), o que deixava o crawler a não gravar nada sem falhar o workflow.
+    vistos = set()
+    unicas = []
+    for atividade in atividades:
+        if atividade["activity_id"] in vistos:
+            continue
+        vistos.add(atividade["activity_id"])
+        unicas.append(atividade)
+    return unicas
+
+
 def run_keep_alive():
     print("📡 A iniciar verificação com emulador de browser...")
     tempo_espera = random.randint(10, 180)
@@ -235,6 +253,12 @@ def run_keep_alive():
             break
 
     # 🟢 NO FINAL DOS REQUESTS: Fazemos um único Upsert massivo para o Supabase
+    total_bruto = len(todas_atividades_encontradas)
+    todas_atividades_encontradas = dedupe_by_activity_id(todas_atividades_encontradas)
+    if total_bruto != len(todas_atividades_encontradas):
+        print(f"🧹 Removidos {total_bruto - len(todas_atividades_encontradas)} activity_id repetidos entre páginas.")
+
+    upsert_falhou = False
     if len(todas_atividades_encontradas) > 0:
         try:
             print(f"\n🚀 Concluído! A enviar o total acumulado de {len(todas_atividades_encontradas)} atividades para o Supabase...")
@@ -246,6 +270,7 @@ def run_keep_alive():
             print("✅ Sincronização em massa concluída com sucesso na base de dados!")
         except Exception as e:
             print(f"❌ Erro ao fazer upsert na DB: {e}")
+            upsert_falhou = True
     else:
         print("\nℹ️ Nenhuma atividade recolhida para salvar.")
 
@@ -255,6 +280,10 @@ def run_keep_alive():
         if novo_cookie != get_current_cookie():
             update_cookie_in_supabase(novo_cookie)
             print("🔄 Cookie global renovado guardado no Supabase!")
+
+    # 🟢 Falha o workflow em vez de o deixar verde quando nada foi gravado.
+    if upsert_falhou:
+        raise SystemExit(1)
 
 if __name__ == "__main__":
     run_keep_alive()

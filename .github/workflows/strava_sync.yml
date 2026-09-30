@@ -22,6 +22,18 @@ jobs:
         run: |
           pip install requests python-dotenv supabase firebase-admin curl_cffi beautifulsoup4
 
+      # 🟢 PASSO 0: Espelha só os utilizadores novos do Firestore (incremental, barato em leituras).
+      # A janela de 48h cobre falhas de runs; o scan completo continua no sync_users.yml diário.
+      # continue-on-error: uma falha do Firebase não pode travar o sync de atividades.
+      - name: Run Incremental Firestore Users Sync
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIRESTORE_USERS_LOOKBACK_HOURS: "48"
+        run: python sync_firestore_users.py
+
       # 🟢 PASSO 1: Puxa as atividades (agora via crawler/atividades_clube, já não depende da API oficial)
       - name: Run Strava Activities Sync
         env:

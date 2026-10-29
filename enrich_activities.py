@@ -150,8 +150,11 @@ def is_cookie_valid(session) -> bool:
     # 🟢 Verificação independente da saúde da sessão, feita uma vez por lote, ANTES de
     # visitar atividades individuais. Sem isto não há forma de distinguir "a sessão morreu"
     # de "esta atividade específica está inacessível" só a partir de um redirect isolado.
-    response = session.get("https://www.strava.com/dashboard", allow_redirects=False, timeout=30)
-    return response.status_code == 200
+    # 🟢 O novo /dashboard (Next.js) devolve 302 para /dashboard?dashboard_next=1 mesmo com
+    # sessão válida -- por isso seguimos o redirect e só consideramos morta a sessão que
+    # acaba em /login, não qualquer redirect.
+    response = session.get("https://www.strava.com/dashboard", allow_redirects=True, timeout=30)
+    return response.status_code == 200 and "/login" not in response.url
 
 
 def get_processed_id_virtuals() -> set:

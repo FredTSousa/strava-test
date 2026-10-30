@@ -140,53 +140,112 @@ def fetch_existing_members_by_athlete_id():
     return {r["athlete_id"]: r for r in rows}
 
 
+def fetch_members_from_activity_feed():
+    # 🟢 A listagem paginada de membros do Strava não mostra perfis privados, e também não
+    # vai além de ~19 páginas mesmo quando o clube já passou dos 700+ membros reportados no
+    # topo da própria página -- há sempre gente invisível nesta lista. Mas quem publica uma
+    # atividade no feed do clube aparece em atividades_clube com o athlete_id real, mesmo
+    # sendo invisível na listagem de membros. Usamos isso como segunda fonte de descoberta.
+    entries_by_id = {}
+    page_size = 1000
+    offset = 0
+    while True:
+        res = supabase.table("atividades_clube") \
+            .select("athlete_id, first_name, athlete_name") \
+            .not_.is_("athlete_id", "null") \
+            .order("activity_id") \
+            .range(offset, offset + page_size - 1) \
+            .execute()
+        rows = res.data or []
+        for r in rows:
+            athlete_id = r.get("athlete_id")
+            first_name = (r.get("first_name") or "").strip()
+            athlete_name = (r.get("athlete_name") or "").strip()
+            if not athlete_id or not athlete_name:
+                continue
+            lastname = athlete_name[len(first_name):].strip() if first_name and athlete_name.startswith(first_name) else athlete_name
+            firstname = first_name or athlete_name.split(" ", 1)[0]
+            if not firstname or not lastname:
+                continue
+            entries_by_id[athlete_id] = {"name": f"{firstname} {lastname}", "athlete_id": athlete_id}
+        if len(rows) < page_size:
+            break
+        offset += page_size
+    return list(entries_by_id.values())
+
+
+def upsert_member(entry, existing_by_athlete_id):
+    athlete_id = entry["athlete_id"]
+    nome_completo = entry["name"]
+    partes = nome_completo.split(" ", 1)
+    firstname = partes[0]
+    lastname = partes[1] if len(partes) > 1 else ""
+
+    if not firstname or not lastname:
+        return None
+
+    existing = existing_by_athlete_id.get(athlete_id)
+
+    if existing is None:
+        # 🟢 athlete_id novo = pessoa nova, sem ambiguidade possível -- entra sempre validado.
+        insert_res = supabase.table("club_members").insert({
+            "firstname": firstname,
+            "lastname": lastname,
+            "athlete_id": athlete_id,
+            "is_validated": True,
+        }).execute()
+        existing_by_athlete_id[athlete_id] = {
+            "id": insert_res.data[0]["id"],
+            "firstname": firstname,
+            "lastname": lastname,
+            "athlete_id": athlete_id,
+        }
+        print(f"   ✅ Novo membro: {nome_completo} (athlete_id={athlete_id})")
+        return "created"
+
+    if existing["firstname"] != firstname or existing["lastname"] != lastname:
+        # 🟢 Mesma pessoa (mesmo athlete_id), o Strava só mudou como mostra o nome
+        # (ex: revelou o apelido completo) -- atualiza o registo em vez de clonar.
+        supabase.table("club_members").update({
+            "firstname": firstname,
+            "lastname": lastname,
+        }).eq("id", existing["id"]).execute()
+        print(f"   🔄 Nome atualizado para athlete_id={athlete_id}: '{existing['firstname']} {existing['lastname']}' -> '{nome_completo}'")
+        existing["firstname"] = firstname
+        existing["lastname"] = lastname
+        return "updated"
+
+    return None
+
+
 def sync_club_members():
     # 🟢 requer a coluna club_members.athlete_id (ver backfill_and_collapse.sql) -- sem ela
     # esta função falha ao tentar gravar/ler por athlete_id.
-    strava_members = fetch_all_members()
-    print(f"📋 Total de membros detetados no Strava: {len(strava_members)}")
-
     existing_by_athlete_id = fetch_existing_members_by_athlete_id()
     print(f"📋 Membros já identificados por athlete_id na base de dados: {len(existing_by_athlete_id)}")
 
-    updated = 0
+    strava_members = fetch_all_members()
+    print(f"📋 Total de membros detetados na listagem de membros do Strava: {len(strava_members)}")
+
     created = 0
-
+    updated = 0
     for entry in strava_members:
-        athlete_id = entry["athlete_id"]
-        nome_completo = entry["name"]
-        partes = nome_completo.split(" ", 1)
-        firstname = partes[0]
-        lastname = partes[1] if len(partes) > 1 else ""
-
-        if not firstname or not lastname:
-            continue
-
-        existing = existing_by_athlete_id.get(athlete_id)
-
-        if existing is None:
-            # 🟢 athlete_id novo = pessoa nova, sem ambiguidade possível -- entra sempre validado.
-            supabase.table("club_members").insert({
-                "firstname": firstname,
-                "lastname": lastname,
-                "athlete_id": athlete_id,
-                "is_validated": True,
-            }).execute()
+        result = upsert_member(entry, existing_by_athlete_id)
+        if result == "created":
             created += 1
-            print(f"   ✅ Novo membro: {nome_completo} (athlete_id={athlete_id})")
-            continue
-
-        if existing["firstname"] != firstname or existing["lastname"] != lastname:
-            # 🟢 Mesma pessoa (mesmo athlete_id), o Strava só mudou como mostra o nome
-            # (ex: revelou o apelido completo) -- atualiza o registo em vez de clonar.
-            supabase.table("club_members").update({
-                "firstname": firstname,
-                "lastname": lastname,
-            }).eq("id", existing["id"]).execute()
+        elif result == "updated":
             updated += 1
-            print(f"   🔄 Nome atualizado para athlete_id={athlete_id}: '{existing['firstname']} {existing['lastname']}' -> '{nome_completo}'")
 
-    print(f"🏁 Sincronização terminada. Novos: {created}, Atualizados: {updated}.")
+    activity_members = fetch_members_from_activity_feed()
+    print(f"📋 Atletas distintos vistos no feed de atividades do clube: {len(activity_members)}")
+
+    created_from_activities = 0
+    for entry in activity_members:
+        result = upsert_member(entry, existing_by_athlete_id)
+        if result == "created":
+            created_from_activities += 1
+
+    print(f"🏁 Sincronização terminada. Novos (listagem): {created}, Atualizados: {updated}, Novos (feed de atividades): {created_from_activities}.")
 
 
 if __name__ == "__main__":

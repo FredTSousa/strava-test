@@ -123,7 +123,11 @@ def sync_club_feed():
                     "total_elevation_gain": 0,
                     "start_date": row.get('start_date'),
                     "device_name": row.get('device_name'),
-                    "athlete": {"firstname": firstname, "lastname": lastname},
+                    # 🟢 atividades_clube já tem o athlete_id real (vem do feed do Strava via
+                    # strava_keep_alive.py) -- sem isto, cada atividade só carregava o nome, o
+                    # que obrigava o dashboard e a view a adivinhar por string em vez de juntar
+                    # pelo id real.
+                    "athlete": {"id": row.get('athlete_id'), "firstname": firstname, "lastname": lastname},
                 },
             }
 

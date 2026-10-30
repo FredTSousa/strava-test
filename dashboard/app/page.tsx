@@ -9,26 +9,19 @@ type StravaAthlete = {
   lastname?: string;
 };
 
-type StravaActivityJson = {
-  name?: string;
-  sport_type?: string;
-  distance?: number;
-  moving_time?: number;
-  total_elevation_gain?: number;
-  athlete?: StravaAthlete;
-  device_name?: string;
-};
-
 type StravaRawFeedRow = {
   id_virtual: string;
-  raw_json: StravaActivityJson;
+  title: string | null;
+  distance: number | null;
+  moving_time: number | null;
+  device_name: string | null;
+  athlete: StravaAthlete | null;
   fetched_at: string;
   assigned_firestore_user_id: string | null;
   synced_to_firestore: boolean;
   total_strava_club_matches?: number;
   firestore_user_athlete_id?: number | null;
   activity_clube_id?: number | null;
-  enriched?: boolean;
   enriched_elevation_gain?: number | null;
   enriched_sport_type?: string | null;
 };
@@ -80,21 +73,20 @@ function formatImportDate(isoString: string): string {
 }
 
 function parseRow(row: StravaRawFeedRow): ParsedActivity {
-  const raw = row.raw_json ?? {};
-  const athlete = raw.athlete ?? {};
+  const athlete = row.athlete ?? {};
   const first = (athlete.firstname ?? "").trim();
   const last = (athlete.lastname ?? "").trim();
   const athleteName = [first, last].filter(Boolean).join(" ") || "Unknown";
 
-  const distanceM = raw.distance ?? 0;
-  const movingSec = raw.moving_time ?? 0;
+  const distanceM = row.distance ?? 0;
+  const movingSec = row.moving_time ?? 0;
 
   return {
     idVirtual: row.id_virtual,
     athleteIdFromStrava: athlete.id ? Number(athlete.id) : null,
     athleteName,
-    deviceName: raw.device_name ?? "Unknown Device",
-    title: raw.name ?? "Untitled",
+    deviceName: row.device_name ?? "Unknown Device",
+    title: row.title ?? "Untitled",
     // 🟢 Elevação e tipo de desporto só existem depois do enriquecimento (não vêm no feed do
     // clube, por isso raw_json nunca os tem de verdade -- vêm da view, não do raw_json).
     sportType: row.enriched_sport_type ?? "—",
@@ -196,9 +188,11 @@ export default function DashboardPage() {
         return acc;
       }, {} as Record<string, FirestoreUser>);
 
+      // 🟢 Puxa só os campos do raw_json que a lista realmente usa (title/distance/moving_time/
+      // device_name/athlete), em vez do blob inteiro -- corta o payload por linha sem perder dados.
       const { data: feedData, error: queryError } = await db
         .from("view_strava_activities")
-        .select("id_virtual, raw_json, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id, enriched, enriched_elevation_gain, enriched_sport_type")
+        .select("id_virtual, title:raw_json->name, distance:raw_json->distance, moving_time:raw_json->moving_time, device_name:raw_json->device_name, athlete:raw_json->athlete, fetched_at, assigned_firestore_user_id, synced_to_firestore, total_strava_club_matches, firestore_user_athlete_id, activity_clube_id, enriched_elevation_gain, enriched_sport_type")
         .order("fetched_at", { ascending: false });
 
       if (queryError) throw new Error(queryError.message);
@@ -225,9 +219,16 @@ export default function DashboardPage() {
       if (session) loadFeed();
     });
 
-    const { data: { subscription } } = db.auth.onAuthStateChange((_event, currentSession) => {
+    const { data: { subscription } } = db.auth.onAuthStateChange((event, currentSession) => {
       setSession(currentSession);
+      // 🟢 TOKEN_REFRESHED dispara sozinho a cada ~1h com a tab aberta -- sem este filtro,
+      // isso re-descarregava a feed inteira (view_strava_activities, ~20k linhas) todas as horas.
+      if (event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION") return;
       if (currentSession) loadFeed();
+      else {
+        setRows([]);
+        setUsers([]);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -310,7 +311,15 @@ export default function DashboardPage() {
     console.log("=== 🏁 FIM DO ASSIGN MANUAL ===");
   };
 
-  const getSuggestedUsers = (athleteName: string) => {
+  const getSuggestedUsers = (athleteName: string, athleteId?: number | null) => {
+  // 🟢 Quando já sabemos o athlete_id real da atividade (Strava), é a correspondência mais
+  // fiável que existe -- substitui a adivinhação por nome sempre que já exista um user Movera
+  // ligado a esse id, em vez de depender de nome/apelido que pode ser ambíguo ou truncado.
+  if (athleteId) {
+    const byAthleteId = users.filter((user) => user.athlete_id !== null && Number(user.athlete_id) === Number(athleteId));
+    if (byAthleteId.length > 0) return byAthleteId;
+  }
+
   // 1. Limpa e normaliza o nome vindo do Strava (ex: "João M." -> "joao m")
   const normalizeAthlete = normalizeForMatch(athleteName).trim();
   const parts = normalizeAthlete.split(" ").filter(Boolean);
@@ -354,7 +363,7 @@ export default function DashboardPage() {
 
     return rows.filter((row) => {
       const hasUserChosen = !!row.assignedFirestoreUserId;
-      const suggestedUsers = getSuggestedUsers(row.athleteName);
+      const suggestedUsers = getSuggestedUsers(row.athleteName, row.firestoreUserAthleteId);
       const isMissingMoveraUser = !hasUserChosen && suggestedUsers.length === 0;
 
       if (unassignedOnlyFilter && (hasUserChosen || row.isSynced || isMissingMoveraUser)) {
@@ -495,7 +504,7 @@ export default function DashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-800/80 bg-slate-900/20">
                   {filteredRows.map((row) => {
-                    const suggestedUsers = getSuggestedUsers(row.athleteName);
+                    const suggestedUsers = getSuggestedUsers(row.athleteName, row.firestoreUserAthleteId);
                     const hasUser = !!row.assignedFirestoreUserId;
                     const associadoAoUser = users.find(u => u.id === row.assignedFirestoreUserId);
                     const targetAthleteId = row.firestoreUserAthleteId || row.athleteIdFromStrava || null;

@@ -51,6 +51,11 @@ def parse_members_page(html: str):
     # 🟢 Página server-rendered normal (não é XHR/JSON). "Administradores" e "Membros" são
     # duas secções separadas com o mesmo layout; a lista pequena na sidebar (ul.grid) é só
     # uma pré-visualização e não deve ser confundida com a lista paginada real (ul.list-athletes).
+    # 🟢 O href de cada atleta ("/athletes/<id>") expõe o athlete_id real do Strava -- é a
+    # ÚNICA identidade estável que existe aqui. O nome sozinho não chega: o Strava mostra
+    # apelidos truncados ("Magda J.") nalgumas alturas e completos ("Magda Jorge Coelho")
+    # noutras, e várias pessoas usam o mesmo nome. Sem o id, cada mudança de como o nome é
+    # mostrado parecia um membro novo e criava um clone.
     soup = BeautifulSoup(html, "html.parser")
     entries = []
 
@@ -68,8 +73,9 @@ def parse_members_page(html: str):
             if not a or "/athletes/" not in a["href"]:
                 continue
             name = a.get_text(strip=True)
-            if name:
-                entries.append(name)
+            id_match = re.search(r"/athletes/(\d+)", a["href"])
+            if name and id_match:
+                entries.append({"name": name, "athlete_id": int(id_match.group(1))})
 
     max_page = 1
     for a in soup.select("nav .pagination a[href]"):
@@ -80,11 +86,11 @@ def parse_members_page(html: str):
     return entries, max_page
 
 
-def fetch_all_member_names():
+def fetch_all_members():
     cookie = get_current_cookie()
     session = build_session(cookie)
 
-    all_names = []
+    all_entries = []
     page = 1
     max_page = 1
 
@@ -98,7 +104,7 @@ def fetch_all_member_names():
             break
 
         entries, detected_max_page = parse_members_page(response.text)
-        all_names.extend(entries)
+        all_entries.extend(entries)
 
         if page == 1:
             max_page = detected_max_page
@@ -107,21 +113,48 @@ def fetch_all_member_names():
         if page <= max_page:
             time.sleep(random.uniform(3, 5))
 
-    return all_names
+    # 🟢 Um membro pode aparecer duas vezes na mesma leitura (ex: admins listados tanto em
+    # "Administradores" como em "Membros") -- o athlete_id é que diz se é a mesma pessoa.
+    by_athlete_id = {}
+    for entry in all_entries:
+        by_athlete_id[entry["athlete_id"]] = entry
+    return list(by_athlete_id.values())
+
+
+def fetch_existing_members_by_athlete_id():
+    rows = []
+    page_size = 1000
+    offset = 0
+    while True:
+        res = supabase.table("club_members") \
+            .select("id, firstname, lastname, athlete_id") \
+            .not_.is_("athlete_id", "null") \
+            .order("id") \
+            .range(offset, offset + page_size - 1) \
+            .execute()
+        batch = res.data or []
+        rows.extend(batch)
+        if len(batch) < page_size:
+            break
+        offset += page_size
+    return {r["athlete_id"]: r for r in rows}
 
 
 def sync_club_members():
-    strava_member_names = fetch_all_member_names()
+    # 🟢 requer a coluna club_members.athlete_id (ver backfill_and_collapse.sql) -- sem ela
+    # esta função falha ao tentar gravar/ler por athlete_id.
+    strava_members = fetch_all_members()
+    print(f"📋 Total de membros detetados no Strava: {len(strava_members)}")
 
-    print(f"📋 Total de membros detetados no Strava: {len(strava_member_names)}")
+    existing_by_athlete_id = fetch_existing_members_by_athlete_id()
+    print(f"📋 Membros já identificados por athlete_id na base de dados: {len(existing_by_athlete_id)}")
 
-    # Contar as ocorrências de cada nome na lista vinda do Strava
-    strava_counts = {}
-    for nome_completo in strava_member_names:
-        strava_counts[nome_completo] = strava_counts.get(nome_completo, 0) + 1
+    updated = 0
+    created = 0
 
-    # Comparar com o Banco de Dados e inserir APENAS a diferença
-    for nome_completo, qte_no_strava in strava_counts.items():
+    for entry in strava_members:
+        athlete_id = entry["athlete_id"]
+        nome_completo = entry["name"]
         partes = nome_completo.split(" ", 1)
         firstname = partes[0]
         lastname = partes[1] if len(partes) > 1 else ""
@@ -129,39 +162,31 @@ def sync_club_members():
         if not firstname or not lastname:
             continue
 
-        # Descobrir quantos registos idênticos já existem na tabela
-        db_res = supabase.table("club_members") \
-            .select("id", count="exact") \
-            .eq("firstname", firstname) \
-            .eq("lastname", lastname) \
-            .execute()
+        existing = existing_by_athlete_id.get(athlete_id)
 
-        qte_no_db = db_res.count if db_res.count is not None else 0
+        if existing is None:
+            # 🟢 athlete_id novo = pessoa nova, sem ambiguidade possível -- entra sempre validado.
+            supabase.table("club_members").insert({
+                "firstname": firstname,
+                "lastname": lastname,
+                "athlete_id": athlete_id,
+                "is_validated": True,
+            }).execute()
+            created += 1
+            print(f"   ✅ Novo membro: {nome_completo} (athlete_id={athlete_id})")
+            continue
 
-        # 🟢 SEGUNDA BARREIRA DE SEGURANÇA: Só age se o Strava tiver MAIS do que o DB
-        if qte_no_strava > qte_no_db:
-            clones_a_criar = qte_no_strava - qte_no_db
-            print(f"⚠️ Incremento detetado para {nome_completo}: Strava ({qte_no_strava}) vs DB ({qte_no_db}). A criar {clones_a_criar} novo(s) registo(s).")
+        if existing["firstname"] != firstname or existing["lastname"] != lastname:
+            # 🟢 Mesma pessoa (mesmo athlete_id), o Strava só mudou como mostra o nome
+            # (ex: revelou o apelido completo) -- atualiza o registo em vez de clonar.
+            supabase.table("club_members").update({
+                "firstname": firstname,
+                "lastname": lastname,
+            }).eq("id", existing["id"]).execute()
+            updated += 1
+            print(f"   🔄 Nome atualizado para athlete_id={athlete_id}: '{existing['firstname']} {existing['lastname']}' -> '{nome_completo}'")
 
-            # Criamos exatamente o número de linhas em falta
-            for _ in range(clones_a_criar):
-                # Se a base de dados estava a zeros E no Strava só existe 1, é um utilizador único legítimo
-                if qte_no_db == 0 and qte_no_strava == 1:
-                    status_validacao = True
-                    print(f"   ✅ Novo membro único: {nome_completo} entra como Validado.")
-                else:
-                    # Se o DB já tinha registos, ou se o Strava enviou múltiplos de uma vez, é ambíguo
-                    status_validacao = False
-                    print(f"   🚨 Homónimo/Clone detetado: {nome_completo} entra como Pendente.")
-
-                # Inserir o novo elemento incremental
-                supabase.table("club_members").insert({
-                    "firstname": firstname,
-                    "lastname": lastname,
-                    "is_validated": status_validacao
-                }).execute()
-
-    print("🏁 Sincronização incremental terminada.")
+    print(f"🏁 Sincronização terminada. Novos: {created}, Atualizados: {updated}.")
 
 
 if __name__ == "__main__":
